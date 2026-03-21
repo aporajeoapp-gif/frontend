@@ -1,0 +1,50 @@
+[
+  {
+    "id": "1",
+    "name": "Ananya Das",
+    "role": "Community Member",
+    "image": "👩",
+    "rating": 5,
+    "text": "This platform has made it so easy to find doctors and emergency services. It's very user-friendly and reliable."
+  },
+  {
+    "id": "2",
+    "name": "Rahul Sharma",
+    "role": "Daily Commuter",
+    "image": "👨",
+    "rating": 5,
+    "text": "The bus and ferry schedules are always accurate. I can plan my daily travel without any confusion."
+  },
+  {
+    "id": "3",
+    "name": "Dr. Priya Mehta",
+    "role": "Healthcare Professional",
+    "image": "👩‍⚕️",
+    "rating": 5,
+    "text": "As a doctor, I appreciate how efficiently this platform connects patients with healthcare providers."
+  },
+  {
+    "id": "4",
+    "name": "Amit Verma",
+    "role": "Event Organizer",
+    "image": "👨‍💼",
+    "rating": 5,
+    "text": "The events feature helps us reach a wider audience. It's great for community engagement."
+  },
+  {
+    "id": "5",
+    "name": "Sneha Kapoor",
+    "role": "Student",
+    "image": "👩",
+    "rating": 4,
+    "text": "Very helpful app! I especially like the emergency contacts and transport updates."
+  },
+  {
+    "id": "6",
+    "name": "Rohit Singh",
+    "role": "Working Professional",
+    "image": "👨",
+    "rating": 5,
+    "text": "Everything is available in one place—transport, healthcare, and events. Saves a lot of time."
+  }
+]

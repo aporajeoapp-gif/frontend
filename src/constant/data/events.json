@@ -1,0 +1,102 @@
+[
+  {
+    "id": "1",
+    "name": "Community Health Camp",
+    "date": "2026-04-10",
+    "time": "10:00",
+    "location": "Eco Park, Kolkata",
+    "description": "Free health checkups and doctor consultations",
+    "photos": ["health1.jpg", "health2.jpg"],
+    "category": "Health"
+  },
+  {
+    "id": "2",
+    "name": "Youth Cricket Tournament",
+    "date": "2026-04-15",
+    "time": "14:00",
+    "location": "Salt Lake Stadium, Kolkata",
+    "description": "Cricket tournament for young players",
+    "photos": ["cricket1.jpg", "cricket2.jpg"],
+    "category": "Sports"
+  },
+  {
+    "id": "3",
+    "name": "Cultural Fest 2026",
+    "date": "2026-04-20",
+    "time": "18:00",
+    "location": "Rabindra Sadan, Kolkata",
+    "description": "Music, dance, and traditional performances",
+    "photos": ["culture1.jpg", "culture2.jpg"],
+    "category": "Culture"
+  },
+  {
+    "id": "4",
+    "name": "River Cleanup Drive",
+    "date": "2026-04-25",
+    "time": "08:00",
+    "location": "Hooghly River, Kolkata",
+    "description": "Community cleanup and environmental awareness",
+    "photos": ["cleanup1.jpg", "cleanup2.jpg"],
+    "category": "Environment"
+  },
+  {
+    "id": "5",
+    "name": "Tech Meetup Kolkata",
+    "date": "2026-05-02",
+    "time": "11:00",
+    "location": "Sector V, Salt Lake",
+    "description": "Networking event for developers and tech enthusiasts",
+    "photos": ["tech1.jpg", "tech2.jpg"],
+    "category": "Technology"
+  },
+  {
+    "id": "6",
+    "name": "Startup Pitch Event",
+    "date": "2026-05-05",
+    "time": "13:00",
+    "location": "T-Hub, Hyderabad",
+    "description": "Pitch your startup ideas to investors",
+    "photos": ["startup1.jpg", "startup2.jpg"],
+    "category": "Business"
+  },
+  {
+    "id": "7",
+    "name": "Food Festival India",
+    "date": "2026-05-10",
+    "time": "16:00",
+    "location": "JLN Stadium, Delhi",
+    "description": "Explore cuisines from across India",
+    "photos": ["food1.jpg", "food2.jpg"],
+    "category": "Food"
+  },
+  {
+    "id": "8",
+    "name": "Marathon Run 2026",
+    "date": "2026-05-15",
+    "time": "06:00",
+    "location": "Marine Drive, Mumbai",
+    "description": "Annual marathon for fitness enthusiasts",
+    "photos": ["run1.jpg", "run2.jpg"],
+    "category": "Sports"
+  },
+  {
+    "id": "9",
+    "name": "Art & Craft Exhibition",
+    "date": "2026-05-18",
+    "time": "12:00",
+    "location": "Lalit Kala Akademi, Delhi",
+    "description": "Display of local artists and handmade crafts",
+    "photos": ["art1.jpg", "art2.jpg"],
+    "category": "Art"
+  },
+  {
+    "id": "10",
+    "name": "Music Concert Night",
+    "date": "2026-05-22",
+    "time": "19:00",
+    "location": "Bangalore Palace Grounds",
+    "description": "Live performances by top artists",
+    "photos": ["music1.jpg", "music2.jpg"],
+    "category": "Music"
+  }
+]

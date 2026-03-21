@@ -1,0 +1,110 @@
+[
+  {
+    "id": "1",
+    "routeNumber": "201",
+    "routeName": "Kolkata - Howrah",
+    "departureTime": "06:00",
+    "arrivalTime": "06:45",
+    "stops": ["Esplanade", "BBD Bagh", "Howrah Station"],
+    "fare": 20
+  },
+  {
+    "id": "2",
+    "routeNumber": "202",
+    "routeName": "Kolkata - Salt Lake",
+    "departureTime": "06:30",
+    "arrivalTime": "07:30",
+    "stops": ["Park Street", "Sealdah", "Salt Lake Sector V"],
+    "fare": 30
+  },
+  {
+    "id": "3",
+    "routeNumber": "203",
+    "routeName": "Kolkata - New Town",
+    "departureTime": "07:00",
+    "arrivalTime": "08:15",
+    "stops": ["Esplanade", "Ultadanga", "New Town"],
+    "fare": 35
+  },
+  {
+    "id": "4",
+    "routeNumber": "204",
+    "routeName": "Kolkata - Garia",
+    "departureTime": "07:15",
+    "arrivalTime": "08:30",
+    "stops": ["Park Circus", "Ruby", "Garia"],
+    "fare": 25
+  },
+  {
+    "id": "5",
+    "routeNumber": "205",
+    "routeName": "Kolkata - Dum Dum",
+    "departureTime": "08:00",
+    "arrivalTime": "09:00",
+    "stops": ["Esplanade", "Shyambazar", "Dum Dum"],
+    "fare": 25
+  },
+  {
+    "id": "6",
+    "routeNumber": "301",
+    "routeName": "Delhi - Noida",
+    "departureTime": "06:30",
+    "arrivalTime": "07:30",
+    "stops": ["Connaught Place", "Akshardham", "Noida Sector 62"],
+    "fare": 40
+  },
+  {
+    "id": "7",
+    "routeNumber": "302",
+    "routeName": "Delhi - Gurgaon",
+    "departureTime": "07:00",
+    "arrivalTime": "08:00",
+    "stops": ["AIIMS", "Dhaula Kuan", "Gurgaon"],
+    "fare": 50
+  },
+  {
+    "id": "8",
+    "routeNumber": "401",
+    "routeName": "Mumbai - Navi Mumbai",
+    "departureTime": "06:45",
+    "arrivalTime": "08:00",
+    "stops": ["Dadar", "Chembur", "Vashi"],
+    "fare": 45
+  },
+  {
+    "id": "9",
+    "routeNumber": "402",
+    "routeName": "Mumbai - Thane",
+    "departureTime": "07:30",
+    "arrivalTime": "08:45",
+    "stops": ["Andheri", "Mulund", "Thane"],
+    "fare": 40
+  },
+  {
+    "id": "10",
+    "routeNumber": "501",
+    "routeName": "Bangalore - Whitefield",
+    "departureTime": "06:30",
+    "arrivalTime": "08:00",
+    "stops": ["Majestic", "Indiranagar", "Whitefield"],
+    "fare": 50
+  },
+  {
+    "id": "11",
+    "routeNumber": "502",
+    "routeName": "Bangalore - Electronic City",
+    "departureTime": "07:00",
+    "arrivalTime": "08:30",
+    "stops": ["Silk Board", "BTM Layout", "Electronic City"],
+    "fare": 55
+  },
+  {
+    "id": "12",
+    "routeNumber": "601",
+    "routeName": "Chennai - Tambaram",
+    "departureTime": "06:15",
+    "arrivalTime": "07:45",
+    "stops": ["T Nagar", "Guindy", "Tambaram"],
+    "fare": 35
+  }
+]
