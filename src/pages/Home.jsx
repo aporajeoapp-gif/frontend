@@ -27,6 +27,10 @@ import emergencyContacts from "../constant/data/emergencyContacts.json";
 import busServices from "../constant/data/busServices.json";
 import ferryServices from "../constant/data/ferryServices.json";
 import testimonials from "../constant/data/testimonials.json";
+import advertisements from "../constant/data/advertisements.json";
+import AdBanner from "../components/AdBanner";
+import Testimonials from "../components/Testimonials";
+import AddBanner from "../components/AddBanner";
 
 const SLIDES = [
   {
@@ -452,6 +456,10 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ── ADVERTISEMENTS ── */}
+      <AdBanner  />
+      {/* <AddBanner ads={advertisements} /> */}
+
       {/* ── WHY US ── */}
       <section className="py-16 px-4 bg-white dark:bg-slate-900">
         <div className="max-w-7xl mx-auto">
@@ -500,7 +508,7 @@ export default function Home() {
       </section>
 
       {/* ── TESTIMONIALS ── */}
-      <section className="py-16 px-4 bg-slate-50 dark:bg-slate-950">
+      {/* <section className="py-16 px-4 bg-slate-50 dark:bg-slate-950">
         <div className="max-w-7xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -554,7 +562,9 @@ export default function Home() {
             ))}
           </div>
         </div>
-      </section>
+      </section> */}
+
+      <Testimonials/>
 
       {/* ── CTA ── */}
       <section className="py-16 px-4 bg-white dark:bg-slate-900">

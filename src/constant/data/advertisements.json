@@ -1,0 +1,68 @@
+[
+  {
+    "id": 1,
+    "title": "Hospital Promotion",
+    "description": "Best cardiology services in the city. Book your appointment today.",
+    "tag": "Healthcare",
+    "tagColor": "bg-rose-500",
+    "imageUrl": "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=800&auto=format&fit=crop&q=80",
+    "redirectUrl": "https://hospital.com",
+    "gradient": "from-rose-600/90 to-pink-700/80",
+    "cta": "Book Now"
+  },
+  {
+    "id": 2,
+    "title": "Pharmacy Discount",
+    "description": "Up to 40% off on all medicines. Free home delivery on orders above ₹500.",
+    "tag": "Pharmacy",
+    "tagColor": "bg-emerald-500",
+    "imageUrl": "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=800&auto=format&fit=crop&q=80",
+    "redirectUrl": "https://pharmacy.com",
+    "gradient": "from-emerald-600/90 to-teal-700/80",
+    "cta": "Shop Now"
+  },
+  {
+    "id": 3,
+    "title": "City Bus Pass",
+    "description": "Monthly unlimited travel pass at just ₹299. Valid on all city routes.",
+    "tag": "Transport",
+    "tagColor": "bg-indigo-500",
+    "imageUrl": "https://images.unsplash.com/photo-1570125909232-eb263c188f7e?w=800&auto=format&fit=crop&q=80",
+    "redirectUrl": "https://buspass.com",
+    "gradient": "from-indigo-600/90 to-violet-700/80",
+    "cta": "Get Pass"
+  },
+  {
+    "id": 4,
+    "title": "Community Festival",
+    "description": "Join the biggest cultural festival of the year. Free entry for all.",
+    "tag": "Events",
+    "tagColor": "bg-amber-500",
+    "imageUrl": "https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?w=800&auto=format&fit=crop&q=80",
+    "redirectUrl": "https://festival.com",
+    "gradient": "from-amber-600/90 to-orange-700/80",
+    "cta": "Learn More"
+  },
+  {
+    "id": 5,
+    "title": "Dental Care Clinic",
+    "description": "Complete dental checkup at ₹199. Smile brighter with expert care.",
+    "tag": "Healthcare",
+    "tagColor": "bg-cyan-500",
+    "imageUrl": "https://images.unsplash.com/photo-1606811841689-23dfddce3e95?w=800&auto=format&fit=crop&q=80",
+    "redirectUrl": "https://dentalcare.com",
+    "gradient": "from-cyan-600/90 to-blue-700/80",
+    "cta": "Book Now"
+  },
+  {
+    "id": 6,
+    "title": "Ferry Season Pass",
+    "description": "Unlimited ferry rides for 30 days. Explore the waterways freely.",
+    "tag": "Transport",
+    "tagColor": "bg-violet-500",
+    "imageUrl": "https://images.unsplash.com/photo-1605281317010-fe5ffe798166?w=800&auto=format&fit=crop&q=80",
+    "redirectUrl": "https://ferrypass.com",
+    "gradient": "from-violet-600/90 to-purple-700/80",
+    "cta": "Get Pass"
+  }
+]
