@@ -72,6 +72,7 @@ const ads = [
   },
 ];
 
+/* ── Dark mode observer ─────────────────────────────────────────────────── */
 function useDark() {
   const [dark, setDark] = useState(
     () => document.documentElement.classList.contains("dark")
@@ -80,14 +81,17 @@ function useDark() {
     const obs = new MutationObserver(() =>
       setDark(document.documentElement.classList.contains("dark"))
     );
-    obs.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+    obs.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
     return () => obs.disconnect();
   }, []);
   return dark;
 }
 
-function AdCard({ ad }) {
-  const dark = useDark();
+/* ── Single ad card ─────────────────────────────────────────────────────── */
+function AdCard({ ad, dark, didDragRef }) {
   const accent = dark ? ad.colorDark : ad.color;
 
   return (
@@ -95,10 +99,18 @@ function AdCard({ ad }) {
       href={ad.redirectUrl}
       target="_blank"
       rel="noopener noreferrer"
-      className="group relative shrink-0 w-[290px] mx-3 flex flex-col overflow-hidden rounded-2xl transition-all duration-300 hover:-translate-y-2"
+      draggable={false}
+      onClick={(e) => {
+        if (didDragRef.current) e.preventDefault();
+      }}
+      className="group relative shrink-0 w-[290px] mx-3 flex flex-col overflow-hidden rounded-2xl transition-all duration-300 hover:-translate-y-2 select-none"
       style={{
-        background: dark ? "rgba(255,255,255,0.04)" : "rgba(255,255,255,0.85)",
-        border: `1px solid ${dark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.07)"}`,
+        background: dark
+          ? "rgba(255,255,255,0.04)"
+          : "rgba(255,255,255,0.85)",
+        border: `1px solid ${
+          dark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.07)"
+        }`,
         backdropFilter: "blur(12px)",
         boxShadow: dark
           ? "0 4px 24px rgba(0,0,0,0.4)"
@@ -106,31 +118,28 @@ function AdCard({ ad }) {
       }}
     >
       {/* Image */}
-      <div className="relative h-36 overflow-hidden rounded-t-2xl">
+      <div className="relative h-36 overflow-hidden rounded-t-2xl pointer-events-none">
         <img
           src={ad.imageUrl}
           alt={ad.title}
+          draggable={false}
           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
           loading="lazy"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-
-        {/* Tag */}
         <span
           className="absolute bottom-2.5 left-3 text-[9px] font-black uppercase tracking-[0.15em] px-2.5 py-1 rounded-md text-white"
           style={{ background: accent }}
         >
           {ad.tag}
         </span>
-
-        {/* AD badge */}
         <span className="absolute top-2.5 right-2.5 text-[9px] font-bold text-white/60 border border-white/25 px-1.5 py-0.5 rounded backdrop-blur-sm tracking-widest">
           AD
         </span>
       </div>
 
       {/* Body */}
-      <div className="flex flex-col gap-2 p-4 flex-1">
+      <div className="flex flex-col gap-2 p-4 flex-1 pointer-events-none">
         <h3
           className="text-[13px] font-bold leading-snug"
           style={{ color: dark ? "#f1f5f9" : "#1e293b" }}
@@ -139,19 +148,30 @@ function AdCard({ ad }) {
         </h3>
         <p
           className="text-[11.5px] leading-relaxed flex-1"
-          style={{ color: dark ? "rgba(255,255,255,0.45)" : "rgba(0,0,0,0.5)" }}
+          style={{
+            color: dark ? "rgba(255,255,255,0.45)" : "rgba(0,0,0,0.5)",
+          }}
         >
           {ad.description}
         </p>
 
-        {/* Footer */}
         <div
           className="flex items-center justify-between pt-3 mt-auto"
-          style={{ borderTop: `1px solid ${dark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.07)"}` }}
+          style={{
+            borderTop: `1px solid ${
+              dark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.07)"
+            }`,
+          }}
         >
           <div className="flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full" style={{ background: accent }} />
-            <span className="text-[10px] font-semibold" style={{ color: accent }}>
+            <span
+              className="w-1.5 h-1.5 rounded-full"
+              style={{ background: accent }}
+            />
+            <span
+              className="text-[10px] font-semibold"
+              style={{ color: accent }}
+            >
               Sponsored
             </span>
           </div>
@@ -165,7 +185,7 @@ function AdCard({ ad }) {
         </div>
       </div>
 
-      {/* Hover glow */}
+      {/* Inset glow on hover */}
       <div
         className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
         style={{ boxShadow: `inset 0 0 0 1.5px ${accent}55` }}
@@ -174,63 +194,139 @@ function AdCard({ ad }) {
   );
 }
 
-function MarqueeTrack({ paused, speed = 32 }) {
-  const trackRef = useRef(null);
-  const posRef   = useRef(0);
-  const rafRef   = useRef(null);
-  const pausedRef = useRef(paused);
+/* ── Marquee with drag + touch + momentum ───────────────────────────────── */
+const AUTO_SPEED = 32; // px / second (auto-scroll)
+const FRICTION   = 0.92; // momentum decay per frame
 
-  useEffect(() => { pausedRef.current = paused; }, [paused]);
+function MarqueeTrack({ dark }) {
+  const trackRef   = useRef(null);
+  const posRef     = useRef(0);
+  const rafRef     = useRef(null);
 
-  useEffect(() => {
-    const track = trackRef.current;
-    if (!track) return;
-    let last = null;
-    const step = (ts) => {
-      if (last !== null && !pausedRef.current) {
-        const half = track.scrollWidth / 2;
-        posRef.current -= (speed / 1000) * (ts - last);
-        if (posRef.current <= -half) posRef.current += half;
-        track.style.transform = `translateX(${posRef.current}px)`;
-      }
-      last = ts;
-      rafRef.current = requestAnimationFrame(step);
-    };
-    rafRef.current = requestAnimationFrame(step);
-    return () => cancelAnimationFrame(rafRef.current);
-  }, [speed]);
+  // interaction state kept in refs so RAF doesn't need re-registration
+  const hoveredRef  = useRef(false);
+  const dragRef     = useRef(false);     // is finger / mouse currently held
+  const didDragRef  = useRef(false);     // moved >4px this gesture?
+  const startXRef   = useRef(0);
+  const lastXRef    = useRef(0);
+  const lastTRef    = useRef(0);
+  const velRef      = useRef(0);         // px / ms — for momentum after release
 
   const doubled = [...ads, ...ads];
 
+  /* RAF loop */
+  useEffect(() => {
+    const track = trackRef.current;
+    if (!track) return;
+    let prev = null;
+
+    const step = (ts) => {
+      const dt  = prev !== null ? ts - prev : 0;
+      const half = track.scrollWidth / 2;
+
+      if (dragRef.current) {
+        // While dragging: position is set directly in move handler
+      } else if (Math.abs(velRef.current) > 0.02) {
+        // Momentum coast after release
+        posRef.current += velRef.current * dt;
+        velRef.current *= FRICTION;
+      } else if (!hoveredRef.current) {
+        // Normal auto-scroll
+        velRef.current = 0;
+        posRef.current -= (AUTO_SPEED / 1000) * dt;
+      }
+
+      // Seamless loop
+      while (posRef.current <= -half) posRef.current += half;
+      while (posRef.current > 0)      posRef.current -= half;
+
+      track.style.transform = `translateX(${posRef.current}px)`;
+      prev = ts;
+      rafRef.current = requestAnimationFrame(step);
+    };
+
+    rafRef.current = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(rafRef.current);
+  }, []);
+
+  /* Shared pointer start */
+  const handleStart = (clientX) => {
+    dragRef.current    = true;
+    didDragRef.current = false;
+    velRef.current     = 0;
+    startXRef.current  = clientX;
+    lastXRef.current   = clientX;
+    lastTRef.current   = performance.now();
+    if (trackRef.current) trackRef.current.style.cursor = "grabbing";
+  };
+
+  /* Shared pointer move */
+  const handleMove = (clientX) => {
+    if (!dragRef.current) return;
+    const now = performance.now();
+    const dx  = clientX - lastXRef.current;
+    const dt  = now - lastTRef.current;
+
+    if (Math.abs(clientX - startXRef.current) > 4) didDragRef.current = true;
+
+    posRef.current  += dx;
+    velRef.current   = dt > 0 ? (dx / dt) : 0;
+    lastXRef.current = clientX;
+    lastTRef.current = now;
+  };
+
+  /* Shared pointer end */
+  const handleEnd = () => {
+    dragRef.current = false;
+    if (trackRef.current) trackRef.current.style.cursor = "grab";
+    // velRef keeps its value → momentum handled in RAF
+  };
+
   return (
-    <div className="overflow-hidden w-full py-3">
-      <div ref={trackRef} className="flex will-change-transform">
+    <div
+      className="overflow-hidden w-full py-3"
+      style={{ cursor: "grab", touchAction: "pan-y" }}
+      /* Mouse */
+      onMouseEnter={() => { hoveredRef.current = true; }}
+      onMouseLeave={() => { hoveredRef.current = false; handleEnd(); }}
+      onMouseDown={(e) => handleStart(e.clientX)}
+      onMouseMove={(e) => handleMove(e.clientX)}
+      onMouseUp={handleEnd}
+      /* Touch */
+      onTouchStart={(e) => handleStart(e.touches[0].clientX)}
+      onTouchMove={(e) => { handleMove(e.touches[0].clientX); }}
+      onTouchEnd={handleEnd}
+      onTouchCancel={handleEnd}
+    >
+      <div
+        ref={trackRef}
+        className="flex will-change-transform"
+        style={{ userSelect: "none" }}
+      >
         {doubled.map((ad, i) => (
-          <AdCard key={`${ad.id}-${i}`} ad={ad} />
+          <AdCard
+            key={`${ad.id}-${i}`}
+            ad={ad}
+            dark={dark}
+            didDragRef={didDragRef}
+          />
         ))}
       </div>
     </div>
   );
 }
 
+/* ── Main export ────────────────────────────────────────────────────────── */
 export default function AdSection() {
-  const [paused, setPaused] = useState(false);
   const dark = useDark();
 
-  // Section background — light: warm off-white; dark: deep navy-slate (not black)
   const sectionBg = dark
     ? "linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%)"
     : "linear-gradient(135deg, #f8faff 0%, #eef2ff 50%, #f8faff 100%)";
 
   return (
-    <section
-      className="overflow-hidden py-12"
-      style={{ background: sectionBg }}
-      onMouseEnter={() => setPaused(true)}
-      onMouseLeave={() => setPaused(false)}
-      onTouchStart={() => setPaused(true)}
-      onTouchEnd={() => setPaused(false)}
-    >
+    <section className="overflow-hidden py-12" style={{ background: sectionBg }}>
+
       {/* ── Centered Header ── */}
       <motion.div
         initial={{ opacity: 0, y: 18 }}
@@ -243,9 +339,15 @@ export default function AdSection() {
         <div
           className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-[0.2em]"
           style={{
-            background: dark ? "rgba(255,255,255,0.07)" : "rgba(99,102,241,0.1)",
+            background: dark
+              ? "rgba(255,255,255,0.07)"
+              : "rgba(99,102,241,0.1)",
             color: dark ? "rgba(255,255,255,0.5)" : "#6366f1",
-            border: `1px solid ${dark ? "rgba(255,255,255,0.1)" : "rgba(99,102,241,0.2)"}`,
+            border: `1px solid ${
+              dark
+                ? "rgba(255,255,255,0.1)"
+                : "rgba(99,102,241,0.2)"
+            }`,
           }}
         >
           <Sparkles size={10} />
@@ -260,9 +362,7 @@ export default function AdSection() {
           Offers &amp;{" "}
           <span
             style={{
-              background: dark
-                ? "linear-gradient(90deg, #a5b4fc, #c4b5fd)"
-                : "linear-gradient(90deg, #6366f1, #8b5cf6)",
+              background: "linear-gradient(90deg, #6366f1, #8b5cf6)",
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
             }}
@@ -271,27 +371,26 @@ export default function AdSection() {
           </span>
         </h2>
 
-        {/* Thin divider line */}
+        {/* Accent rule */}
         <div
           className="mt-1 w-12 h-0.5 rounded-full"
-          style={{
-            background: dark
-              ? "linear-gradient(90deg, #6366f1, #8b5cf6)"
-              : "linear-gradient(90deg, #6366f1, #8b5cf6)",
-          }}
+          style={{ background: "linear-gradient(90deg, #6366f1, #8b5cf6)" }}
         />
 
         <p
-          className="text-[13px] mt-1"
-          style={{ color: dark ? "rgba(255,255,255,0.35)" : "rgba(0,0,0,0.4)" }}
+          className="text-[12px] mt-0.5"
+          style={{
+            color: dark
+              ? "rgba(255,255,255,0.3)"
+              : "rgba(0,0,0,0.35)",
+          }}
         >
-          Hover to pause · {ads.length} active promotions
+          Drag or swipe to explore · {ads.length} active promotions
         </p>
       </motion.div>
 
-      {/* ── Marquee ── */}
+      {/* ── Marquee with fade edges ── */}
       <div className="relative">
-        {/* Left fade */}
         <div
           className="pointer-events-none absolute inset-y-0 left-0 w-20 z-10"
           style={{
@@ -300,7 +399,6 @@ export default function AdSection() {
               : "linear-gradient(to right, #f8faff, transparent)",
           }}
         />
-        {/* Right fade */}
         <div
           className="pointer-events-none absolute inset-y-0 right-0 w-20 z-10"
           style={{
@@ -309,13 +407,17 @@ export default function AdSection() {
               : "linear-gradient(to left, #f8faff, transparent)",
           }}
         />
-        <MarqueeTrack paused={paused} speed={32} />
+        <MarqueeTrack dark={dark} />
       </div>
 
       {/* Footer */}
       <p
         className="text-center text-[10px] mt-5 tracking-wide"
-        style={{ color: dark ? "rgba(255,255,255,0.18)" : "rgba(0,0,0,0.25)" }}
+        style={{
+          color: dark
+            ? "rgba(255,255,255,0.18)"
+            : "rgba(0,0,0,0.25)",
+        }}
       >
         Advertisements help keep this platform free for everyone
       </p>
