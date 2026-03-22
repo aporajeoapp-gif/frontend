@@ -7,22 +7,32 @@ export default function LoginModal({ isOpen, onClose }) {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
-
+  const ADMIN_EMAIL = "admin@gmail.com";
+  const ADMIN_PASSWORD = "123456";
   const handleSubmit = (e) => {
     e.preventDefault();
     setError("");
     setSuccess(false);
+
     if (!email.trim()) return setError("Email is required.");
     if (!password.trim()) return setError("Password is required.");
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
       return setError("Invalid email address.");
-    setSuccess(true);
-    setEmail("");
-    setPassword("");
-    setTimeout(() => {
-      onClose();
-      setSuccess(false);
-    }, 1500);
+
+    // 🔐 Static check
+    if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
+      setSuccess(true);
+
+      setTimeout(() => {
+        onClose();
+        setSuccess(false);
+
+        // 👉 redirect to admin page
+        window.location.href = "/admin";
+      }, 1000);
+    } else {
+      setError("Invalid admin credentials");
+    }
   };
 
   return (
