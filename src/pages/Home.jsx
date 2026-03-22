@@ -455,7 +455,7 @@ export default function Home() {
       </section>
 
       {/* ── ADVERTISEMENTS ── */}
-      {/* <AdBanner /> */}
+      <AdBanner />
       {/* <AddBanner ads={advertisements} /> */}
 
       {/* ── WHY US ── */}
@@ -562,7 +562,7 @@ export default function Home() {
         </div>
       </section> */}
 
-      {/* <Testimonials /> */}
+      <Testimonials />
 
       {/* ── CTA ── */}
       <section className="py-16 px-4 bg-white dark:bg-slate-900">
