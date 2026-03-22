@@ -1,0 +1,104 @@
+[
+  {
+    "id": "1",
+    "campName": "Life Saver Blood Camp",
+    "organizer": "Red Cross Society",
+    "date": "2026-04-10",
+    "time": "09:00 AM - 04:00 PM",
+    "location": "Town Hall, Kolkata",
+    "address": "1, S.N. Banerjee Road, Kolkata 700013",
+    "bloodGroupsNeeded": ["A+", "B+", "O+", "AB+"],
+    "contactPhone": "+91-9800000001",
+    "contactEmail": "redcross.kolkata@example.com",
+    "description": "Annual blood donation drive organized by Red Cross. All healthy adults aged 18-65 are welcome.",
+    "status": "upcoming",
+    "targetUnits": 200,
+    "collectedUnits": 0,
+    "donors": [
+      {
+        "id": "d1",
+        "name": "Rahul Das",
+        "bloodGroup": "O+",
+        "age": 28,
+        "phone": "+91-9800000010",
+        "donatedAt": ""
+      },
+      {
+        "id": "d2",
+        "name": "Priya Roy",
+        "bloodGroup": "A+",
+        "age": 24,
+        "phone": "+91-9800000011",
+        "donatedAt": ""
+      }
+    ]
+  },
+  {
+    "id": "2",
+    "campName": "Community Blood Drive",
+    "organizer": "Lions Club Dhaka",
+    "date": "2026-04-18",
+    "time": "10:00 AM - 05:00 PM",
+    "location": "City Community Center, Dhaka",
+    "address": "45, Mirpur Road, Dhaka 1216",
+    "bloodGroupsNeeded": ["B-", "O-", "A-"],
+    "contactPhone": "+880-1700000002",
+    "contactEmail": "lions.dhaka@example.com",
+    "description": "Emergency blood drive to replenish hospital reserves. Rare blood groups especially needed.",
+    "status": "upcoming",
+    "targetUnits": 150,
+    "collectedUnits": 0,
+    "donors": [
+      {
+        "id": "d3",
+        "name": "Karim Hossain",
+        "bloodGroup": "O-",
+        "age": 32,
+        "phone": "+880-1700000020",
+        "donatedAt": ""
+      }
+    ]
+  },
+  {
+    "id": "3",
+    "campName": "Youth Blood Donation Camp",
+    "organizer": "NSS Unit, Jadavpur University",
+    "date": "2026-03-15",
+    "time": "09:00 AM - 02:00 PM",
+    "location": "Jadavpur University Campus, Kolkata",
+    "address": "188, Raja S.C. Mallick Road, Kolkata 700032",
+    "bloodGroupsNeeded": ["A+", "B+", "AB-", "O+"],
+    "contactPhone": "+91-9800000003",
+    "contactEmail": "nss.ju@example.com",
+    "description": "Student-led blood donation initiative. Free health checkup for all donors.",
+    "status": "completed",
+    "targetUnits": 100,
+    "collectedUnits": 87,
+    "donors": [
+      {
+        "id": "d4",
+        "name": "Ananya Sen",
+        "bloodGroup": "A+",
+        "age": 21,
+        "phone": "+91-9800000030",
+        "donatedAt": "2026-03-15"
+      },
+      {
+        "id": "d5",
+        "name": "Sourav Ghosh",
+        "bloodGroup": "B+",
+        "age": 22,
+        "phone": "+91-9800000031",
+        "donatedAt": "2026-03-15"
+      },
+      {
+        "id": "d6",
+        "name": "Mita Paul",
+        "bloodGroup": "O+",
+        "age": 20,
+        "phone": "+91-9800000032",
+        "donatedAt": "2026-03-15"
+      }
+    ]
+  }
+]

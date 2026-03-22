@@ -1,6 +1,6 @@
 import { useContext, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import {
   Home,
   Stethoscope,
@@ -8,6 +8,7 @@ import {
   Bus,
   Ship,
   CalendarDays,
+  Droplets,
   Sun,
   Moon,
   Globe,
@@ -24,30 +25,26 @@ const NAV_LINKS = [
   { path: "/bus", label: "Bus", Icon: Bus },
   { path: "/ferry", label: "Ferry", Icon: Ship },
   { path: "/events", label: "Events", Icon: CalendarDays },
+  { path: "/blood-donation", label: "Blood Donation", Icon: Droplets },
 ];
 
 export default function Navbar() {
   const { theme, toggleTheme } = useContext(ThemeContext);
-  const { language, toggleLanguage } = useContext(LanguageContext);
+  const { language, toggleLanguage, t } = useContext(LanguageContext);
   const [loginOpen, setLoginOpen] = useState(false);
   const location = useLocation();
   const isDark = theme === "dark";
 
   return (
     <>
-      <motion.nav
-        initial={{ y: -80 }}
-        animate={{ y: 0 }}
-        transition={{ type: "spring", stiffness: 200, damping: 22 }}
-        className="sticky top-0 z-40 bg-white/90 dark:bg-slate-900/90 backdrop-blur-2xl border-b border-slate-200/70 dark:border-slate-700/60 shadow-sm"
-      >
+      <nav className="sticky top-0 z-[10000] bg-white/90 dark:bg-slate-900/90 backdrop-blur-2xl border-b border-slate-200/70 dark:border-slate-700/60 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2.5 shrink-0 group">
+          <Link to="/" className="flex items-center gap-2.5 shrink-0">
             <img
               src="/logo.png"
               alt="Oporajeo"
-              className="h-20 w-30 md:w-50 object-contain group-hover:scale-105 transition-transform"
+              className="h-10 w-auto object-contain"
             />
           </Link>
 
@@ -59,7 +56,7 @@ export default function Navbar() {
                 <Link
                   key={path}
                   to={path}
-                  className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-200
+                  className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium transition-colors
                     ${
                       active
                         ? "bg-indigo-50 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400"
@@ -73,38 +70,27 @@ export default function Navbar() {
             })}
           </div>
 
-          {/* Right controls — always visible including mobile */}
+          {/* Right controls */}
           <div className="flex items-center gap-2">
             {/* Theme toggle */}
             <button
               onClick={toggleTheme}
               data-testid="theme-toggle"
-              className="w-9 h-9 rounded-xl flex items-center justify-center border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all"
+              className="w-9 h-9 rounded-xl flex items-center justify-center border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
               title={isDark ? "Switch to light" : "Switch to dark"}
             >
-              <AnimatePresence mode="wait" initial={false}>
-                <motion.span
-                  key={isDark ? "sun" : "moon"}
-                  initial={{ rotate: -90, opacity: 0, scale: 0.5 }}
-                  animate={{ rotate: 0, opacity: 1, scale: 1 }}
-                  exit={{ rotate: 90, opacity: 0, scale: 0.5 }}
-                  transition={{ duration: 0.2 }}
-                  className="flex items-center"
-                >
-                  {isDark ? (
-                    <Sun size={15} className="text-amber-400" />
-                  ) : (
-                    <Moon size={15} className="text-indigo-500" />
-                  )}
-                </motion.span>
-              </AnimatePresence>
+              {isDark ? (
+                <Sun size={15} className="text-amber-400" />
+              ) : (
+                <Moon size={15} className="text-indigo-500" />
+              )}
             </button>
 
             {/* Language toggle */}
             <button
               onClick={toggleLanguage}
               data-testid="language-toggle"
-              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all text-slate-700 dark:text-slate-200"
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors text-slate-700 dark:text-slate-200"
             >
               <Globe size={13} className="text-indigo-500" />
               <span className="text-xs font-bold">
@@ -112,20 +98,18 @@ export default function Navbar() {
               </span>
             </button>
 
-            {/* Login — visible on ALL screen sizes now */}
+            {/* Login */}
             <button
               onClick={() => setLoginOpen(true)}
               data-testid="login-button"
-              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white text-sm font-semibold transition-all shadow-md shadow-indigo-200 dark:shadow-indigo-900/40"
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold transition-colors shadow-md"
             >
               <LogIn size={14} />
               <span className="hidden sm:inline">Login</span>
             </button>
           </div>
         </div>
-
-        {/* Mobile bottom nav handles page navigation — no hamburger needed */}
-      </motion.nav>
+      </nav>
 
       <LoginModal isOpen={loginOpen} onClose={() => setLoginOpen(false)} />
     </>

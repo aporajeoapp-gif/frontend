@@ -10,9 +10,12 @@ import {
   Search,
   CheckCircle,
   ArrowRight,
+  ChevronDown,
 } from "lucide-react";
 import busServices from "../constant/data/busServices.json";
 import PageBanner from "../components/PageBanner";
+import { useTranslation } from "../context/LanguageContext";
+import { useAdmin } from "../admin/context/AdminContext";
 
 function getDuration(dep, arr) {
   const [dh, dm] = dep.split(":").map(Number);
@@ -25,6 +28,9 @@ function getDuration(dep, arr) {
 }
 
 export default function Bus() {
+  const { t } = useTranslation();
+  const { state } = useAdmin();
+  const busServices = state.busRoutes;
   const [view, setView] = useState("table");
   const [search, setSearch] = useState("");
 
@@ -52,32 +58,37 @@ export default function Bus() {
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.06 }}
-          className="flex flex-col sm:flex-row gap-3 mb-6 bg-white dark:bg-slate-900 p-3 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm"
+          className="flex flex-col sm:flex-row gap-4 mb-8 bg-slate-900/95 dark:bg-slate-900/50 backdrop-blur-xl p-2 sm:p-2.5 rounded-[24px] border border-white/5 dark:border-white/10 shadow-2xl"
         >
           <div className="relative flex-1">
             <Search
-              size={14}
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
+              size={15}
+              className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
             />
             <input
               type="text"
-              placeholder="Search routes or stops..."
+              placeholder={t.search_placeholder_bus}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition"
+              className="w-full h-12 pl-12 pr-4 rounded-[18px] bg-white/5 dark:bg-slate-800/40 text-sm text-slate-100 dark:text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all border-none"
             />
           </div>
-          <div className="flex rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+          <div className="flex p-1 gap-1 bg-white/5 dark:bg-slate-800/40 rounded-[18px] shrink-0 h-12 items-center">
             {[
-              ["table", Table2, "Table"],
-              ["card", LayoutGrid, "Cards"],
+              ["table", Table2, t.table_view],
+              ["card", LayoutGrid, t.card_view],
             ].map(([v, Icon, lbl]) => (
               <button
                 key={v}
                 onClick={() => setView(v)}
-                className={`flex items-center gap-1.5 px-3 py-2 text-sm font-medium transition-colors ${view === v ? "bg-emerald-600 text-white" : "bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700"}`}
+                className={`flex items-center justify-center w-10 sm:w-11 h-10 rounded-[14px] transition-all duration-300 ${
+                  view === v
+                    ? "bg-emerald-600 text-white shadow-lg shadow-emerald-600/30"
+                    : "text-slate-500 hover:text-slate-300 hover:bg-white/5"
+                }`}
+                title={lbl}
               >
-                <Icon size={13} /> {lbl}
+                <Icon size={16} />
               </button>
             ))}
           </div>
@@ -97,14 +108,14 @@ export default function Bus() {
                   <thead>
                     <tr className="bg-slate-50 dark:bg-slate-800/60 border-b border-slate-200 dark:border-slate-700">
                       {[
-                        "Route #",
-                        "Route Name",
-                        "Departure",
-                        "Arrival",
-                        "Duration",
-                        "Fare",
-                        "Stops",
-                        "Status",
+                        t.route_no,
+                        t.route_name,
+                        t.departure,
+                        t.arrival,
+                        t.duration,
+                        t.fare,
+                        t.stops,
+                        t.status,
                       ].map((h) => (
                         <th
                           key={h}
@@ -174,7 +185,7 @@ export default function Bus() {
                         </td>
                         <td className="px-4 py-3">
                           <span className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 px-2.5 py-1 rounded-full">
-                            <CheckCircle size={10} /> Active
+                            <CheckCircle size={10} /> {t.active}
                           </span>
                         </td>
                       </motion.tr>
@@ -232,19 +243,19 @@ export default function Bus() {
                     <div className="grid grid-cols-3 gap-2 mb-4">
                       {[
                         {
-                          label: "Departure",
+                          label: t.departure,
                           val: s.departureTime,
                           Icon: Clock,
                           color: "text-emerald-500",
                         },
                         {
-                          label: "Arrival",
+                          label: t.arrival,
                           val: s.arrivalTime,
                           Icon: Clock,
                           color: "text-teal-500",
                         },
                         {
-                          label: "Duration",
+                          label: t.duration,
                           val: getDuration(s.departureTime, s.arrivalTime),
                           Icon: ArrowRight,
                           color: "text-slate-400",
@@ -272,12 +283,12 @@ export default function Bus() {
                         </span>
                       </div>
                       <span className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 px-2.5 py-1 rounded-full">
-                        <CheckCircle size={10} /> Active
+                        <CheckCircle size={10} /> {t.active}
                       </span>
                     </div>
                     <div>
                       <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">
-                        <Navigation size={10} /> Stops
+                        <Navigation size={10} /> {t.stops}
                       </div>
                       <div className="flex flex-wrap gap-1.5">
                         {s.stops.map((stop, idx) => (

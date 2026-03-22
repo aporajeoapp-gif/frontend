@@ -176,28 +176,26 @@ export default function Home() {
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
       {/* ── HERO ── */}
       <section
-        className="relative overflow-hidden"
+        className="relative overflow-hidden z-0"
         style={{ minHeight: "clamp(520px, 72vh, 760px)" }}
         onMouseEnter={() => setPaused(true)}
         onMouseLeave={() => setPaused(false)}
       >
-        <AnimatePresence mode="sync">
+        <AnimatePresence mode="wait">
           <motion.div
             key={slide.id}
             initial={{ opacity: 0, scale: 1.04 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.9, ease: "easeInOut" }}
+            transition={{ duration: 0.5, ease: "easeInOut" }}
             className="absolute inset-0"
+            style={{ pointerEvents: "none", zIndex: 0 }}
           >
-            <img
-              src={slide.image}
-              alt={slide.badge}
-              className="w-full h-full object-cover"
-              loading="eager"
-            />
+            <div className="absolute inset-0 pointer-events-none z-0">
+              <img src={slide.image} className="w-full h-full object-cover" />
+            </div>
             <div
-              className={`absolute inset-0 bg-linear-to-r ${slide.overlay}`}
+              className={`absolute inset-0 pointer-events-none bg-linear-to-r ${slide.overlay} pointer-events-none`}
             />
             <div className="absolute bottom-0 left-0 right-0 h-32 bg-linear-to-t from-slate-50 dark:from-slate-950 to-transparent" />
           </motion.div>
@@ -423,7 +421,7 @@ export default function Home() {
                     <motion.div
                       whileHover={{ y: -6, scale: 1.02 }}
                       transition={{ type: "spring", stiffness: 300 }}
-                      className="group bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm hover:shadow-xl transition-all h-full relative overflow-hidden"
+                      className="group bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm hover:shadow-xl transition-all h-full relative overflow-hidden z-0"
                     >
                       <div
                         className={`absolute top-0 right-0 w-32 h-32 rounded-full bg-linear-to-br ${from} ${to} opacity-5 translate-x-8 -translate-y-8 group-hover:opacity-10 transition-opacity`}
@@ -457,7 +455,7 @@ export default function Home() {
       </section>
 
       {/* ── ADVERTISEMENTS ── */}
-      <AdBanner  />
+      {/* <AdBanner /> */}
       {/* <AddBanner ads={advertisements} /> */}
 
       {/* ── WHY US ── */}
@@ -564,7 +562,7 @@ export default function Home() {
         </div>
       </section> */}
 
-      <Testimonials/>
+      {/* <Testimonials /> */}
 
       {/* ── CTA ── */}
       <section className="py-16 px-4 bg-white dark:bg-slate-900">
@@ -576,7 +574,7 @@ export default function Home() {
             className="relative rounded-3xl overflow-hidden p-10 md:p-16 text-center text-white shadow-2xl shadow-indigo-200 dark:shadow-indigo-900/40"
           >
             <div className="absolute inset-0 bg-linear-to-br from-indigo-600 via-violet-600 to-purple-700" />
-            <div className="absolute inset-0 opacity-10">
+            <div className="absolute inset-0 pointer-events-none">
               <svg width="100%" height="100%">
                 <defs>
                   <pattern

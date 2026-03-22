@@ -1,30 +1,137 @@
-import React, { createContext, useState, useEffect } from "react";
+import { createContext, useState, useContext } from "react";
 
 export const LanguageContext = createContext();
 
-// Programmatically trigger Google Translate to switch language
-function applyGoogleTranslate(langCode) {
-  // Google Translate sets a cookie named "googtrans" to control the language
-  // Format: /en/<target> or /auto/<target>; clearing it restores original
-  const domain = window.location.hostname;
+const TRANSLATIONS = {
+  en: {
+    // Navbar
+    home: "Home",
+    doctors: "Doctors",
+    emergency: "Emergency",
+    bus: "Bus",
+    ferry: "Ferry",
+    events: "Events",
+    blood: "Blood",
+    ambulance: "Ambulance",
+    // Common
+    search: "Search",
+    filter: "Filter",
+    all: "All",
+    active: "Active",
+    book: "Book Now",
+    call_now: "Call Now",
+    // Placeholders
+    search_placeholder_doctors: "Search by name, specialty or location...",
+    search_placeholder_bus: "Search route name, number or stops...",
+    search_placeholder_ferry: "Search ferry route or stops...",
+    search_placeholder_emergency: "Search emergency services...",
+    // Specialties
+    all_specialties: "All Specialties",
+    all_categories: "All Categories",
+    // Table Headers
+    name: "Name",
+    specialty: "Specialty",
+    location: "Location",
+    experience: "Experience",
+    rating: "Rating",
+    actions: "Actions",
+    route_no: "Route #",
+    route_name: "Route Name",
+    departure: "Departure",
+    arrival: "Arrival",
+    duration: "Duration",
+    fare: "Fare",
+    stops: "Stops",
+    status: "Status",
+    service: "Service",
+    category: "Category",
+    description: "Description",
+    phone: "Phone",
+    action: "Action",
+    available_247: "Available 24/7",
+    weekly_schedule: "Weekly Schedule",
+    call_clinic: "Call Clinic",
+    confirm: "Confirm",
+    // Views
+    table_view: "Table",
+    card_view: "Card",
+  },
+  bn: {
+    // Navbar
+    home: "হোম",
+    doctors: "ডাক্তার",
+    emergency: "জরুরী",
+    bus: "বাস",
+    ferry: "ফেরী",
+    events: "ইভেন্ট",
+    blood: "রক্ত",
+    ambulance: "অ্যাম্বুলেন্স",
+    // Common
+    search: "অনুসন্ধান",
+    filter: "ফিল্টার",
+    all: "সব",
+    active: "সক্রিয়",
+    book: "বুক করুন",
+    call_now: "কল করুন",
+    // Placeholders
+    search_placeholder_doctors: "নাম, বিশেষজ্ঞ বা স্থান দিয়ে খুঁজুন...",
+    search_placeholder_bus: "রুটের নাম বা নাম্বার দিয়ে খুঁজুন...",
+    search_placeholder_ferry: "ফেরী রুট বা স্টপ দিয়ে খুঁজুন...",
+    search_placeholder_emergency: "জরুরী সেবা খুঁজুন...",
+    // Specialties
+    all_specialties: "সব বিশেষজ্ঞ",
+    all_categories: "সব ক্যাটাগরি",
+    // Table Headers
+    name: "নাম",
+    specialty: "বিশেষজ্ঞ",
+    location: "স্থান",
+    experience: "অভিজ্ঞতা",
+    rating: "রেটিং",
+    actions: "অ্যাকশন",
+    route_no: "রুট নং",
+    route_name: "রুটের নাম",
+    departure: "প্রস্থান",
+    arrival: "পৌঁছানো",
+    duration: "সময়",
+    fare: "ভাড়া",
+    stops: "স্টপসমূহ",
+    status: "অবস্থা",
+    service: "সেবা",
+    category: "ক্যাটাগরি",
+    description: "বিবরণ",
+    phone: "ফোন",
+    action: "অ্যাকশন",
+    available_247: "২৪/৭ উপলব্ধ",
+    weekly_schedule: "সাপ্তাহিক শিডিউল",
+    call_clinic: "ক্লিনিকে কল করুন",
+    confirm: "নিশ্চিত করুন",
+    // Views
+    table_view: "টেবিল",
+    card_view: "কার্ড",
+  },
+};
 
-  if (langCode === "en") {
-    // Remove the cookie to restore original English
-    document.cookie = `googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/`;
-    document.cookie = `googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=${domain}`;
-    document.cookie = `googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=.${domain}`;
+function applyTranslation(lang) {
+  const domain = window.location.hostname;
+  const val = `/en/${lang}`;
+
+  if (lang === "en") {
+    // Clear cookies
+    document.cookie = `googtrans=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC`;
+    document.cookie = `googtrans=; path=/; domain=${domain}; expires=Thu, 01 Jan 1970 00:00:00 UTC`;
+    document.cookie = `googtrans=; path=/; domain=.${domain}; expires=Thu, 01 Jan 1970 00:00:00 UTC`;
   } else {
-    const val = `/en/${langCode}`;
+    // Set cookies
     document.cookie = `googtrans=${val}; path=/`;
     document.cookie = `googtrans=${val}; path=/; domain=${domain}`;
     document.cookie = `googtrans=${val}; path=/; domain=.${domain}`;
   }
 
-  // Reload the page so Google Translate picks up the new cookie
+  // Mandatory reload because Google Translate extension/widget 
+  // needs a fresh start to correctly detect and apply (or remove) translations.
   window.location.reload();
 }
 
-// Read current language from the googtrans cookie
 function getLangFromCookie() {
   const match = document.cookie.match(/googtrans=\/en\/([a-z]{2})/);
   return match ? match[1] : "en";
@@ -33,21 +140,25 @@ function getLangFromCookie() {
 export const LanguageProvider = ({ children }) => {
   const [language, setLanguage] = useState(() => {
     const fromCookie = getLangFromCookie();
-    return fromCookie !== "en"
-      ? fromCookie
-      : localStorage.getItem("language") || "en";
+    if (fromCookie !== "en") return fromCookie;
+    return localStorage.getItem("language") || "en";
   });
 
   const toggleLanguage = () => {
     const next = language === "en" ? "bn" : "en";
     localStorage.setItem("language", next);
-    setLanguage(next);
-    applyGoogleTranslate(next);
-  };
+    setLanguage(next); // Update state immediately for UI
+    applyTranslation(next);
+  }
+
+  // t is an object-proxy to support both t("key") and t.key
+  const t = TRANSLATIONS[language] || TRANSLATIONS.en;
 
   return (
-    <LanguageContext.Provider value={{ language, toggleLanguage }}>
+    <LanguageContext.Provider value={{ language, toggleLanguage, t }}>
       {children}
     </LanguageContext.Provider>
   );
 };
+
+export const useTranslation = () => useContext(LanguageContext);

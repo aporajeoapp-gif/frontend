@@ -13,7 +13,7 @@ import {
   Settings,
   ChevronLeft,
   X,
-  Zap,
+  Droplets,
 } from "lucide-react";
 import logo from "../../../public/logo.png";
 const NAV_ITEMS = [
@@ -24,6 +24,7 @@ const NAV_ITEMS = [
   { to: "/admin/doctors", label: "Doctors", icon: Stethoscope },
   { to: "/admin/emergency", label: "Emergency", icon: AlertTriangle },
   { to: "/admin/events", label: "Events", icon: CalendarDays },
+  { to: "/admin/blood-donation", label: "Blood Donation", icon: Droplets },
   { to: "/admin/advertisements", label: "Advertisements", icon: Megaphone },
   { to: "/admin/analytics", label: "Analytics", icon: BarChart3 },
   { to: "/admin/settings", label: "Settings", icon: Settings },

@@ -13,15 +13,49 @@
         else document.documentElement.classList.remove("dark");
       })();
     </script>
+    <style>
+      /* Hide Google Translate banner immediately */
+      .goog-te-banner-frame,
+      iframe.goog-te-banner-frame,
+      .skiptranslate {
+        display: none !important;
+        height: 0 !important;
+        pointer-events: none !important;
+      }
+      body {
+        top: 0 !important;
+        position: static !important;
+      }
+    </style>
+    <script>
+      // Fix Google Translate body offset that breaks click hit-testing
+      (function () {
+        var observer = new MutationObserver(function () {
+          if (document.body && document.body.style.top) {
+            document.body.style.top = "0px";
+          }
+          if (document.body && document.body.style.position === "relative") {
+            document.body.style.position = "static";
+          }
+        });
+        document.addEventListener("DOMContentLoaded", function () {
+          observer.observe(document.body, {
+            attributes: true,
+            attributeFilter: ["style"],
+          });
+        });
+      })();
+    </script>
   </head>
   <body>
-    <!-- Hidden Google Translate widget container -->
-    <div id="google_translate_element" style="display: none"></div>
-
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
 
-    <!-- Google Translate API -->
+    <!-- Google Translate (hidden widget, triggered programmatically) -->
+    <div
+      id="google_translate_element"
+      style="display: none; visibility: hidden; position: absolute"
+    ></div>
     <script>
       window.googleTranslateElementInit = function () {
         new window.google.translate.TranslateElement(

@@ -6,6 +6,7 @@ import doctorsData from "../../constant/data/doctors.json";
 import emergencyData from "../../constant/data/emergencyContacts.json";
 import eventsData from "../../constant/data/events.json";
 import adsData from "../../constant/data/advertisements.json";
+import bloodDonationData from "../../constant/data/bloodDonation.json";
 
 // ─── Initial State ─────────────────────────────────────────────────────────────
 const initialState = {
@@ -16,6 +17,7 @@ const initialState = {
   emergency: emergencyData,
   events: eventsData,
   advertisements: adsData,
+  bloodCamps: bloodDonationData,
   settings: SETTINGS,
   toasts: [],
 };
@@ -168,6 +170,27 @@ function adminReducer(state, action) {
         advertisements: state.advertisements.filter(
           (a) => a.id !== action.payload,
         ),
+      };
+    // Blood Camps
+    case "ADD_BLOOD_CAMP":
+      return {
+        ...state,
+        bloodCamps: [
+          ...state.bloodCamps,
+          { ...action.payload, id: String(Date.now()), donors: [] },
+        ],
+      };
+    case "UPDATE_BLOOD_CAMP":
+      return {
+        ...state,
+        bloodCamps: state.bloodCamps.map((c) =>
+          c.id === action.payload.id ? action.payload : c,
+        ),
+      };
+    case "DELETE_BLOOD_CAMP":
+      return {
+        ...state,
+        bloodCamps: state.bloodCamps.filter((c) => c.id !== action.payload),
       };
     // Settings
     case "UPDATE_SETTINGS":

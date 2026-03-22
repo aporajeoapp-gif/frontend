@@ -27,9 +27,9 @@
   }
 }
 
-/* ── Smooth theme transitions ── */
-*, *::before, *::after {
-  transition-property: background-color, border-color, color, box-shadow;
+/* ── Smooth theme transitions (background/color only, not transforms) ── */
+body, body * {
+  transition-property: background-color, border-color, color;
   transition-duration: 150ms;
   transition-timing-function: ease;
 }
@@ -70,14 +70,37 @@
   box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.06), 0 1px 2px -1px rgb(0 0 0 / 0.06);
 }
 
-/* ── Hide Google Translate toolbar ── */
+
+
+/* ── Hide Google Translate toolbar injected into DOM ── */
 .goog-te-banner-frame,
-.skiptranslate > iframe,
-.goog-te-banner-frame.skiptranslate {
+.goog-te-banner-frame.skiptranslate,
+#goog-gt-tt,
+.goog-te-balloon-frame,
+.skiptranslate {
+  display: none !important;
+  visibility: hidden !important;
+  height: 0 !important;
+  pointer-events: none !important;
+}
+body {
+  top: 0 !important;
+  position: static !important;
+  margin-top: 0 !important;
+  transform: none !important;
+}
+iframe.goog-te-banner-frame {
+  display: none !important;
+  pointer-events: none !important;
+}
+.goog-te-gadget { display: none !important; }
+.goog-te-combo { display: none !important; }
+
+/* Prevent Google Translate iframes from blocking clicks */
+iframe[id^="goog"] {
+  pointer-events: none !important;
   display: none !important;
 }
-body { top: 0 !important; }
-.goog-te-gadget { display: none !important; }
 
 /* Ticker tape animation */
 @keyframes ticker {

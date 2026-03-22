@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import events from "../constant/data/events.json";
 import PageBanner from "../components/PageBanner";
+import { useTranslation } from "../context/LanguageContext";
 
 const CATEGORY_META = {
   Health: {
@@ -42,6 +43,7 @@ const CATEGORY_META = {
 };
 
 export default function Events() {
+  const { t } = useTranslation();
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
       <PageBanner

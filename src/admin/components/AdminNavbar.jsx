@@ -11,8 +11,10 @@ import {
   User,
   Settings,
   ExternalLink,
+  Globe,
 } from "lucide-react";
 import { ThemeContext } from "../../context/ThemeContext";
+import { LanguageContext } from "../../context/LanguageContext";
 import { Link } from "react-router-dom";
 
 const NOTIFICATIONS = [
@@ -39,6 +41,7 @@ const NOTIFICATIONS = [
 
 export default function AdminNavbar({ onMenuClick }) {
   const { theme, toggleTheme } = useContext(ThemeContext);
+  const { language, toggleLanguage } = useContext(LanguageContext);
   const [notifOpen, setNotifOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [search, setSearch] = useState("");
@@ -86,6 +89,18 @@ export default function AdminNavbar({ onMenuClick }) {
           className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 transition-colors"
         >
           {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
+        </button>
+
+        {/* Language toggle */}
+        <button
+          onClick={toggleLanguage}
+          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors text-slate-600 dark:text-slate-300"
+          title="Toggle language"
+        >
+          <Globe size={15} className="text-indigo-500" />
+          <span className="text-xs font-bold hidden sm:inline">
+            {language === "en" ? "বাংলা" : "EN"}
+          </span>
         </button>
 
         {/* Notifications */}

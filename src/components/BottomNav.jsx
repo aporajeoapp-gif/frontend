@@ -5,7 +5,7 @@ import {
   AlertTriangle,
   Bus,
   Ship,
-  CalendarDays,
+  Droplets,
 } from "lucide-react";
 
 const LINKS = [
@@ -14,7 +14,7 @@ const LINKS = [
   { path: "/emergency", label: "Emergency", Icon: AlertTriangle },
   { path: "/bus", label: "Bus", Icon: Bus },
   { path: "/ferry", label: "Ferry", Icon: Ship },
-  { path: "/events", label: "Events", Icon: CalendarDays },
+  { path: "/blood-donation", label: "Blood", Icon: Droplets },
 ];
 
 export default function BottomNav() {

@@ -15,9 +15,13 @@ import {
   CalendarCheck,
   ChevronUp,
   ChevronDown,
+  X,
+  Clock,
+  Building,
 } from "lucide-react";
 import doctors from "../constant/data/doctors.json";
 import PageBanner from "../components/PageBanner";
+import { useTranslation } from "../context/LanguageContext";
 
 function StarRating({ rating }) {
   return (
@@ -39,6 +43,90 @@ function StarRating({ rating }) {
         {rating}
       </span>
     </div>
+  );
+}
+
+function BookingModal({ doctor, onClose }) {
+  const { t } = useTranslation();
+  if (!doctor) return null;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 z-[10001] flex items-center justify-center px-4 bg-slate-950/60 backdrop-blur-md"
+      onClick={onClose}
+    >
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.9, y: 20 }}
+        onClick={(e) => e.stopPropagation()}
+        className="w-full max-w-md bg-white dark:bg-slate-900 rounded-3xl overflow-hidden shadow-2xl border border-slate-200 dark:border-slate-800"
+      >
+        <div className="relative p-6 pt-8 text-center bg-linear-to-br from-indigo-500/10 to-violet-500/10 border-b border-slate-100 dark:border-slate-800">
+          <button
+            onClick={onClose}
+            className="absolute top-4 right-4 p-2 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+          >
+            <X size={20} />
+          </button>
+          <div className="w-16 h-16 rounded-2xl bg-linear-to-br from-indigo-500 to-violet-500 flex items-center justify-center mx-auto mb-4 shadow-lg shadow-indigo-200 dark:shadow-indigo-900/40">
+            <CalendarCheck size={32} className="text-white" />
+          </div>
+          <h3 className="text-xl font-extrabold text-slate-800 dark:text-white">
+            {doctor.name}
+          </h3>
+          <p className="text-sm font-semibold text-indigo-600 dark:text-indigo-400 mt-1 uppercase tracking-wider">
+            {doctor.specialty}
+          </p>
+        </div>
+
+        <div className="p-6">
+          <h4 className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-4">
+            {t.weekly_schedule}
+          </h4>
+          <div className="space-y-3">
+            {doctor.schedule?.map((s, idx) => (
+              <div
+                key={idx}
+                className="group flex flex-col gap-2 p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700/50 hover:border-indigo-200 dark:hover:border-indigo-500/30 transition-all"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-bold text-slate-700 dark:text-slate-200">
+                    {s.day}
+                  </span>
+                  <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400">
+                    <Clock size={12} className="shrink-0" />
+                    <span className="text-[11px] font-bold">{s.time}</span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+                  <Building size={12} className="shrink-0 text-slate-400" />
+                  <span className="truncate">{s.chamber}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-8 flex gap-3">
+            <a
+              href={`tel:${doctor.phone}`}
+              className="flex-1 inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-2xl bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold text-sm border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all active:scale-95"
+            >
+              <Phone size={16} /> {t.call_clinic}
+            </a>
+            <button
+              onClick={onClose}
+              className="flex-1 px-6 py-3.5 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm shadow-lg shadow-indigo-200 dark:shadow-indigo-900/40 transition-all active:scale-95"
+            >
+              {t.confirm}
+            </button>
+          </div>
+        </div>
+      </motion.div>
+    </motion.div>
   );
 }
 
@@ -76,11 +164,13 @@ const defaultColor = {
 };
 
 export default function Doctor() {
+  const { t } = useTranslation();
   const [search, setSearch] = useState("");
   const [specialty, setSpecialty] = useState("");
   const [view, setView] = useState("table");
   const [sortField, setSortField] = useState("name");
   const [sortDir, setSortDir] = useState("asc");
+  const [selectedDoctor, setSelectedDoctor] = useState(null);
 
   const specialties = [...new Set(doctors.map((d) => d.specialty))];
 
@@ -149,54 +239,64 @@ export default function Doctor() {
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.06 }}
-          className="flex flex-col sm:flex-row gap-3 mb-6 bg-white dark:bg-slate-900 p-3 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm"
+          className="flex flex-col sm:flex-row gap-4 mb-8 bg-slate-900/95 dark:bg-slate-900/50 backdrop-blur-xl p-2 sm:p-2.5 rounded-[24px] border border-white/5 dark:border-white/10 shadow-2xl"
         >
           <div className="relative flex-1">
             <Search
-              size={14}
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
+              size={15}
+              className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
             />
             <input
               type="text"
-              placeholder="Search doctors..."
+              placeholder={t.search_placeholder_doctors}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+              className="w-full h-12 pl-12 pr-4 rounded-[18px] bg-white/5 dark:bg-slate-800/40 text-sm text-slate-100 dark:text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all border-none"
               data-testid="search-input"
             />
           </div>
-          <div className="relative">
-            <SlidersHorizontal
-              size={13}
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
-            />
-            <select
-              value={specialty}
-              onChange={(e) => setSpecialty(e.target.value)}
-              className="pl-9 pr-8 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition appearance-none"
-              data-testid="filter-dropdown"
-            >
-              <option value="">All Specialties</option>
-              {specialties.map((s) => (
-                <option key={s} value={s}>
-                  {s}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="flex rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
-            {[
-              ["table", Table2, "Table"],
-              ["card", LayoutGrid, "Cards"],
-            ].map(([v, Icon, lbl]) => (
-              <button
-                key={v}
-                onClick={() => setView(v)}
-                className={`flex items-center gap-1.5 px-3 py-2 text-sm font-medium transition-colors ${view === v ? "bg-indigo-600 text-white" : "bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700"}`}
+          
+          <div className="flex gap-2">
+            <div className="relative">
+              <SlidersHorizontal
+                size={14}
+                className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
+              />
+              <select
+                value={specialty}
+                onChange={(e) => setSpecialty(e.target.value)}
+                className="h-12 pl-11 pr-10 rounded-[18px] bg-white/5 dark:bg-slate-800/40 text-sm text-slate-300 dark:text-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all appearance-none border-none min-w-[160px]"
+                data-testid="filter-dropdown"
               >
-                <Icon size={13} /> {lbl}
-              </button>
-            ))}
+                <option value="" className="bg-slate-900">{t.all_specialties}</option>
+                {specialties.map((s) => (
+                  <option key={s} value={s} className="bg-slate-900">
+                    {s}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown size={14} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none" />
+            </div>
+
+            <div className="flex p-1 gap-1 bg-white/5 dark:bg-slate-800/40 rounded-[18px] shrink-0 h-12 items-center">
+              {[
+                ["table", Table2, t.table_view],
+                ["card", LayoutGrid, t.card_view],
+              ].map(([v, Icon, lbl]) => (
+                <button
+                  key={v}
+                  onClick={() => setView(v)}
+                  className={`flex items-center justify-center w-10 sm:w-11 h-10 rounded-[14px] transition-all duration-300 ${
+                    view === v 
+                      ? "bg-indigo-600 text-white shadow-lg shadow-indigo-600/30" 
+                      : "text-slate-500 hover:text-slate-300 hover:bg-white/5"
+                  }`}
+                  title={lbl}
+                >
+                  <Icon size={16} />
+                </button>
+              ))}
+            </div>
           </div>
         </motion.div>
 
@@ -214,12 +314,12 @@ export default function Doctor() {
                   <thead>
                     <tr className="bg-slate-50 dark:bg-slate-800/60 border-b border-slate-200 dark:border-slate-700">
                       {[
-                        ["name", "Name"],
-                        ["specialty", "Specialty"],
-                        ["location", "Location"],
-                        ["experience", "Experience"],
-                        ["rating", "Rating"],
-                        [null, "Actions"],
+                        ["name", t.name],
+                        ["specialty", t.specialty],
+                        ["location", t.location],
+                        ["experience", t.experience],
+                        // ["rating", t.rating],
+                        [null, t.actions],
                       ].map(([key, label]) => (
                         <th
                           key={label}
@@ -289,19 +389,22 @@ export default function Doctor() {
                               {doc.experience} yrs
                             </div>
                           </td>
-                          <td className="px-4 py-3">
+                          {/* <td className="px-4 py-3">
                             <StarRating rating={doc.rating} />
-                          </td>
+                          </td> */}
                           <td className="px-4 py-3">
                             <div className="flex items-center gap-2">
                               <a
                                 href={`tel:${doc.phone}`}
                                 className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-xs font-semibold hover:bg-emerald-100 transition-colors"
                               >
-                                <PhoneCall size={10} /> Call
+                                <PhoneCall size={10} /> {t.call_now}
                               </a>
-                              <button className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 text-xs font-semibold hover:bg-indigo-100 transition-colors">
-                                <CalendarCheck size={10} /> Book
+                              <button
+                                onClick={() => setSelectedDoctor(doc)}
+                                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 text-xs font-semibold hover:bg-indigo-100 transition-colors"
+                              >
+                                <CalendarCheck size={10} /> {t.book}
                               </button>
                             </div>
                           </td>
@@ -397,7 +500,10 @@ export default function Doctor() {
                           >
                             <PhoneCall size={13} />
                           </a>
-                          <button className="p-2 rounded-lg bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 transition-colors">
+                          <button
+                            onClick={() => setSelectedDoctor(doc)}
+                            className="p-2 rounded-lg bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 transition-colors"
+                          >
                             <CalendarCheck size={13} />
                           </button>
                         </div>
@@ -418,6 +524,15 @@ export default function Doctor() {
                 </div>
               )}
             </motion.div>
+          )}
+        </AnimatePresence>
+
+        <AnimatePresence>
+          {selectedDoctor && (
+            <BookingModal
+              doctor={selectedDoctor}
+              onClose={() => setSelectedDoctor(null)}
+            />
           )}
         </AnimatePresence>
       </div>
