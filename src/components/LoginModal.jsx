@@ -1,38 +1,55 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Mail, Lock, LogIn, CheckCircle, AlertCircle } from "lucide-react";
+import { X, Mail, Lock, LogIn, CheckCircle, AlertCircle, CloudCog } from "lucide-react";
+import { loginUser } from "../api/authApi";
+import { useNavigate } from "react-router-dom";
+
 
 export default function LoginModal({ isOpen, onClose }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
-  const ADMIN_EMAIL = "admin@gmail.com";
-  const ADMIN_PASSWORD = "123456";
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setError("");
-    setSuccess(false);
+  // const ADMIN_EMAIL = "admin@gmail.com";
+  // const ADMIN_PASSWORD = "123456";
+  const navigate=useNavigate()
+  const handleSubmit = async (e) => {
+    try {
+      e.preventDefault();
+      setError("");
+      setSuccess(false);
 
-    if (!email.trim()) return setError("Email is required.");
-    if (!password.trim()) return setError("Password is required.");
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
-      return setError("Invalid email address.");
+      if (!email.trim()) return setError("Email is required.");
+      if (!password.trim()) return setError("Password is required.");
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+        return setError("Invalid email address.");
+      const payload = {
+        email,
+        password
+      }
+      const res=await loginUser(payload)
+      console.log(res.token)
+      localStorage.setItem("token",res.token)
+      navigate("/admin")
+
+    } catch (error) {
+      console.log(error)
+    }
 
     // 🔐 Static check
-    if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
-      setSuccess(true);
+    // if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
+    //   setSuccess(true);
 
-      setTimeout(() => {
-        onClose();
-        setSuccess(false);
+    //   // setTimeout(() => {
+    //   //   onClose();
+    //   //   setSuccess(false);
 
-        // 👉 redirect to admin page
-        window.location.href = "/admin";
-      }, 1000);
-    } else {
-      setError("Invalid admin credentials");
-    }
+    //     // 👉 redirect to admin page
+    //     window.location.href = "/admin";
+    //   // }, 1000);
+    // } else {
+    //   setError("Invalid admin credentials");
+    // }
   };
 
   return (

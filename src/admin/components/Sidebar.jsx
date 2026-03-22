@@ -16,6 +16,7 @@ import {
   Droplets,
 } from "lucide-react";
 import logo from "../../../public/logo.png";
+import fetchUser from "../../hooks/userhook";
 const NAV_ITEMS = [
   { to: "/admin", label: "Dashboard", icon: LayoutDashboard, end: true },
   { to: "/admin/users", label: "Users", icon: Users },
@@ -36,13 +37,14 @@ export default function Sidebar({
   mobileOpen,
   onMobileClose,
 }) {
+  const { profile } = fetchUser()
+  console.log(profile)
   const sidebarContent = (
     <div className="flex flex-col h-full">
       {/* Logo */}
       <div
-        className={`flex flex-col items-center px-4 py-5 border-b border-slate-200 dark:border-slate-800 ${
-          collapsed ? "justify-center" : ""
-        }`}
+        className={`flex flex-col items-center px-4 py-5 border-b border-slate-200 dark:border-slate-800 ${collapsed ? "justify-center" : ""
+          }`}
       >
         <div className="flex items-center justify-center">
           <img
@@ -50,6 +52,17 @@ export default function Sidebar({
             alt="logo"
             className="h-8 w-auto object-contain transition-transform group-hover:scale-105"
           />
+
+          <button
+            onClick={onToggle}
+            className="ml-2 p-2 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition"
+          >
+            <ChevronLeft
+              size={16}
+              className={`transition-transform duration-200 ${collapsed ? "rotate-180" : ""
+                }`}
+            />
+          </button>
         </div>
 
         <AnimatePresence>
@@ -66,7 +79,9 @@ export default function Sidebar({
             </motion.div>
           )}
         </AnimatePresence>
+
       </div>
+
 
       {/* Nav */}
       <nav className="flex-1 overflow-y-auto py-4 px-2 space-y-0.5">
@@ -78,10 +93,9 @@ export default function Sidebar({
             onClick={onMobileClose}
             className={({ isActive }) =>
               `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 group
-              ${
-                isActive
-                  ? "bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400"
-                  : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white"
+              ${isActive
+                ? "bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400"
+                : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white"
               } ${collapsed ? "justify-center" : ""}`
             }
             title={collapsed ? label : undefined}
@@ -112,18 +126,28 @@ export default function Sidebar({
 
       {/* Collapse toggle (desktop) */}
       <div className="p-3 border-t border-slate-200 dark:border-slate-800 hidden lg:block">
-        <button
-          onClick={onToggle}
-          className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors ${collapsed ? "justify-center" : ""}`}
-        >
-          <motion.div
-            animate={{ rotate: collapsed ? 180 : 0 }}
-            transition={{ duration: 0.2 }}
-          >
-            <ChevronLeft size={16} />
-          </motion.div>
-          {!collapsed && <span>Collapse</span>}
-        </button>
+
+        <div className="flex items-center gap-3 px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-800">
+
+          {/* Icon */}
+          <div className="w-8 h-8 flex items-center justify-center rounded-full bg-indigo-500 text-white text-xs font-semibold">
+            {profile?.role?.charAt(0)?.toUpperCase() || "A"}
+          </div>
+
+          {/* Role */}
+          {!collapsed && (
+            <div className="flex flex-col">
+              <span className="text-xs text-slate-500 dark:text-slate-400">
+                Logged in as
+              </span>
+              <span className="text-sm font-semibold text-slate-800 dark:text-white capitalize">
+                {profile?.role || "Admin"}
+              </span>
+            </div>
+          )}
+
+        </div>
+
       </div>
     </div>
   );

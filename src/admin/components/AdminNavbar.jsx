@@ -16,6 +16,7 @@ import {
 import { ThemeContext } from "../../context/ThemeContext";
 import { LanguageContext } from "../../context/LanguageContext";
 import { Link } from "react-router-dom";
+import fetchUser from "../../hooks/userhook";
 
 const NOTIFICATIONS = [
   {
@@ -47,7 +48,7 @@ export default function AdminNavbar({ onMenuClick }) {
   const [search, setSearch] = useState("");
   const notifRef = useRef(null);
   const profileRef = useRef(null);
-
+  const { profile } = fetchUser()
   useEffect(() => {
     function handleClick(e) {
       if (notifRef.current && !notifRef.current.contains(e.target))
@@ -159,10 +160,11 @@ export default function AdminNavbar({ onMenuClick }) {
             className="flex items-center gap-2 pl-2 pr-3 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
           >
             <div className="w-7 h-7 rounded-full bg-indigo-600 flex items-center justify-center text-white text-xs font-bold">
-              AB
+              {profile?.name?.split(" ")[0]?.charAt(0) +
+                profile?.name?.split(" ")[1]?.charAt(0)}
             </div>
             <span className="text-sm font-medium text-slate-700 dark:text-slate-300 hidden sm:block">
-              Aryan Bose
+              {profile?.name}
             </span>
             <ChevronDown size={14} className="text-slate-400 hidden sm:block" />
           </button>
@@ -177,10 +179,10 @@ export default function AdminNavbar({ onMenuClick }) {
               >
                 <div className="px-4 py-3 border-b border-slate-100 dark:border-slate-800">
                   <p className="text-sm font-semibold text-slate-900 dark:text-white">
-                    Aryan Bose
+                    {profile?.name}
                   </p>
                   <p className="text-xs text-slate-500 dark:text-slate-400">
-                    aryan@enjio.app
+                    {profile?.email}
                   </p>
                 </div>
                 {[

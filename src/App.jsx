@@ -30,6 +30,7 @@ import AdsPage from "./admin/pages/AdsPage";
 import AnalyticsPage from "./admin/pages/AnalyticsPage";
 import SettingsPage from "./admin/pages/SettingsPage";
 import BloodDonationPage from "./admin/pages/BloodDonationPage";
+import ProtectedRoute from "./protectedroute/ProtectedRoute";
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -66,18 +67,20 @@ function App() {
         <AdminProvider>
           <ScrollToTop />
           <Routes>
-            <Route path="/admin" element={<AdminLayout />}>
-              <Route index element={<AdminDashboard />} />
-              <Route path="users" element={<UsersPage />} />
-              <Route path="bus" element={<BusPage />} />
-              <Route path="ferry" element={<FerryPage />} />
-              <Route path="doctors" element={<DoctorsPage />} />
-              <Route path="emergency" element={<EmergencyPage />} />
-              <Route path="events" element={<EventsPage />} />
-              <Route path="advertisements" element={<AdsPage />} />
-              <Route path="analytics" element={<AnalyticsPage />} />
-              <Route path="settings" element={<SettingsPage />} />
-              <Route path="blood-donation" element={<BloodDonationPage />} />
+            <Route element={<ProtectedRoute />}>
+              <Route path="/admin" element={<AdminLayout />}>
+                <Route index element={<AdminDashboard />} />
+                <Route path="users" element={<UsersPage />} />
+                <Route path="bus" element={<BusPage />} />
+                <Route path="ferry" element={<FerryPage />} />
+                <Route path="doctors" element={<DoctorsPage />} />
+                <Route path="emergency" element={<EmergencyPage />} />
+                <Route path="events" element={<EventsPage />} />
+                <Route path="advertisements" element={<AdsPage />} />
+                <Route path="analytics" element={<AnalyticsPage />} />
+                <Route path="settings" element={<SettingsPage />} />
+                <Route path="blood-donation" element={<BloodDonationPage />} />
+              </Route>
             </Route>
 
             <Route path="/" element={<PublicLayout />}>
