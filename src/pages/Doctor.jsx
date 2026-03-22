@@ -239,7 +239,7 @@ export default function Doctor() {
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.06 }}
-          className="flex flex-col sm:flex-row gap-4 mb-8 bg-slate-900/95 dark:bg-slate-900/50 backdrop-blur-xl p-2 sm:p-2.5 rounded-[24px] border border-white/5 dark:border-white/10 shadow-2xl"
+          className="flex flex-col sm:flex-row gap-4 mb-8 bg-slate-100 dark:bg-slate-900/50 backdrop-blur-xl p-2 sm:p-2.5 rounded-[24px] border border-slate-200 dark:border-white/10 shadow-md"
         >
           <div className="relative flex-1">
             <Search
@@ -251,11 +251,11 @@ export default function Doctor() {
               placeholder={t.search_placeholder_doctors}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full h-12 pl-12 pr-4 rounded-[18px] bg-white/5 dark:bg-slate-800/40 text-sm text-slate-100 dark:text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all border-none"
+              className="w-full h-12 pl-12 pr-4 rounded-[18px] bg-slate-100 dark:bg-slate-800/40 text-sm text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all border-none outline-none"
               data-testid="search-input"
             />
           </div>
-          
+
           <div className="flex gap-2">
             <div className="relative">
               <SlidersHorizontal
@@ -265,20 +265,32 @@ export default function Doctor() {
               <select
                 value={specialty}
                 onChange={(e) => setSpecialty(e.target.value)}
-                className="h-12 pl-11 pr-10 rounded-[18px] bg-white/5 dark:bg-slate-800/40 text-sm text-slate-300 dark:text-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all appearance-none border-none min-w-[160px]"
+                className="h-12 pl-11 pr-10 rounded-[18px] bg-white dark:bg-slate-800/40 text-sm text-slate-800 dark:text-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all appearance-none border border-slate-200 dark:border-transparent min-w-[160px]"
                 data-testid="filter-dropdown"
               >
-                <option value="" className="bg-slate-900">{t.all_specialties}</option>
+                <option
+                  value=""
+                  className="bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200"
+                >
+                  {t.all_specialties}
+                </option>
                 {specialties.map((s) => (
-                  <option key={s} value={s} className="bg-slate-900">
+                  <option
+                    key={s}
+                    value={s}
+                    className="bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200"
+                  >
                     {s}
                   </option>
                 ))}
               </select>
-              <ChevronDown size={14} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none" />
+              <ChevronDown
+                size={14}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none"
+              />
             </div>
 
-            <div className="flex p-1 gap-1 bg-white/5 dark:bg-slate-800/40 rounded-[18px] shrink-0 h-12 items-center">
+            <div className="flex p-1 gap-1 bg-white dark:bg-slate-800/40 border border-slate-200 dark:border-transparent rounded-[18px] shrink-0 h-12 items-center">
               {[
                 ["table", Table2, t.table_view],
                 ["card", LayoutGrid, t.card_view],
@@ -287,8 +299,8 @@ export default function Doctor() {
                   key={v}
                   onClick={() => setView(v)}
                   className={`flex items-center justify-center w-10 sm:w-11 h-10 rounded-[14px] transition-all duration-300 ${
-                    view === v 
-                      ? "bg-indigo-600 text-white shadow-lg shadow-indigo-600/30" 
+                    view === v
+                      ? "bg-indigo-600 text-white shadow-lg shadow-indigo-600/30"
                       : "text-slate-500 hover:text-slate-300 hover:bg-white/5"
                   }`}
                   title={lbl}
