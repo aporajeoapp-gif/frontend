@@ -1,8 +1,7 @@
 import { useRef, useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { ArrowRight, Sparkles } from "lucide-react";
+import { Sparkles } from "lucide-react";
 
-// import ads from "../constant/data/advertisements.json"
 const ads = [
   {
     id: 1,
@@ -103,14 +102,10 @@ function AdCard({ ad, dark, didDragRef }) {
       onClick={(e) => {
         if (didDragRef.current) e.preventDefault();
       }}
-      className="group relative shrink-0 w-[290px] mx-3 flex flex-col overflow-hidden rounded-2xl transition-all duration-300 hover:-translate-y-2 select-none"
+      className="group relative shrink-0 w-[290px] mx-2.5 flex flex-col overflow-hidden rounded-2xl transition-all duration-300 hover:-translate-y-1.5 select-none"
       style={{
-        background: dark
-          ? "rgba(255,255,255,0.04)"
-          : "rgba(255,255,255,0.85)",
-        border: `1px solid ${
-          dark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.07)"
-        }`,
+        background: dark ? "rgba(255,255,255,0.04)" : "rgba(255,255,255,0.85)",
+        border: `1px solid ${dark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.07)"}`,
         backdropFilter: "blur(12px)",
         boxShadow: dark
           ? "0 4px 24px rgba(0,0,0,0.4)"
@@ -148,9 +143,7 @@ function AdCard({ ad, dark, didDragRef }) {
         </h3>
         <p
           className="text-[11.5px] leading-relaxed flex-1"
-          style={{
-            color: dark ? "rgba(255,255,255,0.45)" : "rgba(0,0,0,0.5)",
-          }}
+          style={{ color: dark ? "rgba(255,255,255,0.45)" : "rgba(0,0,0,0.5)" }}
         >
           {ad.description}
         </p>
@@ -168,10 +161,7 @@ function AdCard({ ad, dark, didDragRef }) {
               className="w-1.5 h-1.5 rounded-full"
               style={{ background: accent }}
             />
-            <span
-              className="text-[10px] font-semibold"
-              style={{ color: accent }}
-            >
+            <span className="text-[10px] font-semibold" style={{ color: accent }}>
               Sponsored
             </span>
           </div>
@@ -179,13 +169,12 @@ function AdCard({ ad, dark, didDragRef }) {
             className="inline-flex items-center gap-1.5 text-[11px] font-bold px-3 py-1.5 rounded-lg text-white transition-all duration-200 group-hover:gap-2.5"
             style={{ background: accent }}
           >
-            {ad.cta}
-            <ArrowRight size={11} />
+            {ad.cta} →
           </span>
         </div>
       </div>
 
-      {/* Inset glow on hover */}
+      {/* Hover inset glow */}
       <div
         className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
         style={{ boxShadow: `inset 0 0 0 1.5px ${accent}55` }}
@@ -194,116 +183,155 @@ function AdCard({ ad, dark, didDragRef }) {
   );
 }
 
-/* ── Marquee with drag + touch + momentum ───────────────────────────────── */
-const AUTO_SPEED = 32; // px / second (auto-scroll)
-const FRICTION   = 0.92; // momentum decay per frame
+/* ── Constants ──────────────────────────────────────────────────────────── */
+const AUTO_SPEED = 32;   // px/s
+const FRICTION   = 0.88; // momentum decay per frame
+const MAX_DT     = 50;   // ms — cap to avoid jumps after tab-hide
 
+/* ── Marquee track ──────────────────────────────────────────────────────── */
 function MarqueeTrack({ dark }) {
-  const trackRef   = useRef(null);
-  const posRef     = useRef(0);
-  const rafRef     = useRef(null);
+  const trackRef    = useRef(null);
+  const posRef      = useRef(0);
+  const halfWRef    = useRef(0);
+  const rafRef      = useRef(null);
 
-  // interaction state kept in refs so RAF doesn't need re-registration
+  // Interaction state in refs — no re-renders needed
   const hoveredRef  = useRef(false);
-  const dragRef     = useRef(false);     // is finger / mouse currently held
-  const didDragRef  = useRef(false);     // moved >4px this gesture?
+  const pressingRef = useRef(false);
+  const didDragRef  = useRef(false);
   const startXRef   = useRef(0);
   const lastXRef    = useRef(0);
   const lastTRef    = useRef(0);
-  const velRef      = useRef(0);         // px / ms — for momentum after release
+  const velRef      = useRef(0);       // px/ms
+  const prevTRef    = useRef(null);
 
-  const doubled = [...ads, ...ads];
+  // 3 copies for seamless bidirectional loop
+  const tripled = [...ads, ...ads, ...ads];
 
   /* RAF loop */
   useEffect(() => {
     const track = trackRef.current;
     if (!track) return;
-    let prev = null;
+
+    // Initialise to middle copy after first paint
+    const init = requestAnimationFrame(() => {
+      halfWRef.current = track.scrollWidth / 3;
+      posRef.current   = -halfWRef.current;
+      track.style.transform = `translateX(${posRef.current}px)`;
+    });
 
     const step = (ts) => {
-      const dt  = prev !== null ? ts - prev : 0;
-      const half = track.scrollWidth / 2;
+      const dt   = prevTRef.current !== null
+        ? Math.min(ts - prevTRef.current, MAX_DT)
+        : 0;
+      prevTRef.current = ts;
 
-      if (dragRef.current) {
-        // While dragging: position is set directly in move handler
-      } else if (Math.abs(velRef.current) > 0.02) {
-        // Momentum coast after release
-        posRef.current += velRef.current * dt;
-        velRef.current *= FRICTION;
-      } else if (!hoveredRef.current) {
-        // Normal auto-scroll
-        velRef.current = 0;
-        posRef.current -= (AUTO_SPEED / 1000) * dt;
+      const half = halfWRef.current;
+
+      if (!pressingRef.current) {
+        if (Math.abs(velRef.current) > 0.05) {
+          // Coast with momentum
+          posRef.current += velRef.current * dt;
+          velRef.current *= FRICTION;
+        } else if (!hoveredRef.current) {
+          // Normal auto-scroll
+          velRef.current  = 0;
+          posRef.current -= (AUTO_SPEED / 1000) * dt;
+        }
+        // hovering + vel~0 → do nothing (fully stopped)
       }
 
-      // Seamless loop
-      while (posRef.current <= -half) posRef.current += half;
-      while (posRef.current > 0)      posRef.current -= half;
+      // Seamless clamp: stay within the middle copy range
+      if (half > 0) {
+        if (posRef.current <= -half * 2) posRef.current += half;
+        if (posRef.current >  -half)     posRef.current -= half;
+      }
 
       track.style.transform = `translateX(${posRef.current}px)`;
-      prev = ts;
       rafRef.current = requestAnimationFrame(step);
     };
 
     rafRef.current = requestAnimationFrame(step);
-    return () => cancelAnimationFrame(rafRef.current);
+    return () => {
+      cancelAnimationFrame(init);
+      cancelAnimationFrame(rafRef.current);
+    };
   }, []);
 
-  /* Shared pointer start */
-  const handleStart = (clientX) => {
-    dragRef.current    = true;
-    didDragRef.current = false;
-    velRef.current     = 0;
-    startXRef.current  = clientX;
-    lastXRef.current   = clientX;
-    lastTRef.current   = performance.now();
-    if (trackRef.current) trackRef.current.style.cursor = "grabbing";
+  /* Shared pointer helpers */
+  const onStart = (clientX) => {
+    pressingRef.current = true;
+    didDragRef.current  = false;
+    velRef.current      = 0;
+    startXRef.current   = clientX;
+    lastXRef.current    = clientX;
+    lastTRef.current    = performance.now();
   };
 
-  /* Shared pointer move */
-  const handleMove = (clientX) => {
-    if (!dragRef.current) return;
+  const onMove = (clientX) => {
+    if (!pressingRef.current) return;
     const now = performance.now();
     const dx  = clientX - lastXRef.current;
-    const dt  = now - lastTRef.current;
+    const dt  = now - lastTRef.current || 1;
 
     if (Math.abs(clientX - startXRef.current) > 4) didDragRef.current = true;
 
     posRef.current  += dx;
-    velRef.current   = dt > 0 ? (dx / dt) : 0;
+    velRef.current   = dx / dt;
     lastXRef.current = clientX;
     lastTRef.current = now;
   };
 
-  /* Shared pointer end */
-  const handleEnd = () => {
-    dragRef.current = false;
-    if (trackRef.current) trackRef.current.style.cursor = "grab";
+  const onEnd = () => {
+    pressingRef.current = false;
     // velRef keeps its value → momentum handled in RAF
+  };
+
+  /* Touch — respect vertical scroll */
+  const touchStartYRef  = useRef(0);
+  const isHorizRef      = useRef(false);
+
+  const handleTouchStart = (e) => {
+    touchStartYRef.current = e.touches[0].clientY;
+    isHorizRef.current     = false;
+    onStart(e.touches[0].clientX);
+  };
+
+  const handleTouchMove = (e) => {
+    const t  = e.touches[0];
+    const dx = Math.abs(t.clientX - startXRef.current);
+    const dy = Math.abs(t.clientY - touchStartYRef.current);
+
+    if (!isHorizRef.current && dy > dx) {
+      // Vertical swipe — release and let the page scroll
+      onEnd();
+      return;
+    }
+    isHorizRef.current = true;
+    e.preventDefault(); // block page scroll only for horizontal swipes
+    onMove(t.clientX);
   };
 
   return (
     <div
-      className="overflow-hidden w-full py-3"
+      className="overflow-hidden w-full py-3 select-none"
       style={{ cursor: "grab", touchAction: "pan-y" }}
-      /* Mouse */
       onMouseEnter={() => { hoveredRef.current = true; }}
-      onMouseLeave={() => { hoveredRef.current = false; handleEnd(); }}
-      onMouseDown={(e) => handleStart(e.clientX)}
-      onMouseMove={(e) => handleMove(e.clientX)}
-      onMouseUp={handleEnd}
-      /* Touch */
-      onTouchStart={(e) => handleStart(e.touches[0].clientX)}
-      onTouchMove={(e) => { handleMove(e.touches[0].clientX); }}
-      onTouchEnd={handleEnd}
-      onTouchCancel={handleEnd}
+      onMouseLeave={() => { hoveredRef.current = false; onEnd(); }}
+      onMouseDown={(e) => { e.preventDefault(); onStart(e.clientX); }}
+      onMouseMove={(e) => onMove(e.clientX)}
+      onMouseUp={onEnd}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={onEnd}
+      onTouchCancel={onEnd}
     >
       <div
         ref={trackRef}
         className="flex will-change-transform"
         style={{ userSelect: "none" }}
       >
-        {doubled.map((ad, i) => (
+        {tripled.map((ad, i) => (
           <AdCard
             key={`${ad.id}-${i}`}
             ad={ad}
@@ -324,10 +352,12 @@ export default function AdSection() {
     ? "linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%)"
     : "linear-gradient(135deg, #f8faff 0%, #eef2ff 50%, #f8faff 100%)";
 
+  const fadeBg = dark ? "#0f172a" : "#f8faff";
+
   return (
     <section className="overflow-hidden py-12" style={{ background: sectionBg }}>
 
-      {/* ── Centered Header ── */}
+      {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: 18 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -335,26 +365,18 @@ export default function AdSection() {
         transition={{ duration: 0.5, ease: "easeOut" }}
         className="flex flex-col items-center gap-2 mb-10 px-4 text-center"
       >
-        {/* Sponsored pill */}
         <div
           className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-[0.2em]"
           style={{
-            background: dark
-              ? "rgba(255,255,255,0.07)"
-              : "rgba(99,102,241,0.1)",
-            color: dark ? "rgba(255,255,255,0.5)" : "#6366f1",
-            border: `1px solid ${
-              dark
-                ? "rgba(255,255,255,0.1)"
-                : "rgba(99,102,241,0.2)"
-            }`,
+            background: dark ? "rgba(255,255,255,0.07)" : "rgba(99,102,241,0.1)",
+            color:      dark ? "rgba(255,255,255,0.5)"  : "#6366f1",
+            border: `1px solid ${dark ? "rgba(255,255,255,0.1)" : "rgba(99,102,241,0.2)"}`,
           }}
         >
           <Sparkles size={10} />
           Sponsored
         </div>
 
-        {/* Big heading */}
         <h2
           className="text-4xl sm:text-5xl font-black tracking-tight leading-none"
           style={{ color: dark ? "#f8fafc" : "#0f172a" }}
@@ -371,7 +393,6 @@ export default function AdSection() {
           </span>
         </h2>
 
-        {/* Accent rule */}
         <div
           className="mt-1 w-12 h-0.5 rounded-full"
           style={{ background: "linear-gradient(90deg, #6366f1, #8b5cf6)" }}
@@ -379,45 +400,28 @@ export default function AdSection() {
 
         <p
           className="text-[12px] mt-0.5"
-          style={{
-            color: dark
-              ? "rgba(255,255,255,0.3)"
-              : "rgba(0,0,0,0.35)",
-          }}
+          style={{ color: dark ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.35)" }}
         >
           Drag or swipe to explore · {ads.length} active promotions
         </p>
       </motion.div>
 
-      {/* ── Marquee with fade edges ── */}
+      {/* Marquee with fade edges */}
       <div className="relative">
         <div
           className="pointer-events-none absolute inset-y-0 left-0 w-20 z-10"
-          style={{
-            background: dark
-              ? "linear-gradient(to right, #0f172a, transparent)"
-              : "linear-gradient(to right, #f8faff, transparent)",
-          }}
+          style={{ background: `linear-gradient(to right, ${fadeBg}, transparent)` }}
         />
         <div
           className="pointer-events-none absolute inset-y-0 right-0 w-20 z-10"
-          style={{
-            background: dark
-              ? "linear-gradient(to left, #0f172a, transparent)"
-              : "linear-gradient(to left, #f8faff, transparent)",
-          }}
+          style={{ background: `linear-gradient(to left, ${fadeBg}, transparent)` }}
         />
         <MarqueeTrack dark={dark} />
       </div>
 
-      {/* Footer */}
       <p
         className="text-center text-[10px] mt-5 tracking-wide"
-        style={{
-          color: dark
-            ? "rgba(255,255,255,0.18)"
-            : "rgba(0,0,0,0.25)",
-        }}
+        style={{ color: dark ? "rgba(255,255,255,0.18)" : "rgba(0,0,0,0.25)" }}
       >
         Advertisements help keep this platform free for everyone
       </p>
