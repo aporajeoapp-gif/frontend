@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 import { ThemeContext } from "../../context/ThemeContext";
 import { LanguageContext } from "../../context/LanguageContext";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import fetchUser from "../../hooks/userhook";
 
 const NOTIFICATIONS = [
@@ -49,6 +49,7 @@ export default function AdminNavbar({ onMenuClick }) {
   const notifRef = useRef(null);
   const profileRef = useRef(null);
   const { profile } = fetchUser()
+    const navigate=useNavigate()
   useEffect(() => {
     function handleClick(e) {
       if (notifRef.current && !notifRef.current.contains(e.target))
@@ -61,7 +62,11 @@ export default function AdminNavbar({ onMenuClick }) {
   }, []);
 
   const unreadCount = NOTIFICATIONS.filter((n) => n.unread).length;
+ const handleLogout =()=>{
+  localStorage.removeItem("token")
+  navigate("/")
 
+ }
   return (
     <header className="sticky top-0 z-20 h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center px-4 gap-3">
       <button
@@ -201,7 +206,9 @@ export default function AdminNavbar({ onMenuClick }) {
                   </Link>
                 ))}
                 <div className="border-t border-slate-100 dark:border-slate-800">
-                  <button className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors">
+                  <button 
+                  onClick={handleLogout}
+                  className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors">
                     <LogOut size={15} />
                     Sign Out
                   </button>

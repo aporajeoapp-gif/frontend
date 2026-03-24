@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Plus, Pencil, Trash2, Shield, Check, Eye, EyeOff } from "lucide-react";
 import { useAdmin } from "../context/AdminContext";
 import Table from "../components/ui/Table";
@@ -17,14 +17,16 @@ import {
   resourcePerms,
   allPerms,
 } from "../data/adminData";
+import fetchUser from "../../hooks/userhook";
+import { getAllUsers, createUser, updateUser, deleteUser } from "../../api/authApi";
 
-const ROLES = ["Admin", "Coordinator", "Member"];
+const ROLES = ["admin", "coordinator", "member"];
 const STATUSES = ["Active", "Inactive", "Suspended"];
 const emptyUser = {
   name: "",
   email: "",
   password: "",
-  role: "Member",
+  role: "member",
   status: "Active",
   permissions: [],
   avatar: "",
@@ -250,7 +252,6 @@ function UserForm({ value, onChange, isEdit }) {
         </FormField>
       </div>
 
-      {/* Password field — always shown on create, optional on edit */}
       <PasswordField
         value={value.password ?? ""}
         onChange={(pw) => onChange({ ...value, password: pw })}
@@ -264,7 +265,7 @@ function UserForm({ value, onChange, isEdit }) {
             onChange={(e) => onChange({ ...value, role: e.target.value })}
           >
             {ROLES.map((r) => (
-              <option key={r}>{r}</option>
+              <option key={r} value={r}>{r.charAt(0).toUpperCase() + r.slice(1)}</option>
             ))}
           </Select>
         </FormField>
@@ -290,9 +291,23 @@ function UserForm({ value, onChange, isEdit }) {
 
 // ─── Page ──────────────────────────────────────────────────────────────────────
 export default function UsersPage() {
+  const { profile } = fetchUser()
   const { state, dispatch, toast } = useAdmin();
   const [modal, setModal] = useState(null);
   const [form, setForm] = useState(emptyUser);
+
+  useEffect(() => {
+    const loadUsers = async () => {
+      try {
+        const users = await getAllUsers();
+        dispatch({ type: "SET_USERS", payload: users });
+      } catch (error) {
+        console.error(error);
+        toast("Failed to fetch users", "error");
+      }
+    };
+    loadUsers();
+  }, [dispatch, toast]);
 
   const openAdd = () => {
     setForm({ ...emptyUser });
@@ -307,7 +322,7 @@ export default function UsersPage() {
     setModal({ mode: "perms", data: user });
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!form.name || !form.email)
       return toast("Name and email are required", "error");
     if (modal.mode === "add" && !form.password)
@@ -315,34 +330,37 @@ export default function UsersPage() {
     if (modal.mode === "add" && form.password.length < 8)
       return toast("Password must be at least 8 characters", "error");
 
-    const avatar = form.name
-      .split(" ")
-      .map((w) => w[0])
-      .join("")
-      .toUpperCase()
-      .slice(0, 2);
-
-    if (modal.mode === "add") {
-      dispatch({
-        type: "ADD_USER",
-        payload: {
-          ...form,
-          avatar,
-          joined: new Date().toISOString().split("T")[0],
-        },
-      });
-      toast("User created successfully");
-    } else {
-      // On edit: only update password if a new one was typed
-      const updated = { ...form, avatar };
-      if (!form.password) {
-        // keep existing password
-        updated.password = modal.data.password;
+    try {
+      if (modal.mode === "add") {
+        const response = await createUser(form);
+        dispatch({
+          type: "ADD_USER",
+          payload: response.user || { ...form, _id: response.userId },
+        });
+        toast("User created successfully");
+      } else {
+        const userId = modal.data._id || modal.data.id;
+        const response = await updateUser(userId, form);
+        dispatch({ type: "UPDATE_USER", payload: response.user });
+        toast("User updated successfully");
       }
-      dispatch({ type: "UPDATE_USER", payload: updated });
-      toast("User updated successfully");
+      setModal(null);
+    } catch (error) {
+      console.error(error);
+      toast(error.response?.data?.message || "Operation failed", "error");
     }
-    setModal(null);
+  };
+
+  const handleDelete = async (user) => {
+    try {
+      const userId = user._id || user.id;
+      await deleteUser(userId);
+      dispatch({ type: "DELETE_USER", payload: userId });
+      toast("User deleted", "warning");
+    } catch (error) {
+      console.error(error);
+      toast("Failed to delete user", "error");
+    }
   };
 
   const columns = [
@@ -352,7 +370,7 @@ export default function UsersPage() {
       render: (v, row) => (
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center text-white text-xs font-bold shrink-0">
-            {row.avatar}
+             {v.charAt(0).toUpperCase()}
           </div>
           <div>
             <p className="font-medium text-slate-800 dark:text-slate-200">
@@ -365,11 +383,11 @@ export default function UsersPage() {
     },
     { key: "role", label: "Role", render: (v) => <Badge label={v} /> },
     { key: "status", label: "Status", render: (v) => <Badge label={v} /> },
-    { key: "joined", label: "Joined" },
+    { key: "createdAt", label: "Joined", render: (v) => new Date(v).toLocaleDateString() },
     {
       key: "permissions",
       label: "Permissions",
-      render: (v) => (
+      render: (v = []) => (
         <span className="text-xs text-slate-500 dark:text-slate-400">
           {v.length} / {allPerms().length}
         </span>
@@ -388,9 +406,11 @@ export default function UsersPage() {
             {state.users.length} total users
           </p>
         </div>
-        <ActionBtn onClick={openAdd}>
-          <Plus size={15} /> Add User
-        </ActionBtn>
+        {profile?.role === "admin" && (
+          <ActionBtn onClick={openAdd}>
+            <Plus size={15} /> Add User
+          </ActionBtn>
+        )}
       </div>
 
       <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 p-5">
@@ -400,25 +420,34 @@ export default function UsersPage() {
           searchKeys={["name", "email", "role"]}
           actions={(row) => (
             <>
-              <ActionBtn
-                variant="ghost"
-                onClick={() => openPerms(row)}
-                title="Manage Permissions"
-              >
-                <Shield size={14} />
-              </ActionBtn>
-              <ActionBtn variant="ghost" onClick={() => openEdit(row)}>
-                <Pencil size={14} />
-              </ActionBtn>
-              <ActionBtn
-                variant="ghost"
-                onClick={() => {
-                  dispatch({ type: "DELETE_USER", payload: row.id });
-                  toast("User deleted", "warning");
-                }}
-              >
-                <Trash2 size={14} className="text-red-500" />
-              </ActionBtn>
+              {
+                profile?.role === "admin" && (
+                  <ActionBtn
+                    variant="ghost"
+                    onClick={() => openPerms(row)}
+                    title="Manage Permissions"
+                  >
+                    <Shield size={14} />
+                  </ActionBtn>
+                )
+              }
+              {
+                profile?.role === "admin" && (
+                  <ActionBtn variant="ghost" onClick={() => openEdit(row)}>
+                    <Pencil size={14} />
+                  </ActionBtn>
+                )
+              }
+              {
+                profile?.role === "admin" && (
+                  <ActionBtn
+                    variant="ghost"
+                    onClick={() => handleDelete(row)}
+                  >
+                    <Trash2 size={14} className="text-red-500" />
+                  </ActionBtn>
+                )
+              }
             </>
           )}
         />

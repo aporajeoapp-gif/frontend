@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const axiosClient = axios.create({
-  baseURL: "http://localhost:5001/api/v1", 
+  baseURL: "https://aporajeo-web-backend.onrender.com/api/v1", 
 });
 
 

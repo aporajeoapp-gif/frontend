@@ -19,16 +19,17 @@ import logo from "../../../public/logo.png";
 import fetchUser from "../../hooks/userhook";
 const NAV_ITEMS = [
   { to: "/admin", label: "Dashboard", icon: LayoutDashboard, end: true },
-  { to: "/admin/users", label: "Users", icon: Users },
-  { to: "/admin/bus", label: "Bus Routes", icon: Bus },
-  { to: "/admin/ferry", label: "Ferry Routes", icon: Ship },
+
+  { to: "/admin/users", label: "Users", icon: Users, adminOnly: true },
+  { to: "/admin/bus", label: "Bus Routes", icon: Bus, adminOnly: true },
+  { to: "/admin/ferry", label: "Ferry Routes", icon: Ship, adminOnly: true },
   { to: "/admin/doctors", label: "Doctors", icon: Stethoscope },
   { to: "/admin/emergency", label: "Emergency", icon: AlertTriangle },
   { to: "/admin/events", label: "Events", icon: CalendarDays },
   { to: "/admin/blood-donation", label: "Blood Donation", icon: Droplets },
-  { to: "/admin/advertisements", label: "Advertisements", icon: Megaphone },
-  { to: "/admin/analytics", label: "Analytics", icon: BarChart3 },
-  { to: "/admin/settings", label: "Settings", icon: Settings },
+  { to: "/admin/advertisements", label: "Advertisements", icon: Megaphone, adminOnly: true },
+  { to: "/admin/analytics", label: "Analytics", icon: BarChart3, adminOnly: true },
+  { to: "/admin/settings", label: "Settings", icon: Settings, adminOnly: true },
 ];
 
 export default function Sidebar({
@@ -38,7 +39,8 @@ export default function Sidebar({
   onMobileClose,
 }) {
   const { profile } = fetchUser()
-  console.log(profile)
+  // console.log(profile)
+  const isAdmin = profile?.role === "admin";
   const sidebarContent = (
     <div className="flex flex-col h-full">
       {/* Logo */}

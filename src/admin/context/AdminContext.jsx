@@ -26,22 +26,54 @@ const initialState = {
 function adminReducer(state, action) {
   switch (action.type) {
     // Users
+    case "SET_USERS":
+      return {
+        ...state,
+        users: action.payload,
+      };
     case "ADD_USER":
       return {
         ...state,
-        users: [...state.users, { ...action.payload, id: Date.now() }],
+        users: [action.payload, ...state.users],
       };
     case "UPDATE_USER":
       return {
         ...state,
-        users: state.users.map((u) =>
-          u.id === action.payload.id ? action.payload : u,
-        ),
+        users: state.users.map((u) => {
+          const matchId = action.payload.id && u.id === action.payload.id;
+          const match_Id = action.payload._id && u._id === action.payload._id;
+          return (matchId || match_Id) ? action.payload : u;
+        }),
       };
     case "DELETE_USER":
       return {
         ...state,
-        users: state.users.filter((u) => u.id !== action.payload),
+        users: state.users.filter((u) => u._id !== action.payload && u.id !== action.payload),
+      };
+    // Doctors
+    case "SET_DOCTORS":
+      return {
+        ...state,
+        doctors: action.payload,
+      };
+    case "ADD_DOCTOR":
+      return {
+        ...state,
+        doctors: [action.payload, ...state.doctors],
+      };
+    case "UPDATE_DOCTOR":
+      return {
+        ...state,
+        doctors: state.doctors.map((d) => {
+          const matchId = action.payload.id && d.id === action.payload.id;
+          const match_Id = action.payload._id && d._id === action.payload._id;
+          return (matchId || match_Id) ? action.payload : d;
+        }),
+      };
+    case "DELETE_DOCTOR":
+      return {
+        ...state,
+        doctors: state.doctors.filter((d) => d._id !== action.payload && d.id !== action.payload),
       };
     // Bus
     case "ADD_BUS":
@@ -84,27 +116,6 @@ function adminReducer(state, action) {
       return {
         ...state,
         ferryRoutes: state.ferryRoutes.filter((r) => r.id !== action.payload),
-      };
-    // Doctors
-    case "ADD_DOCTOR":
-      return {
-        ...state,
-        doctors: [
-          ...state.doctors,
-          { ...action.payload, id: String(Date.now()) },
-        ],
-      };
-    case "UPDATE_DOCTOR":
-      return {
-        ...state,
-        doctors: state.doctors.map((d) =>
-          d.id === action.payload.id ? action.payload : d,
-        ),
-      };
-    case "DELETE_DOCTOR":
-      return {
-        ...state,
-        doctors: state.doctors.filter((d) => d.id !== action.payload),
       };
     // Emergency
     case "ADD_EMERGENCY":

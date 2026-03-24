@@ -14,3 +14,18 @@ export const getUser=async()=>{
     const res=await axiosClient.get("/user/me")
     return res.data
 }
+
+export const getAllUsers=async()=>{
+    const res=await axiosClient.get("/user/get-all-users")
+    return res.data
+}
+
+export const updateUser=async(id,data)=>{
+    const res=await axiosClient.put(`/user/update-user/${id}`,data)
+    return res.data
+}
+
+export const deleteUser=async(id)=>{
+    const res=await axiosClient.delete(`/user/delete-user/${id}`)
+    return res.data
+}
