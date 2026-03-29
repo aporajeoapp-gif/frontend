@@ -2,7 +2,6 @@ import { Routes, Route, Outlet, useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import { LanguageProvider } from "./context/LanguageContext";
 import { ThemeProvider } from "./context/ThemeContext";
-import { AdminProvider } from "./admin/context/AdminContext";
 
 import Navbar from "./components/Navbar";
 import BottomNav from "./components/BottomNav";
@@ -31,6 +30,7 @@ import AnalyticsPage from "./admin/pages/AnalyticsPage";
 import SettingsPage from "./admin/pages/SettingsPage";
 import BloodDonationPage from "./admin/pages/BloodDonationPage";
 import ProtectedRoute from "./protectedroute/ProtectedRoute";
+import { Toaster } from "sonner";
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -64,36 +64,41 @@ function App() {
   return (
     <ThemeProvider>
       <LanguageProvider>
-        <AdminProvider>
-          <ScrollToTop />
-          <Routes>
-            <Route element={<ProtectedRoute />}>
-              <Route path="/admin" element={<AdminLayout />}>
-                <Route index element={<AdminDashboard />} />
-                <Route path="users" element={<UsersPage />} />
-                <Route path="bus" element={<BusPage />} />
-                <Route path="ferry" element={<FerryPage />} />
-                <Route path="doctors" element={<DoctorsPage />} />
-                <Route path="emergency" element={<EmergencyPage />} />
-                <Route path="events" element={<EventsPage />} />
-                <Route path="advertisements" element={<AdsPage />} />
-                <Route path="analytics" element={<AnalyticsPage />} />
-                <Route path="settings" element={<SettingsPage />} />
-                <Route path="blood-donation" element={<BloodDonationPage />} />
-              </Route>
+        <ScrollToTop />
+        <Toaster
+          position="top-right"
+          // expand={true}
+          richColors
+          duration={3000}
+          
+        />
+        <Routes>
+          <Route element={<ProtectedRoute />}>
+            <Route path="/admin" element={<AdminLayout />}>
+              <Route index element={<AdminDashboard />} />
+              <Route path="users" element={<UsersPage />} />
+              <Route path="bus" element={<BusPage />} />
+              <Route path="ferry" element={<FerryPage />} />
+              <Route path="doctors" element={<DoctorsPage />} />
+              <Route path="emergency" element={<EmergencyPage />} />
+              <Route path="events" element={<EventsPage />} />
+              <Route path="advertisements" element={<AdsPage />} />
+              <Route path="analytics" element={<AnalyticsPage />} />
+              <Route path="settings" element={<SettingsPage />} />
+              <Route path="blood-donation" element={<BloodDonationPage />} />
             </Route>
+          </Route>
 
-            <Route path="/" element={<PublicLayout />}>
-              <Route index element={<Home />} />
-              <Route path="doctor" element={<Doctor />} />
-              <Route path="emergency" element={<Emergency />} />
-              <Route path="bus" element={<Bus />} />
-              <Route path="ferry" element={<Ferry />} />
-              <Route path="events" element={<Events />} />
-              <Route path="blood-donation" element={<BloodDonation />} />
-            </Route>
-          </Routes>
-        </AdminProvider>
+          <Route path="/" element={<PublicLayout />}>
+            <Route index element={<Home />} />
+            <Route path="doctor" element={<Doctor />} />
+            <Route path="emergency" element={<Emergency />} />
+            <Route path="bus" element={<Bus />} />
+            <Route path="ferry" element={<Ferry />} />
+            <Route path="events" element={<Events />} />
+            <Route path="blood-donation" element={<BloodDonation />} />
+          </Route>
+        </Routes>
       </LanguageProvider>
     </ThemeProvider>
   );

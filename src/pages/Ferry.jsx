@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Ship,
@@ -12,10 +12,9 @@ import {
   ArrowRight,
   ChevronDown,
 } from "lucide-react";
-import ferryServices from "../constant/data/ferryServices.json";
 import PageBanner from "../components/PageBanner";
 import { useTranslation } from "../context/LanguageContext";
-import { useAdmin } from "../admin/context/AdminContext";
+// import { getFerries } from "../api/ferryApi";
 
 function getDuration(dep, arr) {
   const [dh, dm] = dep.split(":").map(Number);
@@ -29,10 +28,13 @@ function getDuration(dep, arr) {
 
 export default function Ferry() {
   const { t } = useTranslation();
-  const { state } = useAdmin();
-  const ferryServices = state.ferryRoutes;
+  const [ferryServices, setFerryServices] = useState([]);
   const [view, setView] = useState("table");
   const [search, setSearch] = useState("");
+
+  // useEffect(() => {
+  //   getFerries().then(setFerryServices).catch(console.error);
+  // }, []);
 
   const filtered = ferryServices.filter((s) => {
     const q = search.toLowerCase();

@@ -1,34 +1,48 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import {
-  Globe,
-  Palette,
-  Shield,
-  Bell,
-  Save,
-  Upload,
-  Check,
-} from "lucide-react";
-import { useAdmin } from "../context/AdminContext";
-import {
-  FormField,
-  Input,
-  Select,
-  ActionBtn,
-} from "../components/ui/FormField";
-import {
-  PERMISSION_RESOURCES,
-  CRUD_ACTIONS,
-  ROLE_DEFAULT_PERMS,
-  permKey,
-  resourcePerms,
-  allPerms,
-} from "../data/adminData";
+import { Globe, Palette, Bell, Save, Upload, X } from "lucide-react";
+
+const inp =
+  "w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg outline-none focus:border-indigo-400 dark:focus:border-indigo-500 text-slate-800 dark:text-slate-200 placeholder-slate-400 transition-colors";
+const btn = (v = "primary") =>
+  ({
+    primary:
+      "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium bg-indigo-600 hover:bg-indigo-700 text-white transition-colors",
+    secondary:
+      "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors",
+  })[v];
+const Field = ({ label, children }) => (
+  <div className="space-y-1.5">
+    <label className="block text-xs font-medium text-slate-600 dark:text-slate-400">
+      {label}
+    </label>
+    {children}
+  </div>
+);
+
+const DEFAULT_SETTINGS = {
+  general: {
+    siteName: "ENJIO",
+    tagline: "Smart City Service Platform",
+    supportEmail: "support@enjio.app",
+    timezone: "Asia/Kolkata",
+  },
+  appearance: {
+    primaryColor: "#6366f1",
+    fontFamily: "Inter",
+    borderRadius: "rounded-xl",
+  },
+  notifications: {
+    emailAlerts: true,
+    systemAlerts: true,
+    smsAlerts: false,
+    weeklyReport: true,
+  },
+};
 
 const TABS = [
   { id: "general", label: "General", icon: Globe },
   { id: "appearance", label: "Appearance", icon: Palette },
-  { id: "permissions", label: "Permissions", icon: Shield },
   { id: "notifications", label: "Notifications", icon: Bell },
 ];
 
@@ -41,34 +55,37 @@ const RADII = [
   "rounded-2xl",
   "rounded-full",
 ];
-const ROLES = ["Admin", "Coordinator", "Member"];
 
 function GeneralTab({ settings, onSave }) {
   const [form, setForm] = useState(settings.general);
   return (
     <div className="space-y-5">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <FormField label="Website Name">
-          <Input
+        <Field label="Website Name">
+          <input
+            className={inp}
             value={form.siteName}
             onChange={(e) => setForm({ ...form, siteName: e.target.value })}
           />
-        </FormField>
-        <FormField label="Tagline">
-          <Input
+        </Field>
+        <Field label="Tagline">
+          <input
+            className={inp}
             value={form.tagline}
             onChange={(e) => setForm({ ...form, tagline: e.target.value })}
           />
-        </FormField>
-        <FormField label="Support Email">
-          <Input
+        </Field>
+        <Field label="Support Email">
+          <input
+            className={inp}
             type="email"
             value={form.supportEmail}
             onChange={(e) => setForm({ ...form, supportEmail: e.target.value })}
           />
-        </FormField>
-        <FormField label="Timezone">
-          <Select
+        </Field>
+        <Field label="Timezone">
+          <select
+            className={inp}
             value={form.timezone}
             onChange={(e) => setForm({ ...form, timezone: e.target.value })}
           >
@@ -77,24 +94,24 @@ function GeneralTab({ settings, onSave }) {
                 <option key={tz}>{tz}</option>
               ),
             )}
-          </Select>
-        </FormField>
+          </select>
+        </Field>
       </div>
-      <FormField label="Logo Upload (UI only)">
+      <Field label="Logo Upload (UI only)">
         <div className="flex items-center gap-4">
           <div className="w-16 h-16 rounded-xl bg-indigo-600 flex items-center justify-center text-white font-bold text-xl">
             E
           </div>
-          <div className="border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-xl p-4 flex-1 text-center cursor-pointer hover:border-indigo-400 dark:hover:border-indigo-500 transition-colors">
+          <div className="border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-xl p-4 flex-1 text-center cursor-pointer hover:border-indigo-400 transition-colors">
             <Upload size={16} className="mx-auto text-slate-400 mb-1" />
             <p className="text-sm text-slate-400">Upload new logo</p>
           </div>
         </div>
-      </FormField>
+      </Field>
       <div className="flex justify-end">
-        <ActionBtn onClick={() => onSave({ general: form })}>
+        <button className={btn()} onClick={() => onSave({ general: form })}>
           <Save size={14} /> Save Changes
-        </ActionBtn>
+        </button>
       </div>
     </div>
   );
@@ -127,20 +144,15 @@ function AppearanceTab({ settings, onSave }) {
               style={{ backgroundColor: c }}
             />
           ))}
-          <div className="flex items-center gap-2">
-            <input
-              type="color"
-              value={form.primaryColor}
-              onChange={(e) =>
-                setForm({ ...form, primaryColor: e.target.value })
-              }
-              className="w-9 h-9 rounded-xl cursor-pointer border-0 p-0.5 bg-transparent"
-            />
-            <span className="text-xs text-slate-400">Custom</span>
-          </div>
+          <input
+            className={inp}
+            type="color"
+            value={form.primaryColor}
+            onChange={(e) => setForm({ ...form, primaryColor: e.target.value })}
+            className="w-9 h-9 rounded-xl cursor-pointer border-0 p-0.5 bg-transparent"
+          />
         </div>
       </div>
-
       <div>
         <p className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-3">
           Font Family
@@ -150,15 +162,14 @@ function AppearanceTab({ settings, onSave }) {
             <button
               key={f}
               onClick={() => setForm({ ...form, fontFamily: f })}
-              className={`px-4 py-2 rounded-lg text-sm border transition-all ${form.fontFamily === f ? "border-indigo-500 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400" : "border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-600"}`}
               style={{ fontFamily: f }}
+              className={`px-4 py-2 rounded-lg text-sm border transition-all ${form.fontFamily === f ? "border-indigo-500 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600" : "border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400"}`}
             >
               {f}
             </button>
           ))}
         </div>
       </div>
-
       <div>
         <p className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-3">
           Border Radius
@@ -168,184 +179,17 @@ function AppearanceTab({ settings, onSave }) {
             <button
               key={r}
               onClick={() => setForm({ ...form, borderRadius: r })}
-              className={`px-4 py-2 text-sm border transition-all ${r} ${form.borderRadius === r ? "border-indigo-500 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400" : "border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400"}`}
+              className={`px-4 py-2 text-sm border transition-all ${r} ${form.borderRadius === r ? "border-indigo-500 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600" : "border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400"}`}
             >
               {r.replace("rounded-", "")}
             </button>
           ))}
         </div>
       </div>
-
       <div className="flex justify-end">
-        <ActionBtn onClick={() => onSave({ appearance: form })}>
+        <button className={btn()} onClick={() => onSave({ appearance: form })}>
           <Save size={14} /> Save Changes
-        </ActionBtn>
-      </div>
-    </div>
-  );
-}
-
-function PermissionsTab() {
-  const [selectedRole, setSelectedRole] = useState("Coordinator");
-  const [perms, setPerms] = useState({ ...ROLE_DEFAULT_PERMS });
-  const { toast } = useAdmin();
-
-  const groups = [...new Set(PERMISSION_RESOURCES.map((r) => r.group))];
-
-  const isChecked = (resource, action) =>
-    perms[selectedRole].includes(permKey(resource, action));
-
-  const toggle = (resource, action) => {
-    const key = permKey(resource, action);
-    const current = perms[selectedRole];
-    setPerms({
-      ...perms,
-      [selectedRole]: current.includes(key)
-        ? current.filter((p) => p !== key)
-        : [...current, key],
-    });
-  };
-
-  const toggleRow = (resource) => {
-    const keys = resourcePerms(resource);
-    const current = perms[selectedRole];
-    const allOn = keys.every((k) => current.includes(k));
-    setPerms({
-      ...perms,
-      [selectedRole]: allOn
-        ? current.filter((p) => !keys.includes(p))
-        : [...new Set([...current, ...keys])],
-    });
-  };
-
-  const toggleCol = (action) => {
-    const keys = PERMISSION_RESOURCES.map((r) => permKey(r.key, action));
-    const current = perms[selectedRole];
-    const allOn = keys.every((k) => current.includes(k));
-    setPerms({
-      ...perms,
-      [selectedRole]: allOn
-        ? current.filter((p) => !keys.includes(p))
-        : [...new Set([...current, ...keys])],
-    });
-  };
-
-  const toggleAll = () => {
-    const all = allPerms();
-    const current = perms[selectedRole];
-    const allOn = all.every((k) => current.includes(k));
-    setPerms({ ...perms, [selectedRole]: allOn ? [] : all });
-  };
-
-  return (
-    <div className="space-y-5">
-      {/* Role selector */}
-      <div className="flex gap-2 flex-wrap">
-        {ROLES.map((r) => (
-          <button
-            key={r}
-            onClick={() => setSelectedRole(r)}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-              selectedRole === r
-                ? "bg-indigo-600 text-white"
-                : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700"
-            }`}
-          >
-            {r}
-          </button>
-        ))}
-        <button
-          onClick={toggleAll}
-          className="ml-auto text-xs text-indigo-600 dark:text-indigo-400 hover:underline font-medium self-center"
-        >
-          {allPerms().every((k) => perms[selectedRole].includes(k))
-            ? "Deselect All"
-            : "Select All"}
         </button>
-      </div>
-
-      {/* Permission matrix per group */}
-      {groups.map((group) => {
-        const resources = PERMISSION_RESOURCES.filter((r) => r.group === group);
-        return (
-          <div key={group}>
-            <p className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wide mb-2">
-              {group}
-            </p>
-            <div className="rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
-              {/* Header */}
-              <div
-                className="grid bg-slate-50 dark:bg-slate-800/60 border-b border-slate-200 dark:border-slate-700"
-                style={{ gridTemplateColumns: "1fr repeat(4, 72px)" }}
-              >
-                <div className="px-3 py-2 text-xs font-semibold text-slate-500 dark:text-slate-400">
-                  Resource
-                </div>
-                {CRUD_ACTIONS.map((action) => (
-                  <button
-                    key={action}
-                    onClick={() => toggleCol(action)}
-                    className="py-2 text-xs font-semibold text-slate-500 dark:text-slate-400 capitalize text-center hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
-                    title={`Toggle all ${action}`}
-                  >
-                    {action}
-                  </button>
-                ))}
-              </div>
-
-              {/* Rows */}
-              {resources.map((res, i) => {
-                const rowAllOn = resourcePerms(res.key).every((k) =>
-                  perms[selectedRole].includes(k),
-                );
-                return (
-                  <div
-                    key={res.key}
-                    className={`grid items-center ${i < resources.length - 1 ? "border-b border-slate-100 dark:border-slate-800" : ""}`}
-                    style={{ gridTemplateColumns: "1fr repeat(4, 72px)" }}
-                  >
-                    <button
-                      onClick={() => toggleRow(res.key)}
-                      className={`px-3 py-2.5 text-sm text-left font-medium transition-colors flex items-center gap-2
-                        ${rowAllOn ? "text-indigo-600 dark:text-indigo-400" : "text-slate-700 dark:text-slate-300"}
-                        hover:text-indigo-600 dark:hover:text-indigo-400`}
-                    >
-                      {rowAllOn && (
-                        <Check size={12} className="text-indigo-500 shrink-0" />
-                      )}
-                      {res.label}
-                    </button>
-                    {CRUD_ACTIONS.map((action) => (
-                      <div
-                        key={action}
-                        className="flex items-center justify-center py-2.5"
-                      >
-                        <input
-                          type="checkbox"
-                          checked={isChecked(res.key, action)}
-                          onChange={() => toggle(res.key, action)}
-                          className="w-4 h-4 rounded border-slate-300 dark:border-slate-600 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
-                        />
-                      </div>
-                    ))}
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        );
-      })}
-
-      <div className="flex items-center justify-between pt-1">
-        <p className="text-xs text-slate-400 dark:text-slate-500">
-          {perms[selectedRole].length} of {allPerms().length} permissions
-          granted to {selectedRole}
-        </p>
-        <ActionBtn
-          onClick={() => toast(`Permissions saved for ${selectedRole}`)}
-        >
-          <Save size={14} /> Save Permissions
-        </ActionBtn>
       </div>
     </div>
   );
@@ -353,7 +197,6 @@ function PermissionsTab() {
 
 function NotificationsTab({ settings, onSave }) {
   const [form, setForm] = useState(settings.notifications);
-
   const toggles = [
     {
       key: "emailAlerts",
@@ -372,7 +215,6 @@ function NotificationsTab({ settings, onSave }) {
       desc: "Summary report every Monday",
     },
   ];
-
   return (
     <div className="space-y-4">
       {toggles.map(({ key, label, desc }) => (
@@ -397,30 +239,27 @@ function NotificationsTab({ settings, onSave }) {
         </div>
       ))}
       <div className="flex justify-end">
-        <ActionBtn onClick={() => onSave({ notifications: form })}>
+        <button
+          className={btn()}
+          onClick={() => onSave({ notifications: form })}
+        >
           <Save size={14} /> Save Preferences
-        </ActionBtn>
+        </button>
       </div>
     </div>
   );
 }
 
 export default function SettingsPage() {
-  const { state, dispatch, toast } = useAdmin();
+  const [settings, setSettings] = useState(DEFAULT_SETTINGS);
   const [activeTab, setActiveTab] = useState("general");
 
-  const handleSave = (patch) => {
-    dispatch({ type: "UPDATE_SETTINGS", payload: patch });
-    toast("Settings saved successfully");
-  };
+  const handleSave = (patch) => setSettings((prev) => ({ ...prev, ...patch }));
 
   const tabContent = {
-    general: <GeneralTab settings={state.settings} onSave={handleSave} />,
-    appearance: <AppearanceTab settings={state.settings} onSave={handleSave} />,
-    permissions: <PermissionsTab />,
-    notifications: (
-      <NotificationsTab settings={state.settings} onSave={handleSave} />
-    ),
+    general: <GeneralTab settings={settings} onSave={handleSave} />,
+    appearance: <AppearanceTab settings={settings} onSave={handleSave} />,
+    notifications: <NotificationsTab settings={settings} onSave={handleSave} />,
   };
 
   return (
@@ -433,9 +272,7 @@ export default function SettingsPage() {
           Manage platform configuration
         </p>
       </div>
-
       <div className="flex flex-col lg:flex-row gap-6">
-        {/* Tab nav */}
         <div className="lg:w-52 shrink-0">
           <nav className="flex lg:flex-col gap-1">
             {TABS.map(({ id, label, icon: Icon }) => (
@@ -450,8 +287,6 @@ export default function SettingsPage() {
             ))}
           </nav>
         </div>
-
-        {/* Tab content */}
         <motion.div
           key={activeTab}
           initial={{ opacity: 0, x: 10 }}

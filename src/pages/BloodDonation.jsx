@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Droplets,
@@ -15,7 +15,6 @@ import {
   XCircle,
   AlertCircle,
 } from "lucide-react";
-import { useAdmin } from "../admin/context/AdminContext";
 import PageBanner from "../components/PageBanner";
 
 const STATUS_META = {
@@ -250,10 +249,14 @@ function CampCard({ camp, onExpand, expanded }) {
 }
 
 export default function BloodDonation() {
-  const { state } = useAdmin();
-  const camps = state.bloodCamps ?? [];
+  const [camps, setCamps] = useState([]);
   const [filter, setFilter] = useState("all");
   const [expanded, setExpanded] = useState(null);
+
+  useEffect(() => {
+    // TODO: replace with real API when available
+    setCamps([]);
+  }, []);
 
   const filtered =
     filter === "all" ? camps : camps.filter((c) => c.status === filter);

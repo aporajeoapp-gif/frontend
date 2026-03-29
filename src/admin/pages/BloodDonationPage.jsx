@@ -7,11 +7,54 @@ import {
   Users,
   Target,
   CheckCircle,
+  X,
 } from "lucide-react";
 import { motion } from "framer-motion";
-import { useAdmin } from "../context/AdminContext";
-import Modal from "../components/ui/Modal";
-import { FormField, Input, ActionBtn } from "../components/ui/FormField";
+
+const inp =
+  "w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg outline-none focus:border-indigo-400 dark:focus:border-indigo-500 text-slate-800 dark:text-slate-200 placeholder-slate-400 transition-colors";
+const btn = (v = "primary") =>
+  ({
+    primary:
+      "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium bg-indigo-600 hover:bg-indigo-700 text-white transition-colors",
+    secondary:
+      "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors",
+    ghost:
+      "inline-flex items-center gap-1.5 px-2 py-1.5 rounded-lg text-sm font-medium hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 transition-colors",
+  })[v];
+const Field = ({ label, children }) => (
+  <div className="space-y-1.5">
+    <label className="block text-xs font-medium text-slate-600 dark:text-slate-400">
+      {label}
+    </label>
+    {children}
+  </div>
+);
+const Modal = ({ open, onClose, title, children }) => {
+  if (!open) return null;
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div
+        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+        onClick={onClose}
+      />
+      <div className="relative w-full max-w-lg bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-slate-800">
+          <h2 className="text-base font-semibold text-slate-900 dark:text-white">
+            {title}
+          </h2>
+          <button
+            onClick={onClose}
+            className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 transition-colors"
+          >
+            <X size={16} />
+          </button>
+        </div>
+        <div className="px-6 py-5 max-h-[75vh] overflow-y-auto">{children}</div>
+      </div>
+    </div>
+  );
+};
 
 const BLOOD_GROUPS = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
 const STATUS_OPTIONS = ["upcoming", "ongoing", "completed", "cancelled"];
@@ -72,63 +115,79 @@ function CampForm({ value, onChange }) {
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-2 gap-4">
-        <FormField label="Camp Name">
-          <Input
+        <Field label="Camp Name">
+          <input
+            className={inp}
+            className={inp}
             value={value.campName}
             onChange={(e) => onChange({ ...value, campName: e.target.value })}
             placeholder="Life Saver Blood Camp"
           />
-        </FormField>
-        <FormField label="Organizer">
-          <Input
+        </Field>
+        <Field label="Organizer">
+          <input
+            className={inp}
+            className={inp}
             value={value.organizer}
             onChange={(e) => onChange({ ...value, organizer: e.target.value })}
             placeholder="Red Cross Society"
           />
-        </FormField>
+        </Field>
       </div>
       <div className="grid grid-cols-2 gap-4">
-        <FormField label="Date">
-          <Input
+        <Field label="Date">
+          <input
+            className={inp}
+            className={inp}
             type="date"
             value={value.date}
             onChange={(e) => onChange({ ...value, date: e.target.value })}
           />
-        </FormField>
-        <FormField label="Time">
-          <Input
+        </Field>
+        <Field label="Time">
+          <input
+            className={inp}
+            className={inp}
             value={value.time}
             onChange={(e) => onChange({ ...value, time: e.target.value })}
             placeholder="09:00 AM - 04:00 PM"
           />
-        </FormField>
+        </Field>
       </div>
-      <FormField label="Location / Venue">
-        <Input
+      <Field label="Location / Venue">
+        <input
+          className={inp}
+          className={inp}
           value={value.location}
           onChange={(e) => onChange({ ...value, location: e.target.value })}
           placeholder="Town Hall, Kolkata"
         />
-      </FormField>
-      <FormField label="Full Address">
-        <Input
+      </Field>
+      <Field label="Full Address">
+        <input
+          className={inp}
+          className={inp}
           value={value.address}
           onChange={(e) => onChange({ ...value, address: e.target.value })}
           placeholder="1, S.N. Banerjee Road, Kolkata"
         />
-      </FormField>
+      </Field>
       <div className="grid grid-cols-2 gap-4">
-        <FormField label="Contact Phone">
-          <Input
+        <Field label="Contact Phone">
+          <input
+            className={inp}
+            className={inp}
             value={value.contactPhone}
             onChange={(e) =>
               onChange({ ...value, contactPhone: e.target.value })
             }
             placeholder="+91-9800000001"
           />
-        </FormField>
-        <FormField label="Contact Email">
-          <Input
+        </Field>
+        <Field label="Contact Email">
+          <input
+            className={inp}
+            className={inp}
             type="email"
             value={value.contactEmail}
             onChange={(e) =>
@@ -136,11 +195,13 @@ function CampForm({ value, onChange }) {
             }
             placeholder="camp@example.com"
           />
-        </FormField>
+        </Field>
       </div>
       <div className="grid grid-cols-3 gap-4">
-        <FormField label="Target Units">
-          <Input
+        <Field label="Target Units">
+          <input
+            className={inp}
+            className={inp}
             type="number"
             value={value.targetUnits}
             onChange={(e) =>
@@ -148,9 +209,11 @@ function CampForm({ value, onChange }) {
             }
             placeholder="200"
           />
-        </FormField>
-        <FormField label="Collected Units">
-          <Input
+        </Field>
+        <Field label="Collected Units">
+          <input
+            className={inp}
+            className={inp}
             type="number"
             value={value.collectedUnits}
             onChange={(e) =>
@@ -158,8 +221,8 @@ function CampForm({ value, onChange }) {
             }
             placeholder="0"
           />
-        </FormField>
-        <FormField label="Status">
+        </Field>
+        <Field label="Status">
           <select
             value={value.status}
             onChange={(e) => onChange({ ...value, status: e.target.value })}
@@ -171,15 +234,15 @@ function CampForm({ value, onChange }) {
               </option>
             ))}
           </select>
-        </FormField>
+        </Field>
       </div>
-      <FormField label="Blood Groups Needed">
+      <Field label="Blood Groups Needed">
         <BloodGroupToggle
           selected={value.bloodGroupsNeeded}
           onChange={(v) => onChange({ ...value, bloodGroupsNeeded: v })}
         />
-      </FormField>
-      <FormField label="Description">
+      </Field>
+      <Field label="Description">
         <textarea
           value={value.description}
           onChange={(e) => onChange({ ...value, description: e.target.value })}
@@ -187,18 +250,18 @@ function CampForm({ value, onChange }) {
           placeholder="Details about the camp..."
           className="w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
         />
-      </FormField>
+      </Field>
     </div>
   );
 }
 
 export default function BloodDonationPage() {
-  const { state, dispatch, toast } = useAdmin();
+  const [bloodCamps, setBloodCamps] = useState([]);
   const [modal, setModal] = useState(null);
   const [form, setForm] = useState(empty);
   const [search, setSearch] = useState("");
 
-  const camps = state.bloodCamps ?? [];
+  const camps = bloodCamps;
 
   const filtered = camps.filter(
     (c) =>
@@ -217,19 +280,21 @@ export default function BloodDonationPage() {
   };
 
   const handleSave = () => {
-    if (!form.campName || !form.date || !form.location)
-      return toast("Camp name, date and location are required", "error");
+    if (!form.campName || !form.date || !form.location) return;
     const payload = {
       ...form,
       targetUnits: Number(form.targetUnits) || 0,
       collectedUnits: Number(form.collectedUnits) || 0,
     };
     if (modal === "add") {
-      dispatch({ type: "ADD_BLOOD_CAMP", payload });
-      toast("Blood camp added");
+      setBloodCamps((prev) => [
+        { ...payload, id: String(Date.now()), donors: [] },
+        ...prev,
+      ]);
     } else {
-      dispatch({ type: "UPDATE_BLOOD_CAMP", payload });
-      toast("Blood camp updated");
+      setBloodCamps((prev) =>
+        prev.map((c) => (c.id === payload.id ? payload : c)),
+      );
     }
     setModal(null);
   };
@@ -276,9 +341,9 @@ export default function BloodDonationPage() {
             {camps.length} camps registered
           </p>
         </div>
-        <ActionBtn onClick={openAdd}>
+        <button className={btn()} onClick={openAdd}>
           <Plus size={15} /> Add Camp
-        </ActionBtn>
+        </button>
       </div>
 
       {/* Stats */}
@@ -306,6 +371,7 @@ export default function BloodDonationPage() {
       </div>
 
       <input
+        className={inp}
         value={search}
         onChange={(e) => setSearch(e.target.value)}
         placeholder="Search camps..."
@@ -369,22 +435,20 @@ export default function BloodDonationPage() {
             </div>
 
             <div className="flex gap-2 mt-4 pt-3 border-t border-slate-100 dark:border-slate-800">
-              <ActionBtn
-                variant="secondary"
+              <button
+                className={btn("secondary") + " flex-1 justify-center"}
                 onClick={() => openEdit(camp)}
-                className="flex-1 justify-center"
               >
                 <Pencil size={13} /> Edit
-              </ActionBtn>
-              <ActionBtn
-                variant="ghost"
-                onClick={() => {
-                  dispatch({ type: "DELETE_BLOOD_CAMP", payload: camp.id });
-                  toast("Camp removed", "warning");
-                }}
+              </button>
+              <button
+                className={btn("ghost")}
+                onClick={() =>
+                  setBloodCamps((prev) => prev.filter((c) => c.id !== camp.id))
+                }
               >
                 <Trash2 size={13} className="text-red-500" />
-              </ActionBtn>
+              </button>
             </div>
           </motion.div>
         ))}
@@ -397,10 +461,12 @@ export default function BloodDonationPage() {
       >
         <CampForm value={form} onChange={setForm} />
         <div className="flex justify-end gap-2 mt-6 pt-4 border-t border-slate-100 dark:border-slate-800">
-          <ActionBtn variant="secondary" onClick={() => setModal(null)}>
+          <button className={btn("secondary")} onClick={() => setModal(null)}>
             Cancel
-          </ActionBtn>
-          <ActionBtn onClick={handleSave}>Save</ActionBtn>
+          </button>
+          <button className={btn()} onClick={handleSave}>
+            Save
+          </button>
         </div>
       </Modal>
     </div>

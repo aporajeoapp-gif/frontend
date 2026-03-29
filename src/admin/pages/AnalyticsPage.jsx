@@ -14,8 +14,11 @@ import {
   Cell,
   Legend,
 } from "recharts";
-import { EVENTS_PER_MONTH, USER_GROWTH } from "../data/adminData";
-import { useAdmin } from "../context/AdminContext";
+import { useState, useEffect } from "react";
+import { getAllUsers } from "../../api/authApi";
+import { getDoctors } from "../../api/doctorApi";
+// import { getBuses } from "../../api/busApi";
+// import { getFerries } from "../../api/ferryApi";
 
 const PIE_COLORS = ["#6366f1", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6"];
 
@@ -34,20 +37,38 @@ const CustomTooltip = ({ active, payload, label }) => {
 };
 
 export default function AnalyticsPage() {
-  const { state } = useAdmin();
+  const [counts, setCounts] = useState({
+    users: [],
+    doctors: [],
+    busRoutes: [],
+    ferryRoutes: [],
+  });
+
+  useEffect(() => {
+    Promise.allSettled([
+      getAllUsers(),
+      getDoctors(),
+      getBuses(),
+      getFerries(),
+    ]).then(([users, doctors, buses, ferries]) => {
+      setCounts({
+        users: users.value ?? [],
+        doctors: doctors.value ?? [],
+        busRoutes: buses.value ?? [],
+        ferryRoutes: ferries.value ?? [],
+      });
+    });
+  }, []);
 
   const roleData = ["Admin", "Coordinator", "Member"].map((role) => ({
     name: role,
-    value: state.users.filter((u) => u.role === role).length,
+    value: counts.users.filter((u) => u.role === role).length,
   }));
 
   const routeData = [
-    { name: "Bus Routes", count: state.busRoutes.length },
-    { name: "Ferry Routes", count: state.ferryRoutes.length },
-    { name: "Doctors", count: state.doctors.length },
-    { name: "Emergency", count: state.emergency.length },
-    { name: "Events", count: state.events.length },
-    { name: "Ads", count: state.advertisements.length },
+    { name: "Bus Routes", count: counts.busRoutes.length },
+    { name: "Ferry Routes", count: counts.ferryRoutes.length },
+    { name: "Doctors", count: counts.doctors.length },
   ];
 
   return (
@@ -72,7 +93,7 @@ export default function AnalyticsPage() {
             User Growth (2025)
           </h3>
           <ResponsiveContainer width="100%" height={220}>
-            <AreaChart data={USER_GROWTH}>
+            <AreaChart data={[]}>
               <defs>
                 <linearGradient id="ug" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="#6366f1" stopOpacity={0.25} />
@@ -118,7 +139,7 @@ export default function AnalyticsPage() {
             Events per Month
           </h3>
           <ResponsiveContainer width="100%" height={220}>
-            <BarChart data={EVENTS_PER_MONTH}>
+            <BarChart data={[]}>
               <CartesianGrid
                 strokeDasharray="3 3"
                 stroke="#e2e8f0"

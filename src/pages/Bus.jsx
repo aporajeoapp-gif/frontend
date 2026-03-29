@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Bus as BusIcon,
@@ -12,10 +12,9 @@ import {
   ArrowRight,
   ChevronDown,
 } from "lucide-react";
-// import busServices from "../constant/data/busServices.json";
 import PageBanner from "../components/PageBanner";
 import { useTranslation } from "../context/LanguageContext";
-import { useAdmin } from "../admin/context/AdminContext";
+// import { getBuses } from "../api/busApi";
 
 function getDuration(dep, arr) {
   const [dh, dm] = dep.split(":").map(Number);
@@ -29,10 +28,13 @@ function getDuration(dep, arr) {
 
 export default function Bus() {
   const { t } = useTranslation();
-  const { state } = useAdmin();
-  const busServices = state.busRoutes;
+  const [busServices, setBusServices] = useState([]);
   const [view, setView] = useState("table");
   const [search, setSearch] = useState("");
+
+  // useEffect(() => {
+  //   getBuses().then(setBusServices).catch(console.error);
+  // }, []);
 
   const filtered = busServices.filter((s) => {
     const q = search.toLowerCase();

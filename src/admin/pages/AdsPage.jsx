@@ -6,17 +6,54 @@ import {
   ExternalLink,
   ToggleLeft,
   ToggleRight,
+  X,
 } from "lucide-react";
 import { motion } from "framer-motion";
-import { useAdmin } from "../context/AdminContext";
-import Modal from "../components/ui/Modal";
-import {
-  FormField,
-  Input,
-  Select,
-  Textarea,
-  ActionBtn,
-} from "../components/ui/FormField";
+
+const inp =
+  "w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg outline-none focus:border-indigo-400 dark:focus:border-indigo-500 text-slate-800 dark:text-slate-200 placeholder-slate-400 transition-colors";
+const btn = (v = "primary") =>
+  ({
+    primary:
+      "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium bg-indigo-600 hover:bg-indigo-700 text-white transition-colors",
+    secondary:
+      "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors",
+    ghost:
+      "inline-flex items-center gap-1.5 px-2 py-1.5 rounded-lg text-sm font-medium hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 transition-colors",
+  })[v];
+const Field = ({ label, children }) => (
+  <div className="space-y-1.5">
+    <label className="block text-xs font-medium text-slate-600 dark:text-slate-400">
+      {label}
+    </label>
+    {children}
+  </div>
+);
+const Modal = ({ open, onClose, title, children }) => {
+  if (!open) return null;
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div
+        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+        onClick={onClose}
+      />
+      <div className="relative w-full max-w-2xl bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-slate-800">
+          <h2 className="text-base font-semibold text-slate-900 dark:text-white">
+            {title}
+          </h2>
+          <button
+            onClick={onClose}
+            className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 transition-colors"
+          >
+            <X size={16} />
+          </button>
+        </div>
+        <div className="px-6 py-5 max-h-[75vh] overflow-y-auto">{children}</div>
+      </div>
+    </div>
+  );
+};
 
 const TAGS = [
   "Healthcare",
@@ -39,97 +76,8 @@ const empty = {
   endDate: "",
 };
 
-function AdForm({ value, onChange }) {
-  return (
-    <div className="space-y-4">
-      <FormField label="Title">
-        <Input
-          value={value.title}
-          onChange={(e) => onChange({ ...value, title: e.target.value })}
-          placeholder="Hospital Promotion"
-        />
-      </FormField>
-      <FormField label="Description">
-        <Textarea
-          value={value.description}
-          onChange={(e) => onChange({ ...value, description: e.target.value })}
-          placeholder="Ad description..."
-        />
-      </FormField>
-      <div className="grid grid-cols-2 gap-4">
-        <FormField label="Tag / Category">
-          <Select
-            value={value.tag}
-            onChange={(e) => onChange({ ...value, tag: e.target.value })}
-          >
-            {TAGS.map((t) => (
-              <option key={t}>{t}</option>
-            ))}
-          </Select>
-        </FormField>
-        <FormField label="CTA Button Text">
-          <Input
-            value={value.cta}
-            onChange={(e) => onChange({ ...value, cta: e.target.value })}
-            placeholder="Learn More"
-          />
-        </FormField>
-      </div>
-      <FormField label="Image URL (or upload)">
-        <Input
-          value={value.imageUrl}
-          onChange={(e) => onChange({ ...value, imageUrl: e.target.value })}
-          placeholder="https://..."
-        />
-      </FormField>
-      <FormField label="Image Upload (UI only)">
-        <div className="border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-xl p-5 text-center cursor-pointer hover:border-indigo-400 dark:hover:border-indigo-500 transition-colors">
-          <p className="text-sm text-slate-400">Click to upload image</p>
-          <p className="text-xs text-slate-300 dark:text-slate-600 mt-1">
-            PNG, JPG up to 5MB
-          </p>
-        </div>
-      </FormField>
-      <FormField label="Redirect URL">
-        <Input
-          value={value.redirectUrl}
-          onChange={(e) => onChange({ ...value, redirectUrl: e.target.value })}
-          placeholder="https://example.com"
-        />
-      </FormField>
-      <div className="grid grid-cols-2 gap-4">
-        <FormField label="Start Date">
-          <Input
-            type="date"
-            value={value.startDate}
-            onChange={(e) => onChange({ ...value, startDate: e.target.value })}
-          />
-        </FormField>
-        <FormField label="End Date">
-          <Input
-            type="date"
-            value={value.endDate}
-            onChange={(e) => onChange({ ...value, endDate: e.target.value })}
-          />
-        </FormField>
-      </div>
-      <label className="flex items-center gap-2 cursor-pointer">
-        <input
-          type="checkbox"
-          checked={value.active !== false}
-          onChange={(e) => onChange({ ...value, active: e.target.checked })}
-          className="w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
-        />
-        <span className="text-sm text-slate-600 dark:text-slate-400">
-          Active
-        </span>
-      </label>
-    </div>
-  );
-}
-
 export default function AdsPage() {
-  const { state, dispatch, toast } = useAdmin();
+  const [advertisements, setAdvertisements] = useState([]);
   const [modal, setModal] = useState(null);
   const [form, setForm] = useState(empty);
 
@@ -141,23 +89,20 @@ export default function AdsPage() {
     setForm({ ...a });
     setModal("edit");
   };
-
   const handleSave = () => {
-    if (!form.title) return toast("Title is required", "error");
-    if (modal === "add") {
-      dispatch({ type: "ADD_AD", payload: form });
-      toast("Advertisement added");
-    } else {
-      dispatch({ type: "UPDATE_AD", payload: form });
-      toast("Advertisement updated");
-    }
+    if (!form.title) return;
+    if (modal === "add")
+      setAdvertisements((prev) => [{ ...form, id: Date.now() }, ...prev]);
+    else
+      setAdvertisements((prev) =>
+        prev.map((a) => (a.id === form.id ? form : a)),
+      );
     setModal(null);
   };
-
-  const toggleActive = (ad) => {
-    dispatch({ type: "UPDATE_AD", payload: { ...ad, active: !ad.active } });
-    toast(`Ad ${ad.active ? "deactivated" : "activated"}`);
-  };
+  const toggleActive = (ad) =>
+    setAdvertisements((prev) =>
+      prev.map((a) => (a.id === ad.id ? { ...a, active: !a.active } : a)),
+    );
 
   return (
     <div className="space-y-5">
@@ -167,18 +112,17 @@ export default function AdsPage() {
             Advertisements
           </h1>
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
-            {state.advertisements.length} total ·{" "}
-            {state.advertisements.filter((a) => a.active !== false).length}{" "}
-            active
+            {advertisements.length} total ·{" "}
+            {advertisements.filter((a) => a.active !== false).length} active
           </p>
         </div>
-        <ActionBtn onClick={openAdd}>
+        <button className={btn()} onClick={openAdd}>
           <Plus size={15} /> Add Ad
-        </ActionBtn>
+        </button>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {state.advertisements.map((ad, i) => (
+        {advertisements.map((ad, i) => (
           <motion.div
             key={ad.id}
             initial={{ opacity: 0, y: 12 }}
@@ -197,13 +141,9 @@ export default function AdsPage() {
                   }}
                 />
               )}
-              <div
-                className={`absolute inset-0 bg-gradient-to-t ${ad.gradient ?? "from-slate-900/60 to-transparent"}`}
-              />
+              <div className="absolute inset-0 bg-linear-to-t from-slate-900/60 to-transparent" />
               <div className="absolute top-2 left-2">
-                <span
-                  className={`text-xs font-medium px-2 py-0.5 rounded-full text-white ${ad.tagColor ?? "bg-slate-600"}`}
-                >
+                <span className="text-xs font-medium px-2 py-0.5 rounded-full text-white bg-slate-600">
                   {ad.tag}
                 </span>
               </div>
@@ -243,22 +183,22 @@ export default function AdsPage() {
                 </a>
               )}
               <div className="flex gap-2 mt-4 pt-3 border-t border-slate-100 dark:border-slate-800">
-                <ActionBtn
-                  variant="secondary"
+                <button
+                  className={btn("secondary") + " flex-1 justify-center"}
                   onClick={() => openEdit(ad)}
-                  className="flex-1 justify-center"
                 >
                   <Pencil size={13} /> Edit
-                </ActionBtn>
-                <ActionBtn
-                  variant="ghost"
-                  onClick={() => {
-                    dispatch({ type: "DELETE_AD", payload: ad.id });
-                    toast("Ad deleted", "warning");
-                  }}
+                </button>
+                <button
+                  className={btn("ghost")}
+                  onClick={() =>
+                    setAdvertisements((prev) =>
+                      prev.filter((a) => a.id !== ad.id),
+                    )
+                  }
                 >
                   <Trash2 size={13} className="text-red-500" />
-                </ActionBtn>
+                </button>
               </div>
             </div>
           </motion.div>
@@ -269,14 +209,105 @@ export default function AdsPage() {
         open={!!modal}
         onClose={() => setModal(null)}
         title={modal === "add" ? "Add Advertisement" : "Edit Advertisement"}
-        size="lg"
       >
-        <AdForm value={form} onChange={setForm} />
+        <div className="space-y-4">
+          <Field label="Title">
+            <input
+              className={inp}
+              value={form.title}
+              onChange={(e) => setForm({ ...form, title: e.target.value })}
+              placeholder="Hospital Promotion"
+            />
+          </Field>
+          <Field label="Description">
+            <textarea
+              className={inp + " resize-none"}
+              rows={3}
+              value={form.description}
+              onChange={(e) =>
+                setForm({ ...form, description: e.target.value })
+              }
+              placeholder="Ad description..."
+            />
+          </Field>
+          <div className="grid grid-cols-2 gap-4">
+            <Field label="Tag">
+              <select
+                className={inp}
+                value={form.tag}
+                onChange={(e) => setForm({ ...form, tag: e.target.value })}
+              >
+                {TAGS.map((t) => (
+                  <option key={t}>{t}</option>
+                ))}
+              </select>
+            </Field>
+            <Field label="CTA Text">
+              <input
+                className={inp}
+                value={form.cta}
+                onChange={(e) => setForm({ ...form, cta: e.target.value })}
+                placeholder="Learn More"
+              />
+            </Field>
+          </div>
+          <Field label="Image URL">
+            <input
+              className={inp}
+              value={form.imageUrl}
+              onChange={(e) => setForm({ ...form, imageUrl: e.target.value })}
+              placeholder="https://..."
+            />
+          </Field>
+          <Field label="Redirect URL">
+            <input
+              className={inp}
+              value={form.redirectUrl}
+              onChange={(e) =>
+                setForm({ ...form, redirectUrl: e.target.value })
+              }
+              placeholder="https://example.com"
+            />
+          </Field>
+          <div className="grid grid-cols-2 gap-4">
+            <Field label="Start Date">
+              <input
+                className={inp}
+                type="date"
+                value={form.startDate}
+                onChange={(e) =>
+                  setForm({ ...form, startDate: e.target.value })
+                }
+              />
+            </Field>
+            <Field label="End Date">
+              <input
+                className={inp}
+                type="date"
+                value={form.endDate}
+                onChange={(e) => setForm({ ...form, endDate: e.target.value })}
+              />
+            </Field>
+          </div>
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={form.active !== false}
+              onChange={(e) => setForm({ ...form, active: e.target.checked })}
+              className="w-4 h-4 rounded border-slate-300 accent-indigo-600"
+            />
+            <span className="text-sm text-slate-600 dark:text-slate-400">
+              Active
+            </span>
+          </label>
+        </div>
         <div className="flex justify-end gap-2 mt-6 pt-4 border-t border-slate-100 dark:border-slate-800">
-          <ActionBtn variant="secondary" onClick={() => setModal(null)}>
+          <button className={btn("secondary")} onClick={() => setModal(null)}>
             Cancel
-          </ActionBtn>
-          <ActionBtn onClick={handleSave}>Save</ActionBtn>
+          </button>
+          <button className={btn()} onClick={handleSave}>
+            Save
+          </button>
         </div>
       </Modal>
     </div>

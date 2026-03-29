@@ -1,219 +1,109 @@
 import { useState, useEffect } from "react";
-import { Plus, Pencil, Trash2, Shield, Check, Eye, EyeOff } from "lucide-react";
-import { useAdmin } from "../context/AdminContext";
+import { Plus, Pencil, Trash2, Eye, EyeOff, Check, X } from "lucide-react";
+import { toast } from "sonner";
 import Table from "../components/ui/Table";
-import Badge from "../components/ui/Badge";
-import Modal from "../components/ui/Modal";
-import {
-  FormField,
-  Input,
-  Select,
-  ActionBtn,
-} from "../components/ui/FormField";
-import {
-  PERMISSION_RESOURCES,
-  CRUD_ACTIONS,
-  permKey,
-  resourcePerms,
-  allPerms,
-} from "../data/adminData";
-import fetchUser from "../../hooks/userhook";
-import { getAllUsers, createUser, updateUser, deleteUser } from "../../api/authApi";
+import fetchUser, { useUsers } from "../../hooks/userhook";
+import { createUser, updateUser, deleteUser } from "../../api/authApi";
+import { confirmDelete, errorAlert, successAlert } from "../../utils/alert";
+
+const inp =
+  "w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg outline-none focus:border-indigo-400 dark:focus:border-indigo-500 text-slate-800 dark:text-slate-200 placeholder-slate-400 transition-colors";
+
+const btn = (v = "primary") =>
+  ({
+    primary:
+      "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium bg-indigo-600 hover:bg-indigo-700 text-white transition-colors",
+    secondary:
+      "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors",
+    ghost:
+      "inline-flex items-center gap-1.5 px-2 py-1.5 rounded-lg text-sm font-medium hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 transition-colors",
+  })[v];
 
 const ROLES = ["admin", "coordinator", "member"];
-const STATUSES = ["Active", "Inactive", "Suspended"];
-const emptyUser = {
-  name: "",
-  email: "",
-  password: "",
-  role: "member",
-  status: "Active",
-  permissions: [],
-  avatar: "",
+const STATUSES = ["active", "deactive"];
+const RESOURCES = [
+  { key: "bus", label: "Bus Routes", group: "Transport" },
+  { key: "ferry", label: "Ferry Routes", group: "Transport" },
+  { key: "doctors", label: "Doctors", group: "Healthcare" },
+  { key: "emergency", label: "Emergency Services", group: "Healthcare" },
+  { key: "blood", label: "Blood Donation", group: "Healthcare" },
+  { key: "events", label: "Events", group: "Content" },
+  { key: "ads", label: "Advertisements", group: "Content" },
+];
+const ACTIONS = ["create", "read", "update", "delete"];
+const pKey = (r, a) => `${r}.${a}`;
+const allGroups = [...new Set(RESOURCES.map((r) => r.group))];
+const TOTAL = RESOURCES.length * ACTIONS.length;
+
+const emptyUser = { name: "", email: "", password: "", role: "member", status: "active", permissions: [] };
+
+const badgeCls = {
+  admin: "bg-violet-100 dark:bg-violet-950/50 text-violet-700 dark:text-violet-300",
+  coordinator: "bg-indigo-100 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300",
+  member: "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400",
+  active: "bg-emerald-100 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300",
+  inactive: "bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400",
+  suspended: "bg-red-100 dark:bg-red-950/50 text-red-600 dark:text-red-400",
 };
 
-// ─── Password strength meter ───────────────────────────────────────────────────
-function passwordStrength(pw) {
-  if (!pw) return { score: 0, label: "", color: "" };
-  let score = 0;
-  if (pw.length >= 8) score++;
-  if (/[A-Z]/.test(pw)) score++;
-  if (/[0-9]/.test(pw)) score++;
-  if (/[^A-Za-z0-9]/.test(pw)) score++;
-  const map = [
-    { label: "Too short", color: "bg-red-400" },
-    { label: "Weak", color: "bg-red-400" },
-    { label: "Fair", color: "bg-amber-400" },
-    { label: "Good", color: "bg-emerald-400" },
-    { label: "Strong", color: "bg-emerald-500" },
-  ];
-  return { score, ...map[score] };
-}
+const Badge = ({ label }) => {
+  const cls = badgeCls[(label ?? "").toLowerCase()] ?? "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400";
+  return <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${cls}`}>{label}</span>;
+};
 
-function PasswordField({ value, onChange, isEdit }) {
+function PasswordCell({ value }) {
   const [show, setShow] = useState(false);
-  const strength = passwordStrength(value);
+  if (!value) return <span className="text-xs text-slate-400 italic">—</span>;
   return (
-    <FormField
-      label={isEdit ? "New Password (leave blank to keep current)" : "Password"}
-    >
-      <div className="relative">
-        <input
-          type={show ? "text" : "password"}
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          placeholder={
-            isEdit
-              ? "Leave blank to keep current"
-              : "Min 8 chars, e.g. Admin@123"
-          }
-          autoComplete="new-password"
-          className="w-full px-3 py-2 pr-10 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg outline-none focus:border-indigo-400 dark:focus:border-indigo-500 text-slate-800 dark:text-slate-200 placeholder-slate-400 transition-colors"
-        />
-        <button
-          type="button"
-          onClick={() => setShow((v) => !v)}
-          className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
-        >
-          {show ? <EyeOff size={14} /> : <Eye size={14} />}
-        </button>
-      </div>
-      {value && (
-        <div className="mt-1.5 space-y-1">
-          <div className="flex gap-1">
-            {[1, 2, 3, 4].map((i) => (
-              <div
-                key={i}
-                className={`h-1 flex-1 rounded-full transition-colors ${i <= strength.score ? strength.color : "bg-slate-200 dark:bg-slate-700"}`}
-              />
-            ))}
-          </div>
-          <p
-            className={`text-xs font-medium ${strength.score <= 1 ? "text-red-500" : strength.score === 2 ? "text-amber-500" : "text-emerald-500"}`}
-          >
-            {strength.label}
-          </p>
-        </div>
-      )}
-    </FormField>
+    <div className="flex items-center gap-1.5">
+      <span className="text-xs font-mono text-slate-700 dark:text-slate-300">{show ? value : "••••••••"}</span>
+      <button type="button" onClick={() => setShow((v) => !v)} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors">
+        {show ? <EyeOff size={13} /> : <Eye size={13} />}
+      </button>
+    </div>
   );
 }
 
-// ─── CRUD Permission Matrix ────────────────────────────────────────────────────
 function PermissionMatrix({ permissions, onChange }) {
-  const groups = [...new Set(PERMISSION_RESOURCES.map((r) => r.group))];
+  const has = (r, a) => permissions.includes(pKey(r, a));
 
-  const isChecked = (resource, action) =>
-    permissions.includes(permKey(resource, action));
-
-  const toggle = (resource, action) => {
-    const key = permKey(resource, action);
-    onChange(
-      permissions.includes(key)
-        ? permissions.filter((p) => p !== key)
-        : [...permissions, key],
-    );
+  const toggle = (r, a) => {
+    const k = pKey(r, a);
+    onChange(permissions.includes(k) ? permissions.filter((p) => p !== k) : [...permissions, k]);
   };
 
-  const toggleRow = (resource) => {
-    const keys = resourcePerms(resource);
+  const toggleRow = (r) => {
+    const keys = ACTIONS.map((a) => pKey(r, a));
     const allOn = keys.every((k) => permissions.includes(k));
-    onChange(
-      allOn
-        ? permissions.filter((p) => !keys.includes(p))
-        : [...new Set([...permissions, ...keys])],
-    );
-  };
-
-  const toggleCol = (action) => {
-    const keys = PERMISSION_RESOURCES.map((r) => permKey(r.key, action));
-    const allOn = keys.every((k) => permissions.includes(k));
-    onChange(
-      allOn
-        ? permissions.filter((p) => !keys.includes(p))
-        : [...new Set([...permissions, ...keys])],
-    );
-  };
-
-  const toggleAll = () => {
-    const all = allPerms();
-    onChange(all.every((k) => permissions.includes(k)) ? [] : all);
+    onChange(allOn ? permissions.filter((p) => !keys.includes(p)) : [...new Set([...permissions, ...keys])]);
   };
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <p className="text-sm font-medium text-slate-700 dark:text-slate-300 flex items-center gap-2">
-          <Shield size={14} className="text-indigo-500" /> Permissions
-        </p>
-        <button
-          onClick={toggleAll}
-          className="text-xs text-indigo-600 dark:text-indigo-400 hover:underline font-medium"
-        >
-          {allPerms().every((k) => permissions.includes(k))
-            ? "Deselect All"
-            : "Select All"}
-        </button>
-      </div>
-
-      {groups.map((group) => {
-        const resources = PERMISSION_RESOURCES.filter((r) => r.group === group);
+      <p className="text-sm font-medium text-slate-700 dark:text-slate-300">Permissions</p>
+      {allGroups.map((group) => {
+        const resources = RESOURCES.filter((r) => r.group === group);
         return (
           <div key={group}>
-            <p className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wide mb-2">
-              {group}
-            </p>
+            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-1.5">{group}</p>
             <div className="rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
-              <div
-                className="grid bg-slate-50 dark:bg-slate-800/60 border-b border-slate-200 dark:border-slate-700"
-                style={{ gridTemplateColumns: "1fr repeat(4, 72px)" }}
-              >
-                <div className="px-3 py-2 text-xs font-semibold text-slate-500 dark:text-slate-400">
-                  Resource
-                </div>
-                {CRUD_ACTIONS.map((action) => (
-                  <button
-                    key={action}
-                    onClick={() => toggleCol(action)}
-                    className="py-2 text-xs font-semibold text-slate-500 dark:text-slate-400 capitalize text-center hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
-                    title={`Toggle all ${action}`}
-                  >
-                    {action}
-                  </button>
+              <div className="grid bg-slate-50 dark:bg-slate-800/60 border-b border-slate-200 dark:border-slate-700" style={{ gridTemplateColumns: "1fr repeat(4, 64px)" }}>
+                <div className="px-3 py-2 text-xs font-semibold text-slate-500 dark:text-slate-400">Resource</div>
+                {ACTIONS.map((a) => (
+                  <div key={a} className="py-2 text-xs font-semibold text-slate-500 dark:text-slate-400 capitalize text-center">{a}</div>
                 ))}
               </div>
               {resources.map((res, i) => {
-                const rowAllOn = resourcePerms(res.key).every((k) =>
-                  permissions.includes(k),
-                );
+                const rowOn = ACTIONS.every((a) => has(res.key, a));
                 return (
-                  <div
-                    key={res.key}
-                    className={`grid items-center ${i < resources.length - 1 ? "border-b border-slate-100 dark:border-slate-800" : ""}`}
-                    style={{ gridTemplateColumns: "1fr repeat(4, 72px)" }}
-                  >
-                    <button
-                      onClick={() => toggleRow(res.key)}
-                      className={`px-3 py-2.5 text-sm text-left font-medium transition-colors flex items-center gap-2
-                        ${rowAllOn ? "text-indigo-600 dark:text-indigo-400" : "text-slate-700 dark:text-slate-300"}
-                        hover:text-indigo-600 dark:hover:text-indigo-400`}
-                    >
-                      {rowAllOn && (
-                        <Check size={12} className="text-indigo-500 shrink-0" />
-                      )}
+                  <div key={res.key} className={`grid items-center ${i < resources.length - 1 ? "border-b border-slate-100 dark:border-slate-800" : ""}`} style={{ gridTemplateColumns: "1fr repeat(4, 64px)" }}>
+                    <button onClick={() => toggleRow(res.key)} className={`px-3 py-2.5 text-sm text-left font-medium flex items-center gap-1.5 transition-colors hover:text-indigo-600 dark:hover:text-indigo-400 ${rowOn ? "text-indigo-600 dark:text-indigo-400" : "text-slate-700 dark:text-slate-300"}`}>
+                      {rowOn && <Check size={11} className="text-indigo-500 shrink-0" />}
                       {res.label}
                     </button>
-                    {CRUD_ACTIONS.map((action) => (
-                      <div
-                        key={action}
-                        className="flex items-center justify-center py-2.5"
-                      >
-                        <input
-                          type="checkbox"
-                          checked={isChecked(res.key, action)}
-                          onChange={() => toggle(res.key, action)}
-                          className="w-4 h-4 rounded border-slate-300 dark:border-slate-600 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
-                        />
+                    {ACTIONS.map((a) => (
+                      <div key={a} className="flex items-center justify-center py-2.5">
+                        <input type="checkbox" checked={has(res.key, a)} onChange={() => toggle(res.key, a)} className="w-4 h-4 rounded border-slate-300 dark:border-slate-600 accent-indigo-600 cursor-pointer" />
                       </div>
                     ))}
                   </div>
@@ -223,143 +113,75 @@ function PermissionMatrix({ permissions, onChange }) {
           </div>
         );
       })}
-      <p className="text-xs text-slate-400 dark:text-slate-500">
-        {permissions.length} of {allPerms().length} permissions granted
-      </p>
     </div>
   );
 }
 
-// ─── User Form ─────────────────────────────────────────────────────────────────
-function UserForm({ value, onChange, isEdit }) {
-  return (
-    <div className="space-y-5">
-      <div className="grid grid-cols-2 gap-4">
-        <FormField label="Full Name">
-          <Input
-            value={value.name}
-            onChange={(e) => onChange({ ...value, name: e.target.value })}
-            placeholder="John Doe"
-          />
-        </FormField>
-        <FormField label="Email">
-          <Input
-            type="email"
-            value={value.email}
-            onChange={(e) => onChange({ ...value, email: e.target.value })}
-            placeholder="john@enjio.app"
-          />
-        </FormField>
-      </div>
-
-      <PasswordField
-        value={value.password ?? ""}
-        onChange={(pw) => onChange({ ...value, password: pw })}
-        isEdit={isEdit}
-      />
-
-      <div className="grid grid-cols-2 gap-4">
-        <FormField label="Role">
-          <Select
-            value={value.role}
-            onChange={(e) => onChange({ ...value, role: e.target.value })}
-          >
-            {ROLES.map((r) => (
-              <option key={r} value={r}>{r.charAt(0).toUpperCase() + r.slice(1)}</option>
-            ))}
-          </Select>
-        </FormField>
-        <FormField label="Status">
-          <Select
-            value={value.status}
-            onChange={(e) => onChange({ ...value, status: e.target.value })}
-          >
-            {STATUSES.map((s) => (
-              <option key={s}>{s}</option>
-            ))}
-          </Select>
-        </FormField>
-      </div>
-
-      <PermissionMatrix
-        permissions={value.permissions}
-        onChange={(perms) => onChange({ ...value, permissions: perms })}
-      />
-    </div>
-  );
-}
-
-// ─── Page ──────────────────────────────────────────────────────────────────────
 export default function UsersPage() {
-  const { profile } = fetchUser()
-  const { state, dispatch, toast } = useAdmin();
-  const [modal, setModal] = useState(null);
+  const { profile } = fetchUser();
+  const { users, addUser, updateUser: updateUserInList, removeUser } = useUsers();
+  const [modal, setModal] = useState(null); // null | { mode: "add" } | { mode: "edit", id: string }
   const [form, setForm] = useState(emptyUser);
+  const [showPw, setShowPw] = useState(false);
 
-  useEffect(() => {
-    const loadUsers = async () => {
-      try {
-        const users = await getAllUsers();
-        dispatch({ type: "SET_USERS", payload: users });
-      } catch (error) {
-        console.error(error);
-        toast("Failed to fetch users", "error");
-      }
-    };
-    loadUsers();
-  }, [dispatch, toast]);
+  const isAdmin = profile?.role === "admin";
 
   const openAdd = () => {
     setForm({ ...emptyUser });
+    setShowPw(false);
     setModal({ mode: "add" });
   };
+
   const openEdit = (user) => {
-    setForm({ ...user, password: "" });
-    setModal({ mode: "edit", data: user });
-  };
-  const openPerms = (user) => {
-    setForm({ ...user, password: "" });
-    setModal({ mode: "perms", data: user });
+    const perms =
+      Array.isArray(user.permissions) && user.permissions.includes("*")
+        ? RESOURCES.flatMap((r) => ACTIONS.map((a) => pKey(r, a)))
+        : (user.permissions ?? []);
+    setForm({ ...user, password: "", permissions: perms });
+    setShowPw(false);
+    setModal({ mode: "edit", id: user._id || user.id });
   };
 
   const handleSave = async () => {
-    if (!form.name || !form.email)
-      return toast("Name and email are required", "error");
-    if (modal.mode === "add" && !form.password)
-      return toast("Password is required", "error");
-    if (modal.mode === "add" && form.password.length < 8)
-      return toast("Password must be at least 8 characters", "error");
-
+    if (!form.name || !form.email) {
+      errorAlert("Please fill in all required fields (Name and Email)");
+      return;
+    }
+    if (modal.mode === "add" && (!form.password || form.password.length < 8)) {
+      errorAlert("Password must be at least 8 characters");
+      return;
+    }
     try {
       if (modal.mode === "add") {
-        const response = await createUser(form);
-        dispatch({
-          type: "ADD_USER",
-          payload: response.user || { ...form, _id: response.userId },
-        });
-        toast("User created successfully");
+        const res = await createUser(form);
+        if (res.user) {
+          addUser(res.user);
+          toast.success(res.message);
+          setModal(null);
+        }
       } else {
-        const userId = modal.data._id || modal.data.id;
-        const response = await updateUser(userId, form);
-        dispatch({ type: "UPDATE_USER", payload: response.user });
-        toast("User updated successfully");
+        const res = await updateUser(modal.id, form);
+        if (res.user) {
+          updateUserInList(modal.id, res.user);
+          toast.success(res.message);
+          setModal(null);
+        }
       }
-      setModal(null);
-    } catch (error) {
-      console.error(error);
-      toast(error.response?.data?.message || "Operation failed", "error");
+    } catch (err) {
+      errorAlert(err.response?.data?.message || "Failed to save user");
     }
   };
 
   const handleDelete = async (user) => {
+    const result = await confirmDelete();
+    if (!result.isConfirmed) return;
+    const id = user._id || user.id;
     try {
-      const userId = user._id || user.id;
-      await deleteUser(userId);
-      dispatch({ type: "DELETE_USER", payload: userId });
-      toast("User deleted", "warning");
-    } catch (error) {
-      console.error(error);
-      toast("Failed to delete user", "error");
+      await deleteUser(id);
+      removeUser(id);
+      successAlert("User deleted successfully");
+    } catch (err) {
+      errorAlert("Failed to delete user");
     }
   };
 
@@ -370,113 +192,133 @@ export default function UsersPage() {
       render: (v, row) => (
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center text-white text-xs font-bold shrink-0">
-             {v.charAt(0).toUpperCase()}
+            {v.charAt(0).toUpperCase()}
           </div>
           <div>
-            <p className="font-medium text-slate-800 dark:text-slate-200">
-              {v}
-            </p>
+            <p className="font-medium text-slate-800 dark:text-slate-200">{v}</p>
             <p className="text-xs text-slate-400">{row.email}</p>
           </div>
         </div>
       ),
     },
     { key: "role", label: "Role", render: (v) => <Badge label={v} /> },
+    { key: "password", label: "Password", render: (v) => <PasswordCell value={v} /> },
     { key: "status", label: "Status", render: (v) => <Badge label={v} /> },
-    { key: "createdAt", label: "Joined", render: (v) => new Date(v).toLocaleDateString() },
     {
       key: "permissions",
       label: "Permissions",
-      render: (v = []) => (
-        <span className="text-xs text-slate-500 dark:text-slate-400">
-          {v.length} / {allPerms().length}
-        </span>
-      ),
+      render: (v = []) => {
+        const count = Array.isArray(v) && v.includes("*") ? TOTAL : Array.isArray(v) ? v.length : 0;
+        return (
+          <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${count === TOTAL ? "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400" : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400"}`}>
+            {count}/{TOTAL}
+          </span>
+        );
+      },
     },
+    { key: "createdAt", label: "Joined", render: (v) => new Date(v).toLocaleDateString() },
   ];
 
   return (
     <div className="space-y-5">
+      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
-            Users
-          </h1>
-          <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
-            {state.users.length} total users
-          </p>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Users</h1>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">{users.length} total users</p>
         </div>
-        {profile?.role === "admin" && (
-          <ActionBtn onClick={openAdd}>
+        {isAdmin && (
+          <button className={btn("primary")} onClick={openAdd}>
             <Plus size={15} /> Add User
-          </ActionBtn>
+          </button>
         )}
       </div>
 
+      {/* Table */}
       <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 p-5">
         <Table
           columns={columns}
-          data={state.users}
+          data={users}
           searchKeys={["name", "email", "role"]}
-          actions={(row) => (
-            <>
-              {
-                profile?.role === "admin" && (
-                  <ActionBtn
-                    variant="ghost"
-                    onClick={() => openPerms(row)}
-                    title="Manage Permissions"
-                  >
-                    <Shield size={14} />
-                  </ActionBtn>
-                )
-              }
-              {
-                profile?.role === "admin" && (
-                  <ActionBtn variant="ghost" onClick={() => openEdit(row)}>
-                    <Pencil size={14} />
-                  </ActionBtn>
-                )
-              }
-              {
-                profile?.role === "admin" && (
-                  <ActionBtn
-                    variant="ghost"
-                    onClick={() => handleDelete(row)}
-                  >
-                    <Trash2 size={14} className="text-red-500" />
-                  </ActionBtn>
-                )
-              }
-            </>
-          )}
+          actions={(row) =>
+            isAdmin && (
+              <>
+                <button className={btn("ghost")} onClick={() => openEdit(row)}><Pencil size={14} /></button>
+                <button className={btn("ghost")} onClick={() => handleDelete(row)}><Trash2 size={14} className="text-red-500" /></button>
+              </>
+            )
+          }
         />
       </div>
 
-      <Modal
-        open={!!modal}
-        onClose={() => setModal(null)}
-        title={
-          modal?.mode === "add"
-            ? "Create User"
-            : modal?.mode === "perms"
-              ? "Manage Permissions"
-              : "Edit User"
-        }
-        size="xl"
-      >
-        <UserForm
-          value={form}
-          onChange={setForm}
-          isEdit={modal?.mode !== "add"}
-        />
-        <div className="flex justify-end gap-2 mt-6 pt-4 border-t border-slate-100 dark:border-slate-800">
-          <ActionBtn variant="secondary" onClick={() => setModal(null)}>
-            Cancel
-          </ActionBtn>
-          <ActionBtn onClick={handleSave}>Save</ActionBtn>
+      {/* Modal */}
+      {!!modal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setModal(null)} />
+          <div className="relative w-full max-w-3xl bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-slate-800">
+              <h2 className="text-base font-semibold text-slate-900 dark:text-white">
+                {modal.mode === "add" ? "Create User" : "Edit User"}
+              </h2>
+              <button onClick={() => setModal(null)} className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 transition-colors">
+                <X size={16} />
+              </button>
+            </div>
+            <div className="px-6 py-5 max-h-[75vh] overflow-y-auto space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="block text-xs font-medium text-slate-600 dark:text-slate-400">Full Name</label>
+                  <input className={inp} value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="John Doe" />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="block text-xs font-medium text-slate-600 dark:text-slate-400">Email</label>
+                  <input className={inp} type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} placeholder="john@example.com" />
+                </div>
+              </div>
+              <div className="space-y-1.5">
+                <label className="block text-xs font-medium text-slate-600 dark:text-slate-400">
+                  {modal.mode === "edit" ? "New Password (leave blank to keep)" : "Password"}
+                </label>
+                <div className="relative">
+                  <input
+                    className={inp + " pr-10"}
+                    type={showPw ? "text" : "password"}
+                    value={form.password ?? ""}
+                    onChange={(e) => setForm({ ...form, password: e.target.value })}
+                    placeholder={modal.mode === "edit" ? "Leave blank to keep current" : "Min 8 chars"}
+                    autoComplete="new-password"
+                  />
+                  <button type="button" onClick={() => setShowPw((v) => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors">
+                    {showPw ? <EyeOff size={14} /> : <Eye size={14} />}
+                  </button>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="block text-xs font-medium text-slate-600 dark:text-slate-400">Role</label>
+                  <select className={inp} value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })}>
+                    {ROLES.map((r) => <option key={r} value={r}>{r.charAt(0).toUpperCase() + r.slice(1)}</option>)}
+                  </select>
+                </div>
+                <div className="space-y-1.5">
+                  <label className="block text-xs font-medium text-slate-600 dark:text-slate-400">Status</label>
+                  <select className={inp} value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })}>
+                    {STATUSES.map((s) => <option key={s} value={s}>{s.charAt(0).toUpperCase() + s.slice(1)}</option>)}
+                  </select>
+                </div>
+              </div>
+              <PermissionMatrix
+                permissions={form.permissions ?? []}
+                onChange={(perms) => setForm({ ...form, permissions: perms })}
+              />
+              <div className="flex justify-end gap-2 pt-4 border-t border-slate-100 dark:border-slate-800">
+                <button className={btn("secondary")} onClick={() => setModal(null)}>Cancel</button>
+                <button className={btn("primary")} onClick={handleSave}>Save</button>
+              </div>
+            </div>
+          </div>
         </div>
-      </Modal>
+      )}
     </div>
   );
 }

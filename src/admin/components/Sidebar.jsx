@@ -27,8 +27,18 @@ const NAV_ITEMS = [
   { to: "/admin/emergency", label: "Emergency", icon: AlertTriangle },
   { to: "/admin/events", label: "Events", icon: CalendarDays },
   { to: "/admin/blood-donation", label: "Blood Donation", icon: Droplets },
-  { to: "/admin/advertisements", label: "Advertisements", icon: Megaphone, adminOnly: true },
-  { to: "/admin/analytics", label: "Analytics", icon: BarChart3, adminOnly: true },
+  {
+    to: "/admin/advertisements",
+    label: "Advertisements",
+    icon: Megaphone,
+    adminOnly: true,
+  },
+  {
+    to: "/admin/analytics",
+    label: "Analytics",
+    icon: BarChart3,
+    adminOnly: true,
+  },
   { to: "/admin/settings", label: "Settings", icon: Settings, adminOnly: true },
 ];
 
@@ -38,15 +48,16 @@ export default function Sidebar({
   mobileOpen,
   onMobileClose,
 }) {
-  const { profile } = fetchUser()
+  const { profile } = fetchUser();
   // console.log(profile)
   const isAdmin = profile?.role === "admin";
   const sidebarContent = (
     <div className="flex flex-col h-full">
       {/* Logo */}
       <div
-        className={`flex flex-col items-center px-4 py-5 border-b border-slate-200 dark:border-slate-800 ${collapsed ? "justify-center" : ""
-          }`}
+        className={`flex flex-col items-center px-4 py-5 border-b border-slate-200 dark:border-slate-800 ${
+          collapsed ? "justify-center" : ""
+        }`}
       >
         <div className="flex items-center justify-center">
           <img
@@ -61,8 +72,9 @@ export default function Sidebar({
           >
             <ChevronLeft
               size={16}
-              className={`transition-transform duration-200 ${collapsed ? "rotate-180" : ""
-                }`}
+              className={`transition-transform duration-200 ${
+                collapsed ? "rotate-180" : ""
+              }`}
             />
           </button>
         </div>
@@ -81,9 +93,7 @@ export default function Sidebar({
             </motion.div>
           )}
         </AnimatePresence>
-
       </div>
-
 
       {/* Nav */}
       <nav className="flex-1 overflow-y-auto py-4 px-2 space-y-0.5">
@@ -95,9 +105,10 @@ export default function Sidebar({
             onClick={onMobileClose}
             className={({ isActive }) =>
               `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 group
-              ${isActive
-                ? "bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400"
-                : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white"
+              ${
+                isActive
+                  ? "bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400"
+                  : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white"
               } ${collapsed ? "justify-center" : ""}`
             }
             title={collapsed ? label : undefined}
@@ -128,9 +139,7 @@ export default function Sidebar({
 
       {/* Collapse toggle (desktop) */}
       <div className="p-3 border-t border-slate-200 dark:border-slate-800 hidden lg:block">
-
         <div className="flex items-center gap-3 px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-800">
-
           {/* Icon */}
           <div className="w-8 h-8 flex items-center justify-center rounded-full bg-indigo-500 text-white text-xs font-semibold">
             {profile?.role?.charAt(0)?.toUpperCase() || "A"}
@@ -147,9 +156,7 @@ export default function Sidebar({
               </span>
             </div>
           )}
-
         </div>
-
       </div>
     </div>
   );
