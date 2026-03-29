@@ -2,19 +2,108 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/logo.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>অপরাজেয় — Oporajeo Community Services</title>
+
+    <!-- ── Primary Meta ── -->
+    <title>অপরাজেয় | Oporajeo — Community Services Platform</title>
+    <meta
+      name="title"
+      content="অপরাজেয় | Oporajeo — Community Services Platform"
+    />
+    <meta
+      name="description"
+      content="Oporajeo (অপরাজেয়) is a smart community platform offering verified doctors, emergency contacts, bus & ferry schedules, local events, and blood donation services."
+    />
+    <meta
+      name="keywords"
+      content="oporajeo, অপরাজেয়, community services, doctors, emergency, bus schedule, ferry schedule, blood donation, events, Bangladesh, smart city"
+    />
+    <meta name="author" content="Oporajeo Team" />
+    <meta name="robots" content="index, follow" />
+    <meta name="theme-color" content="#6366f1" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="generator" content="Vite + React" />
+    <meta name="application-name" content="Oporajeo" />
+    <meta name="rating" content="general" />
+    <meta name="language" content="English, Bengali" />
+    <meta name="revisit-after" content="7 days" />
+    <meta name="category" content="Community, Healthcare, Transport" />
+
+    <!-- ── Favicon & Icons ── -->
+    <link rel="icon" type="image/png" href="/logo.png" />
+    <link rel="apple-touch-icon" href="/logo.png" />
+    <link rel="shortcut icon" href="/logo.png" />
+
+    <!-- ── Open Graph / Facebook ── -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://aporajeo.vercel.app/" />
+    <meta
+      property="og:title"
+      content="অপরাজেয় | Oporajeo — Community Services Platform"
+    />
+    <meta
+      property="og:description"
+      content="Find verified doctors, emergency contacts, bus & ferry schedules, local events, and blood donation services — all in one place."
+    />
+    <meta
+      property="og:image"
+      content="https://res.cloudinary.com/dlsuycdfj/image/upload/v1774797481/aporajeo_banner_xmosjk.jpg"
+    />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Oporajeo Community Platform" />
+    <meta property="og:site_name" content="Oporajeo" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:locale:alternate" content="bn_BD" />
+
+    <!-- ── Twitter Card ── -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content="https://aporajeo.vercel.app/" />
+    <meta
+      name="twitter:title"
+      content="অপরাজেয় | Oporajeo — Community Services Platform"
+    />
+    <meta
+      name="twitter:description"
+      content="Find verified doctors, emergency contacts, bus & ferry schedules, local events, and blood donation services — all in one place."
+    />
+    <meta
+      name="twitter:image"
+      content="https://res.cloudinary.com/dlsuycdfj/image/upload/v1774797481/aporajeo_banner_xmosjk.jpg"
+    />
+    <meta name="twitter:image:alt" content="Oporajeo Community Platform" />
+    <meta name="twitter:site" content="@oporajeo" />
+    <meta name="twitter:creator" content="@oporajeo" />
+
+    <!-- ── Canonical ── -->
+    <link rel="canonical" href="https://aporajeo.vercel.app/" />
+
+    <!-- ── Geo / Regional ── -->
+    <meta name="geo.region" content="BD" />
+    <meta name="geo.placename" content="Bangladesh" />
+
+    <!-- ── PWA / Mobile ── -->
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Oporajeo" />
+    <meta name="msapplication-TileColor" content="#6366f1" />
+    <meta name="msapplication-TileImage" content="/logo.png" />
+    <meta name="format-detection" content="telephone=no" />
+
+    <!-- ── Theme flash prevention ── -->
     <script>
-      // Apply saved theme BEFORE React loads to prevent flash
       (function () {
         var t = localStorage.getItem("theme");
         if (t === "dark") document.documentElement.classList.add("dark");
         else document.documentElement.classList.remove("dark");
+        var c = localStorage.getItem("accentColor");
+        if (c) document.documentElement.style.setProperty("--brand", c);
       })();
     </script>
+
+    <!-- ── Google Translate banner suppression ── -->
     <style>
-      /* Hide Google Translate banner immediately */
       .goog-te-banner-frame,
       iframe.goog-te-banner-frame,
       .skiptranslate {
@@ -28,15 +117,12 @@
       }
     </style>
     <script>
-      // Fix Google Translate body offset that breaks click hit-testing
       (function () {
         var observer = new MutationObserver(function () {
-          if (document.body && document.body.style.top) {
+          if (document.body && document.body.style.top)
             document.body.style.top = "0px";
-          }
-          if (document.body && document.body.style.position === "relative") {
+          if (document.body && document.body.style.position === "relative")
             document.body.style.position = "static";
-          }
         });
         document.addEventListener("DOMContentLoaded", function () {
           observer.observe(document.body, {
@@ -51,7 +137,7 @@
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
 
-    <!-- Google Translate (hidden widget, triggered programmatically) -->
+    <!-- Google Translate (hidden widget) -->
     <div
       id="google_translate_element"
       style="display: none; visibility: hidden; position: absolute"
