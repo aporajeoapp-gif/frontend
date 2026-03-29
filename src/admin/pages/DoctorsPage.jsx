@@ -104,7 +104,7 @@ export default function DoctorsPage() {
     const payload = {
       ...form,
       experience: Number(form.experience),
-      // only send complete schedule entries
+      
       schedule: form.schedule.filter((s) => s.day && s.time && s.chamber),
     };
     try {
