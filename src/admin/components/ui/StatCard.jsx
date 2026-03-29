@@ -10,7 +10,7 @@ export default function StatCard({
 }) {
   const colors = {
     indigo:
-      "bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400",
+      "bg-primary-50 dark:bg-primary-900/40 text-primary-600 dark:text-primary-400",
     emerald:
       "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400",
     amber:

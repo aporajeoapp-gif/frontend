@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+﻿import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
 import { createPortal } from "react-dom";
@@ -221,9 +221,9 @@ export default function Footer() {
 
   return (
     <>
-      <footer className="relative overflow-hidden bg-linear-to-br from-slate-100 via-indigo-50 to-violet-50 dark:bg-none dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 notranslate">
+      <footer className="relative overflow-hidden bg-linear-to-br from-slate-100 via-primary-50 to-violet-50 dark:bg-none dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 notranslate">
         {/* decorative blobs */}
-        <div className="absolute top-0 left-0 w-96 h-96 bg-indigo-200/40 dark:bg-indigo-600/10 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2 pointer-events-none" />
+        <div className="absolute top-0 left-0 w-96 h-96 bg-primary-200/40 dark:bg-primary-600/10 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2 pointer-events-none" />
         <div className="absolute bottom-0 right-0 w-80 h-80 bg-violet-200/40 dark:bg-violet-600/10 rounded-full blur-3xl translate-x-1/3 translate-y-1/3 pointer-events-none" />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-14 relative z-10">
@@ -252,12 +252,12 @@ export default function Footer() {
                   <li key={path}>
                     <Link
                       to={path}
-                      className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors group"
+                      className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors group"
                     >
-                      <span className="w-6 h-6 rounded-lg bg-indigo-50 dark:bg-slate-800 flex items-center justify-center shrink-0">
+                      <span className="w-6 h-6 rounded-lg bg-primary-50 dark:bg-slate-800 flex items-center justify-center shrink-0">
                         <Icon
                           size={11}
-                          className="text-indigo-500 dark:text-indigo-400"
+                          className="text-primary-500 dark:text-primary-400"
                         />
                       </span>
                       {label}
@@ -274,10 +274,10 @@ export default function Footer() {
               </h4>
               <div className="space-y-3">
                 <div className="flex items-start gap-2.5 text-sm text-slate-500 dark:text-slate-400">
-                  <span className="w-7 h-7 rounded-lg bg-indigo-50 dark:bg-slate-800 flex items-center justify-center shrink-0 mt-0.5">
+                  <span className="w-7 h-7 rounded-lg bg-primary-50 dark:bg-slate-800 flex items-center justify-center shrink-0 mt-0.5">
                     <MapPin
                       size={13}
-                      className="text-indigo-500 dark:text-indigo-400"
+                      className="text-primary-500 dark:text-primary-400"
                     />
                   </span>
                   <span>
@@ -288,12 +288,12 @@ export default function Footer() {
                 </div>
                 <a
                   href="mailto:info@oporajeo.in"
-                  className="flex items-center gap-2.5 text-sm text-slate-500 dark:text-slate-400 hover:text-indigo-600 transition-colors"
+                  className="flex items-center gap-2.5 text-sm text-slate-500 dark:text-slate-400 hover:text-primary-600 transition-colors"
                 >
-                  <span className="w-7 h-7 rounded-lg bg-indigo-50 dark:bg-slate-800 flex items-center justify-center shrink-0">
+                  <span className="w-7 h-7 rounded-lg bg-primary-50 dark:bg-slate-800 flex items-center justify-center shrink-0">
                     <Mail
                       size={13}
-                      className="text-indigo-500 dark:text-indigo-400"
+                      className="text-primary-500 dark:text-primary-400"
                     />
                   </span>
                   info@oporajeo.in
@@ -359,7 +359,7 @@ export default function Footer() {
               <span>Trusted by 10,000+ community members</span>
               <a
                 href="#"
-                className="hover:text-indigo-500 transition-colors flex items-center gap-1"
+                className="hover:text-primary-500 transition-colors flex items-center gap-1"
               >
                 {t.footer_privacy} <ExternalLink size={9} />
               </a>

@@ -1,4 +1,4 @@
-import { motion } from "framer-motion";
+﻿import { motion } from "framer-motion";
 
 export default function PageBanner({
   title,
@@ -21,7 +21,7 @@ export default function PageBanner({
 
       {/* Gradient overlay */}
       <div
-        className={`absolute inset-0 bg-linear-to-br ${gradient ?? "from-indigo-900/80 via-violet-900/70 to-slate-900/80"}`}
+        className={`absolute inset-0 bg-linear-to-br ${gradient ?? "from-primary-900/80 via-violet-900/70 to-slate-900/80"}`}
       />
 
       {/* Noise texture overlay */}

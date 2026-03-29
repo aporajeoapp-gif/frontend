@@ -1,13 +1,13 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { Plus, Pencil, Trash2, Calendar, MapPin, Clock, X } from "lucide-react";
 import { motion } from "framer-motion";
 
 const inp =
-  "w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg outline-none focus:border-indigo-400 dark:focus:border-indigo-500 text-slate-800 dark:text-slate-200 placeholder-slate-400 transition-colors";
+  "w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg outline-none focus:border-primary-400 dark:focus:border-primary-500 text-slate-800 dark:text-slate-200 placeholder-slate-400 transition-colors";
 const btn = (v = "primary") =>
   ({
     primary:
-      "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium bg-indigo-600 hover:bg-indigo-700 text-white transition-colors",
+      "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium bg-primary-600 hover:bg-primary-700 text-white transition-colors",
     secondary:
       "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors",
     ghost:
@@ -76,7 +76,7 @@ const categoryColors = {
   Environment:
     "bg-green-100 dark:bg-green-950/40 text-green-700 dark:text-green-300",
   Technology:
-    "bg-indigo-100 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300",
+    "bg-primary-100 dark:bg-primary-900/40 text-primary-700 dark:text-primary-300",
   Business:
     "bg-amber-100 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300",
   Food: "bg-orange-100 dark:bg-orange-950/40 text-orange-700 dark:text-orange-300",
@@ -132,7 +132,7 @@ export default function EventsPage() {
         value={search}
         onChange={(e) => setSearch(e.target.value)}
         placeholder="Search events..."
-        className="w-full max-w-xs px-3 py-2 text-sm bg-slate-100 dark:bg-slate-800 rounded-lg border border-transparent focus:border-indigo-400 outline-none text-slate-700 dark:text-slate-300 placeholder-slate-400 transition-colors"
+        className="w-full max-w-xs px-3 py-2 text-sm bg-slate-100 dark:bg-slate-800 rounded-lg border border-transparent focus:border-primary-400 outline-none text-slate-700 dark:text-slate-300 placeholder-slate-400 transition-colors"
       />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -144,7 +144,7 @@ export default function EventsPage() {
             transition={{ delay: i * 0.04 }}
             className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden hover:shadow-md transition-shadow"
           >
-            <div className="h-32 bg-linear-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
+            <div className="h-32 bg-linear-to-br from-primary-500 to-purple-600 flex items-center justify-center">
               <span className="text-4xl">🎉</span>
             </div>
             <div className="p-4">

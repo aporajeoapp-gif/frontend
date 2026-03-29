@@ -1,16 +1,21 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { motion } from "framer-motion";
-import { Globe, Palette, Bell, Save, Upload, X } from "lucide-react";
+import {
+  Globe,
+  Palette,
+  Bell,
+  Save,
+  RotateCcw,
+  Sun,
+  Moon,
+  Check,
+} from "lucide-react";
+import { useBrand } from "../../context/BrandContext";
+import { ThemeContext } from "../../context/ThemeContext";
 
 const inp =
-  "w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg outline-none focus:border-indigo-400 dark:focus:border-indigo-500 text-slate-800 dark:text-slate-200 placeholder-slate-400 transition-colors";
-const btn = (v = "primary") =>
-  ({
-    primary:
-      "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium bg-indigo-600 hover:bg-indigo-700 text-white transition-colors",
-    secondary:
-      "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors",
-  })[v];
+  "w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg outline-none focus:border-primary-400 dark:focus:border-primary-500 text-slate-800 dark:text-slate-200 placeholder-slate-400 transition-colors";
+
 const Field = ({ label, children }) => (
   <div className="space-y-1.5">
     <label className="block text-xs font-medium text-slate-600 dark:text-slate-400">
@@ -20,44 +25,33 @@ const Field = ({ label, children }) => (
   </div>
 );
 
-const DEFAULT_SETTINGS = {
-  general: {
-    siteName: "ENJIO",
-    tagline: "Smart City Service Platform",
-    supportEmail: "support@enjio.app",
-    timezone: "Asia/Kolkata",
-  },
-  appearance: {
-    primaryColor: "#6366f1",
-    fontFamily: "Inter",
-    borderRadius: "rounded-xl",
-  },
-  notifications: {
-    emailAlerts: true,
-    systemAlerts: true,
-    smsAlerts: false,
-    weeklyReport: true,
-  },
-};
-
 const TABS = [
   { id: "general", label: "General", icon: Globe },
   { id: "appearance", label: "Appearance", icon: Palette },
   { id: "notifications", label: "Notifications", icon: Bell },
 ];
 
-const FONTS = ["Inter", "Roboto", "Poppins", "DM Sans", "Nunito"];
-const RADII = [
-  "rounded-sm",
-  "rounded-md",
-  "rounded-lg",
-  "rounded-xl",
-  "rounded-2xl",
-  "rounded-full",
-];
+const DEFAULT_GENERAL = {
+  siteName: "অপরাজেয়",
+  tagline: "Smart City Service Platform",
+  supportEmail: "support@aporajeo.app",
+  timezone: "Asia/Dhaka",
+};
 
-function GeneralTab({ settings, onSave }) {
-  const [form, setForm] = useState(settings.general);
+/* ── General Tab ── */
+function GeneralTab() {
+  const [form, setForm] = useState(() => {
+    const stored = localStorage.getItem("siteGeneral");
+    return stored ? JSON.parse(stored) : DEFAULT_GENERAL;
+  });
+  const [saved, setSaved] = useState(false);
+
+  const save = () => {
+    localStorage.setItem("siteGeneral", JSON.stringify(form));
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2000);
+  };
+
   return (
     <div className="space-y-5">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -89,114 +83,228 @@ function GeneralTab({ settings, onSave }) {
             value={form.timezone}
             onChange={(e) => setForm({ ...form, timezone: e.target.value })}
           >
-            {["Asia/Kolkata", "UTC", "America/New_York", "Europe/London"].map(
-              (tz) => (
-                <option key={tz}>{tz}</option>
-              ),
-            )}
+            {[
+              "Asia/Dhaka",
+              "Asia/Kolkata",
+              "UTC",
+              "America/New_York",
+              "Europe/London",
+            ].map((tz) => (
+              <option key={tz}>{tz}</option>
+            ))}
           </select>
         </Field>
       </div>
-      <Field label="Logo Upload (UI only)">
-        <div className="flex items-center gap-4">
-          <div className="w-16 h-16 rounded-xl bg-indigo-600 flex items-center justify-center text-white font-bold text-xl">
-            E
-          </div>
-          <div className="border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-xl p-4 flex-1 text-center cursor-pointer hover:border-indigo-400 transition-colors">
-            <Upload size={16} className="mx-auto text-slate-400 mb-1" />
-            <p className="text-sm text-slate-400">Upload new logo</p>
-          </div>
-        </div>
-      </Field>
       <div className="flex justify-end">
-        <button className={btn()} onClick={() => onSave({ general: form })}>
-          <Save size={14} /> Save Changes
+        <button
+          onClick={save}
+          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium text-white transition-colors"
+          style={{ backgroundColor: "var(--brand, #6366f1)" }}
+        >
+          {saved ? (
+            <>
+              <Check size={14} /> Saved!
+            </>
+          ) : (
+            <>
+              <Save size={14} /> Save Changes
+            </>
+          )}
         </button>
       </div>
     </div>
   );
 }
 
-function AppearanceTab({ settings, onSave }) {
-  const [form, setForm] = useState(settings.appearance);
-  const COLORS = [
-    "#6366f1",
-    "#8b5cf6",
-    "#ec4899",
-    "#ef4444",
-    "#f59e0b",
-    "#10b981",
-    "#06b6d4",
-    "#3b82f6",
-  ];
+/* ── Appearance Tab ── */
+function AppearanceTab() {
+  const { accentColor, updateColor, resetColor, COLORS } = useBrand();
+  const { theme, toggleTheme } = useContext(ThemeContext);
+  const [customHex, setCustomHex] = useState(accentColor);
+  const [saved, setSaved] = useState(false);
+
+  const apply = (hex) => {
+    updateColor(hex);
+    setCustomHex(hex);
+  };
+
+  const save = () => {
+    updateColor(customHex);
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2000);
+  };
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
+      {/* Theme toggle */}
       <div>
-        <p className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-3">
-          Primary Color
+        <p className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3">
+          Color Mode
         </p>
-        <div className="flex flex-wrap gap-3">
-          {COLORS.map((c) => (
+        <div className="flex gap-3">
+          {[
+            { label: "Light", value: "light", Icon: Sun },
+            { label: "Dark", value: "dark", Icon: Moon },
+          ].map(({ label, value, Icon }) => (
             <button
-              key={c}
-              onClick={() => setForm({ ...form, primaryColor: c })}
-              className={`w-9 h-9 rounded-xl transition-all ${form.primaryColor === c ? "ring-2 ring-offset-2 ring-indigo-500 scale-110" : "hover:scale-105"}`}
-              style={{ backgroundColor: c }}
-            />
+              key={value}
+              onClick={() => theme !== value && toggleTheme()}
+              className={`flex items-center gap-2 px-5 py-3 rounded-xl border-2 text-sm font-medium transition-all ${
+                theme === value
+                  ? "border-[var(--brand)] bg-[color-mix(in_srgb,var(--brand)_10%,transparent)] text-[var(--brand)]"
+                  : "border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-slate-300"
+              }`}
+            >
+              <Icon size={15} /> {label}
+            </button>
           ))}
-          <input
-            className={inp}
-            type="color"
-            value={form.primaryColor}
-            onChange={(e) => setForm({ ...form, primaryColor: e.target.value })}
-            className="w-9 h-9 rounded-xl cursor-pointer border-0 p-0.5 bg-transparent"
+        </div>
+      </div>
+
+      {/* Preset colors */}
+      <div>
+        <p className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3">
+          Accent Color
+        </p>
+        <div className="flex flex-wrap gap-3 mb-4">
+          {COLORS.map(({ name, value }) => (
+            <button
+              key={value}
+              onClick={() => apply(value)}
+              title={name}
+              className="relative w-10 h-10 rounded-xl transition-all hover:scale-110 focus:outline-none"
+              style={{ backgroundColor: value }}
+            >
+              {accentColor === value && (
+                <Check
+                  size={16}
+                  className="absolute inset-0 m-auto text-white drop-shadow"
+                />
+              )}
+            </button>
+          ))}
+        </div>
+
+        {/* Custom color picker */}
+        <div className="flex items-center gap-3 p-4 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200 dark:border-slate-700">
+          <div className="relative">
+            <input
+              type="color"
+              value={customHex}
+              onChange={(e) => setCustomHex(e.target.value)}
+              className="w-12 h-12 rounded-xl cursor-pointer border-0 p-0.5 bg-transparent"
+            />
+          </div>
+          <div className="flex-1">
+            <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">
+              Custom Hex
+            </p>
+            <input
+              type="text"
+              value={customHex}
+              onChange={(e) =>
+                /^#[0-9a-fA-F]{0,6}$/.test(e.target.value) &&
+                setCustomHex(e.target.value)
+              }
+              className="w-32 px-2 py-1 text-sm font-mono bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg outline-none focus:border-[var(--brand)] text-slate-800 dark:text-slate-200"
+            />
+          </div>
+          <div
+            className="w-10 h-10 rounded-xl shadow-inner border border-slate-200 dark:border-slate-700"
+            style={{ backgroundColor: customHex }}
           />
         </div>
       </div>
+
+      {/* Live preview */}
       <div>
-        <p className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-3">
-          Font Family
+        <p className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3">
+          Live Preview
         </p>
-        <div className="flex flex-wrap gap-2">
-          {FONTS.map((f) => (
+        <div className="p-5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/40 space-y-3">
+          <div className="flex gap-2">
             <button
-              key={f}
-              onClick={() => setForm({ ...form, fontFamily: f })}
-              style={{ fontFamily: f }}
-              className={`px-4 py-2 rounded-lg text-sm border transition-all ${form.fontFamily === f ? "border-indigo-500 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600" : "border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400"}`}
+              className="px-4 py-2 rounded-lg text-white text-sm font-semibold"
+              style={{ backgroundColor: customHex }}
             >
-              {f}
+              Primary Button
             </button>
-          ))}
+            <button
+              className="px-4 py-2 rounded-lg text-sm font-semibold border-2"
+              style={{ borderColor: customHex, color: customHex }}
+            >
+              Outline Button
+            </button>
+          </div>
+          <div className="flex items-center gap-2">
+            <div
+              className="w-4 h-4 rounded-full"
+              style={{ backgroundColor: customHex }}
+            />
+            <span className="text-sm font-medium" style={{ color: customHex }}>
+              Accent text color
+            </span>
+          </div>
+          <div
+            className="h-2 rounded-full"
+            style={{ backgroundColor: customHex, opacity: 0.2 }}
+          >
+            <div
+              className="h-2 rounded-full w-2/3"
+              style={{ backgroundColor: customHex }}
+            />
+          </div>
         </div>
       </div>
-      <div>
-        <p className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-3">
-          Border Radius
-        </p>
-        <div className="flex flex-wrap gap-2">
-          {RADII.map((r) => (
-            <button
-              key={r}
-              onClick={() => setForm({ ...form, borderRadius: r })}
-              className={`px-4 py-2 text-sm border transition-all ${r} ${form.borderRadius === r ? "border-indigo-500 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600" : "border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400"}`}
-            >
-              {r.replace("rounded-", "")}
-            </button>
-          ))}
-        </div>
-      </div>
-      <div className="flex justify-end">
-        <button className={btn()} onClick={() => onSave({ appearance: form })}>
-          <Save size={14} /> Save Changes
+
+      <div className="flex items-center justify-between">
+        <button
+          onClick={resetColor}
+          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-colors"
+        >
+          <RotateCcw size={13} /> Reset to Default
+        </button>
+        <button
+          onClick={save}
+          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium text-white transition-colors"
+          style={{ backgroundColor: "var(--brand, #6366f1)" }}
+        >
+          {saved ? (
+            <>
+              <Check size={14} /> Applied!
+            </>
+          ) : (
+            <>
+              <Save size={14} /> Apply Color
+            </>
+          )}
         </button>
       </div>
     </div>
   );
 }
 
-function NotificationsTab({ settings, onSave }) {
-  const [form, setForm] = useState(settings.notifications);
+/* ── Notifications Tab ── */
+function NotificationsTab() {
+  const [form, setForm] = useState(() => {
+    const stored = localStorage.getItem("notifSettings");
+    return stored
+      ? JSON.parse(stored)
+      : {
+          emailAlerts: true,
+          systemAlerts: true,
+          smsAlerts: false,
+          weeklyReport: true,
+        };
+  });
+  const [saved, setSaved] = useState(false);
+
+  const save = () => {
+    localStorage.setItem("notifSettings", JSON.stringify(form));
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2000);
+  };
+
   const toggles = [
     {
       key: "emailAlerts",
@@ -215,6 +323,7 @@ function NotificationsTab({ settings, onSave }) {
       desc: "Summary report every Monday",
     },
   ];
+
   return (
     <div className="space-y-4">
       {toggles.map(({ key, label, desc }) => (
@@ -230,36 +339,48 @@ function NotificationsTab({ settings, onSave }) {
           </div>
           <button
             onClick={() => setForm({ ...form, [key]: !form[key] })}
-            className={`relative w-11 h-6 rounded-full transition-colors ${form[key] ? "bg-indigo-600" : "bg-slate-300 dark:bg-slate-600"}`}
+            className="relative w-11 h-6 rounded-full transition-colors"
+            style={{
+              backgroundColor: form[key] ? "var(--brand, #6366f1)" : undefined,
+            }}
+            data-off={!form[key]}
           >
             <span
-              className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${form[key] ? "translate-x-5" : "translate-x-0"}`}
+              className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${form[key] ? "translate-x-5" : "translate-x-0"} ${!form[key] ? "bg-slate-300 dark:bg-slate-600" : ""}`}
+              style={!form[key] ? { backgroundColor: "#94a3b8" } : {}}
             />
           </button>
         </div>
       ))}
       <div className="flex justify-end">
         <button
-          className={btn()}
-          onClick={() => onSave({ notifications: form })}
+          onClick={save}
+          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium text-white transition-colors"
+          style={{ backgroundColor: "var(--brand, #6366f1)" }}
         >
-          <Save size={14} /> Save Preferences
+          {saved ? (
+            <>
+              <Check size={14} /> Saved!
+            </>
+          ) : (
+            <>
+              <Save size={14} /> Save Preferences
+            </>
+          )}
         </button>
       </div>
     </div>
   );
 }
 
+/* ── Main Page ── */
 export default function SettingsPage() {
-  const [settings, setSettings] = useState(DEFAULT_SETTINGS);
-  const [activeTab, setActiveTab] = useState("general");
-
-  const handleSave = (patch) => setSettings((prev) => ({ ...prev, ...patch }));
+  const [activeTab, setActiveTab] = useState("appearance");
 
   const tabContent = {
-    general: <GeneralTab settings={settings} onSave={handleSave} />,
-    appearance: <AppearanceTab settings={settings} onSave={handleSave} />,
-    notifications: <NotificationsTab settings={settings} onSave={handleSave} />,
+    general: <GeneralTab />,
+    appearance: <AppearanceTab />,
+    notifications: <NotificationsTab />,
   };
 
   return (
@@ -279,7 +400,16 @@ export default function SettingsPage() {
               <button
                 key={id}
                 onClick={() => setActiveTab(id)}
-                className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all text-left w-full ${activeTab === id ? "bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400" : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"}`}
+                className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all text-left w-full ${
+                  activeTab === id
+                    ? "text-white"
+                    : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
+                }`}
+                style={
+                  activeTab === id
+                    ? { backgroundColor: "var(--brand, #6366f1)" }
+                    : {}
+                }
               >
                 <Icon size={16} />
                 {label}

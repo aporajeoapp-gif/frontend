@@ -111,7 +111,7 @@ function CampCard({ camp, onExpand, expanded }) {
               <h3 className="font-bold text-slate-800 dark:text-white text-sm leading-snug">
                 {camp.campName}
               </h3>
-              <p className="text-xs text-indigo-600 dark:text-indigo-400 font-medium">
+              <p className="text-xs text-primary-600 dark:text-primary-400 font-medium">
                 {camp.organizer}
               </p>
             </div>

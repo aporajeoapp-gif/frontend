@@ -3,6 +3,19 @@
 /* Tailwind v4 class-based dark mode */
 @variant dark (&:where(.dark, .dark *));
 
+/* ── Dynamic brand color — updated by BrandContext via JS ── */
+@theme inline {
+  --color-primary: var(--brand, #6366f1);
+  --color-primary-50: color-mix(in srgb, var(--brand, #6366f1) 8%, white);
+  --color-primary-100: color-mix(in srgb, var(--brand, #6366f1) 15%, white);
+  --color-primary-200: color-mix(in srgb, var(--brand, #6366f1) 30%, white);
+  --color-primary-400: color-mix(in srgb, var(--brand, #6366f1) 70%, white);
+  --color-primary-500: var(--brand, #6366f1);
+  --color-primary-600: color-mix(in srgb, var(--brand, #6366f1) 85%, black);
+  --color-primary-700: color-mix(in srgb, var(--brand, #6366f1) 70%, black);
+  --color-primary-900: color-mix(in srgb, var(--brand, #6366f1) 30%, black);
+}
+
 @layer base {
   html {
     scroll-behavior: smooth;
@@ -46,12 +59,12 @@ body, body * {
 /* ── Custom scrollbar ── */
 ::-webkit-scrollbar { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #6366f1; border-radius: 99px; }
-::-webkit-scrollbar-thumb:hover { background: #4f46e5; }
+::-webkit-scrollbar-thumb { background: var(--brand, #6366f1); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: var(--brand, #6366f1); opacity: 0.8; }
 
 /* ── Focus ring ── */
 :focus-visible {
-  outline: 2px solid #6366f1;
+  outline: 2px solid var(--brand, #6366f1);
   outline-offset: 2px;
   border-radius: 6px;
 }
@@ -116,3 +129,10 @@ iframe[id^="goog"] {
 .scrollbar-none::-webkit-scrollbar {
   display: none;
 }
+
+/* ── Brand color utilities (driven by --brand CSS variable) ── */
+.brand-bg       { background-color: var(--brand, #6366f1); }
+.brand-text     { color: var(--brand, #6366f1); }
+.brand-border   { border-color: var(--brand, #6366f1); }
+.brand-ring     { --tw-ring-color: var(--brand, #6366f1); }
+.brand-bg-light { background-color: color-mix(in srgb, var(--brand, #6366f1) 12%, transparent); }

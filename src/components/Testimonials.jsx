@@ -190,7 +190,7 @@ export default function Testimonials() {
         </div>
 
         {/* Pause hint */}
-        <motion.p
+        {/* <motion.p
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
@@ -198,7 +198,7 @@ export default function Testimonials() {
           className="text-center text-xs text-slate-400 dark:text-slate-600 mt-4"
         >
           Hover to pause
-        </motion.p>
+        </motion.p> */}
       </div>
     </section>
   );

@@ -30,19 +30,19 @@ export default function BottomNav() {
               `flex-1 flex flex-col items-center justify-center py-2 gap-0.5 text-[9px] font-bold transition-all duration-200 min-w-0
               ${
                 isActive
-                  ? "text-indigo-600 dark:text-indigo-400 bg-indigo-50/80 dark:bg-indigo-900/30"
-                  : "text-slate-500 dark:text-slate-400 hover:text-indigo-500"
+                  ? "text-primary-600 dark:text-primary-400 bg-primary-50/80 dark:bg-primary-900/30"
+                  : "text-slate-500 dark:text-slate-400 hover:text-primary-500"
               }`
             }
           >
             {({ isActive }) => (
               <>
                 <span
-                  className={`relative flex items-center justify-center w-7 h-7 rounded-xl transition-all ${isActive ? "bg-indigo-100 dark:bg-indigo-900/50" : ""}`}
+                  className={`relative flex items-center justify-center w-7 h-7 rounded-xl transition-all ${isActive ? "bg-primary-100 dark:bg-primary-900/50" : ""}`}
                 >
                   <Icon size={17} />
                   {isActive && (
-                    <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 bg-indigo-500 rounded-full" />
+                    <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 bg-primary-500 rounded-full" />
                   )}
                 </span>
                 <span className="truncate w-full text-center leading-none px-0.5">

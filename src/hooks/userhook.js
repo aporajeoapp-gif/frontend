@@ -32,7 +32,7 @@ export function useUsers() {
     try {
       setLoading(true);
       const data = await getAllUsers();
-      console.log("All Users From Hook",data)
+      // console.log("All Users From Hook",data)
       setUsers(data);
     } catch (error) {
       console.error(error);

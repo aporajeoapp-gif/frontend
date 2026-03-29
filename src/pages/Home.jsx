@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+﻿import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -37,9 +37,9 @@ const SLIDES = [
     id: 0,
     image:
       "https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=1400&q=80",
-    overlay: "from-indigo-900/85 via-violet-900/60 to-transparent",
+    overlay: "from-primary-900/85 via-violet-900/60 to-transparent",
     badge: "Healthcare",
-    badgeColor: "bg-indigo-500",
+    badgeColor: "bg-primary-500",
     title: "Find Trusted Doctors",
     subtitle: "Expert care, close to home",
     desc: "Connect with verified specialists across all medical fields.",
@@ -72,6 +72,19 @@ const SLIDES = [
     cta: "/bus",
     Icon: Bus,
   },
+  {
+    id: 3,
+    image:
+      "https://res.cloudinary.com/dlsuycdfj/image/upload/v1774797481/aporajeo_banner_xmosjk.jpg",
+    overlay: "from-slate-900/70 via-slate-900/30 to-transparent",
+    badge: "Community",
+    badgeColor: "bg-red-600",
+    title: "Aporajeo",
+    subtitle: "Undefeated, together",
+    desc: "A community built on resilience, hope, and the spirit of the people.",
+    cta: "/",
+    Icon: Users,
+  },
 ];
 
 const SERVICES = [
@@ -79,9 +92,9 @@ const SERVICES = [
     path: "/doctor",
     label: "Find Doctors",
     Icon: Stethoscope,
-    from: "from-indigo-500",
+    from: "from-primary-500",
     to: "to-violet-600",
-    shadow: "shadow-indigo-200 dark:shadow-indigo-900/40",
+    shadow: "shadow-primary-200 dark:shadow-primary-900/40",
     desc: "Verified specialists across all fields",
     count: `${doctors.length}+ Doctors`,
   },
@@ -132,8 +145,8 @@ const WHY_US = [
     Icon: Shield,
     title: "Trusted & Verified",
     desc: "All services are verified and regularly updated for accuracy.",
-    color: "text-indigo-500",
-    bg: "bg-indigo-50 dark:bg-indigo-900/30",
+    color: "text-primary-500",
+    bg: "bg-primary-50 dark:bg-primary-900/30",
   },
   {
     Icon: Clock,
@@ -334,7 +347,7 @@ export default function Home() {
               count: doctors.length,
               label: "Verified Doctors",
               Icon: Stethoscope,
-              from: "from-indigo-500",
+              from: "from-primary-500",
               to: "to-violet-600",
             },
             {
@@ -385,7 +398,7 @@ export default function Home() {
           ))}
         </div>
       </section>
-  {/* <AdBanner/> */}
+      {/* <AdBanner/> */}
       {/* ── SERVICES ── */}
       <section className="py-16 px-4 bg-slate-50 dark:bg-slate-950">
         <div className="max-w-7xl mx-auto">
@@ -395,7 +408,7 @@ export default function Home() {
             viewport={{ once: true }}
             className="text-center mb-12"
           >
-            <span className="inline-flex items-center gap-1.5 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-widest mb-3 bg-indigo-50 dark:bg-indigo-900/30 px-3 py-1.5 rounded-full">
+            <span className="inline-flex items-center gap-1.5 text-xs font-bold text-primary-600 dark:text-primary-400 uppercase tracking-widest mb-3 bg-primary-50 dark:bg-primary-900/30 px-3 py-1.5 rounded-full">
               <Sparkles size={10} /> Our Services
             </span>
             <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-800 dark:text-white">
@@ -441,7 +454,7 @@ export default function Home() {
                         <span className="text-xs font-semibold text-slate-400 dark:text-slate-500">
                           {count}
                         </span>
-                        <span className="inline-flex items-center gap-1 text-xs font-bold text-indigo-600 dark:text-indigo-400 group-hover:gap-2 transition-all">
+                        <span className="inline-flex items-center gap-1 text-xs font-bold text-primary-600 dark:text-primary-400 group-hover:gap-2 transition-all">
                           View <ArrowRight size={11} />
                         </span>
                       </div>
@@ -546,7 +559,7 @@ export default function Home() {
                   "{item.text}"
                 </p>
                 <div className="flex items-center gap-2.5">
-                  <div className="w-9 h-9 rounded-full bg-linear-to-br from-indigo-400 to-violet-500 flex items-center justify-center text-base shadow-sm">
+                  <div className="w-9 h-9 rounded-full bg-linear-to-br from-primary-400 to-violet-500 flex items-center justify-center text-base shadow-sm">
                     {item.image}
                   </div>
                   <div>
@@ -571,32 +584,17 @@ export default function Home() {
             initial={{ opacity: 0, y: 32 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="relative rounded-3xl overflow-hidden p-10 md:p-16 text-center text-white shadow-2xl shadow-indigo-200 dark:shadow-indigo-900/40"
+            className="relative rounded-3xl overflow-hidden p-10 md:p-16 text-center text-white shadow-2xl shadow-slate-400 dark:shadow-slate-900/60"
           >
-            <div className="absolute inset-0 bg-linear-to-br from-indigo-600 via-violet-600 to-purple-700" />
-            <div className="absolute inset-0 pointer-events-none">
-              <svg width="100%" height="100%">
-                <defs>
-                  <pattern
-                    id="cg"
-                    width="32"
-                    height="32"
-                    patternUnits="userSpaceOnUse"
-                  >
-                    <path
-                      d="M 32 0 L 0 0 0 32"
-                      fill="none"
-                      stroke="white"
-                      strokeWidth="0.6"
-                    />
-                  </pattern>
-                </defs>
-                <rect width="100%" height="100%" fill="url(#cg)" />
-              </svg>
-            </div>
+            <img
+              src="https://res.cloudinary.com/dlsuycdfj/image/upload/v1774797481/aporajeo_banner_xmosjk.jpg"
+              className="absolute inset-0 w-full h-full object-cover object-center scale-[1.0]"
+              alt="Aporajeo banner"
+            />
+            <div className="absolute inset-0 bg-slate-900/50" />
             <div className="absolute -top-20 -right-20 w-64 h-64 rounded-full bg-white/10 blur-2xl" />
             <div className="absolute -bottom-16 -left-16 w-48 h-48 rounded-full bg-white/10 blur-2xl" />
-            <div className="relative z-10">
+            <div className="relative z-10 p-10 md:p-16">
               <div className="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center mx-auto mb-5 border border-white/30">
                 <Zap size={28} className="text-yellow-300" />
               </div>
@@ -617,7 +615,7 @@ export default function Home() {
                 </a>
                 <a
                   href="mailto:info@oporajeo.com"
-                  className="inline-flex items-center justify-center gap-2 bg-white text-indigo-700 hover:bg-indigo-50 font-bold px-8 py-3.5 rounded-2xl shadow-lg transition-all hover:scale-105 active:scale-95"
+                  className="inline-flex items-center justify-center gap-2 bg-white text-primary-700 hover:bg-primary-50 font-bold px-8 py-3.5 rounded-2xl shadow-lg transition-all hover:scale-105 active:scale-95"
                 >
                   <Mail size={17} /> Email Us
                 </a>

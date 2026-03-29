@@ -11,12 +11,12 @@ import { confirmDelete, successAlert, errorAlert } from "../../utils/alert";
 import fetchUser from "../../hooks/userhook";
 
 const inp =
-  "w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg outline-none focus:border-indigo-400 dark:focus:border-indigo-500 text-slate-800 dark:text-slate-200 placeholder-slate-400 transition-colors";
+  "w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg outline-none focus:border-primary-400 dark:focus:border-primary-500 text-slate-800 dark:text-slate-200 placeholder-slate-400 transition-colors";
 
 const btn = (v = "primary") =>
   ({
     primary:
-      "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium bg-indigo-600 hover:bg-indigo-700 text-white transition-colors",
+      "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium bg-primary-600 hover:bg-primary-700 text-white transition-colors",
     secondary:
       "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors",
     ghost:
@@ -117,7 +117,13 @@ export default function EmergencyPage() {
       errorAlert("Failed to delete service");
     }
   };
-
+if (!canRead) {
+    return (
+      <div className="flex items-center justify-center py-20 text-slate-400 text-sm">
+        You don't have permission to view emergency page.
+      </div>
+    );
+  }
   return (
     <div className="space-y-5">
       {/* Header */}
@@ -161,8 +167,8 @@ export default function EmergencyPage() {
                 )}
                 <div className="flex flex-col gap-1 mt-3">
                   {phones.map((ph) => (
-                    <a key={ph} href={`tel:${ph}`} className="flex items-center gap-2 px-2.5 py-1.5 bg-slate-50 dark:bg-slate-800 rounded-lg hover:bg-indigo-50 dark:hover:bg-slate-700 transition cursor-pointer">
-                      <Phone size={13} className="text-indigo-500" />
+                    <a key={ph} href={`tel:${ph}`} className="flex items-center gap-2 px-2.5 py-1.5 bg-slate-50 dark:bg-slate-800 rounded-lg hover:bg-primary-50 dark:hover:bg-slate-700 transition cursor-pointer">
+                      <Phone size={13} className="text-primary-500" />
                       <span className="font-mono font-bold text-slate-800 dark:text-slate-200 text-sm">{ph}</span>
                     </a>
                   ))}

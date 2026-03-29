@@ -97,7 +97,11 @@ export default function Sidebar({
 
       {/* Nav */}
       <nav className="flex-1 overflow-y-auto py-4 px-2 space-y-0.5">
-        {NAV_ITEMS.map(({ to, label, icon: Icon, end }) => (
+        {NAV_ITEMS.map(({ to, label, icon: Icon, end }) => {
+            if (to === "/admin/settings" && !isAdmin) return null;
+            return (
+
+            
           <NavLink
             key={to}
             to={to}
@@ -107,7 +111,7 @@ export default function Sidebar({
               `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 group
               ${
                 isActive
-                  ? "bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400"
+                  ? "bg-primary-50 dark:bg-primary-900/60 text-primary-600 dark:text-primary-400"
                   : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white"
               } ${collapsed ? "justify-center" : ""}`
             }
@@ -117,7 +121,7 @@ export default function Sidebar({
               <>
                 <Icon
                   size={18}
-                  className={`shrink-0 ${isActive ? "text-indigo-600 dark:text-indigo-400" : "text-slate-500 dark:text-slate-500 group-hover:text-slate-700 dark:group-hover:text-slate-300"}`}
+                  className={`shrink-0 ${isActive ? "text-primary-600 dark:text-primary-400" : "text-slate-500 dark:text-slate-500 group-hover:text-slate-700 dark:group-hover:text-slate-300"}`}
                 />
                 <AnimatePresence>
                   {!collapsed && (
@@ -134,14 +138,14 @@ export default function Sidebar({
               </>
             )}
           </NavLink>
-        ))}
+)})}
       </nav>
 
       {/* Collapse toggle (desktop) */}
       <div className="p-3 border-t border-slate-200 dark:border-slate-800 hidden lg:block">
         <div className="flex items-center gap-3 px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-800">
           {/* Icon */}
-          <div className="w-8 h-8 flex items-center justify-center rounded-full bg-indigo-500 text-white text-xs font-semibold">
+          <div className="w-8 h-8 flex items-center justify-center rounded-full bg-primary-500 text-white text-xs font-semibold">
             {profile?.role?.charAt(0)?.toUpperCase() || "A"}
           </div>
 

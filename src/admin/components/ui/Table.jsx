@@ -39,7 +39,7 @@ export default function Table({
               setPage(1);
             }}
             placeholder="Search..."
-            className="w-full pl-8 pr-3 py-2 text-sm bg-slate-100 dark:bg-slate-800 rounded-lg border border-transparent focus:border-indigo-400 dark:focus:border-indigo-500 outline-none text-slate-700 dark:text-slate-300 placeholder-slate-400 transition-colors"
+            className="w-full pl-8 pr-3 py-2 text-sm bg-slate-100 dark:bg-slate-800 rounded-lg border border-transparent focus:border-primary-400 dark:focus:border-primary-500 outline-none text-slate-700 dark:text-slate-300 placeholder-slate-400 transition-colors"
           />
         </div>
       )}

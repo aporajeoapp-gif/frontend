@@ -15,8 +15,15 @@ export default function FerryPage() {
   const canCreate = hasPerm("ferry.create");
   const canUpdate = hasPerm("ferry.update");
   const canDelete = hasPerm("ferry.delete");
+  const canRead = hasPerm("ferry.read");
   // ───────────────────────────────────────────────────────────────────────────
-
+  if (!canRead) {
+    return (
+      <div className="flex items-center justify-center py-20 text-slate-400 text-sm">
+        You don't have permission to view ferry page.
+      </div>
+    );
+  }
   return (
     <RoutePageTemplate
       title="Ferry Route"

@@ -15,8 +15,15 @@ export default function BusPage() {
   const canCreate = hasPerm("bus.create");
   const canUpdate = hasPerm("bus.update");
   const canDelete = hasPerm("bus.delete");
+  const canRead = hasPerm("bus.read");
   // ───────────────────────────────────────────────────────────────────────────
-  
+    if (!canRead) {
+    return (
+      <div className="flex items-center justify-center py-20 text-slate-400 text-sm">
+        You don't have permission to view buses.
+      </div>
+    );
+  }
   return (
     <RoutePageTemplate
       title="Bus Route"
