@@ -196,7 +196,7 @@ export default function RoutePageTemplate({
         toast.success(res.message)
         const created = res.bus || res.ferry || res;
         setRoutes((prev) => [created, ...prev]);
-        successAlert(`${title} created successfully`);
+        // successAlert(`${title} created successfully`);
       } else {
         const res = await updateFn(form._id || form.id, payload);
         toast.success(res.message)
@@ -206,7 +206,7 @@ export default function RoutePageTemplate({
             (r._id || r.id) === (form._id || form.id) ? updated : r,
           ),
         );
-        successAlert(`${title} updated successfully`);
+        // successAlert(`${title} updated successfully`);
       }
       setModal(null);
     } catch (err) {

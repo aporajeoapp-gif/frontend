@@ -20,7 +20,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import Table from "../components/ui/Table";
-import fetchUser, { useUsers } from "../../hooks/userhook";
+import  { useUsers } from "../../hooks/userhook";
 import { createUser, updateUser, deleteUser } from "../../api/authApi";
 import { confirmDelete, errorAlert, successAlert } from "../../utils/alert";
 import { useAuth } from "../../context/AuthContext";

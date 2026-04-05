@@ -15,10 +15,12 @@ import {
   ChevronDown,
   X,
   Droplets,
+  LogOut,
 } from "lucide-react";
 import { useState } from "react";
 import logo from "../../../public/logo.png";
 import { useAuth } from "../../context/AuthContext";
+import { confirmLogout,successAlert } from "../../utils/alert";
 const NAV_ITEMS = [
   { to: "/admin", label: "Dashboard", icon: LayoutDashboard, end: true },
   { to: "/admin/users", label: "Users", icon: Users, adminOnly: true },
@@ -51,10 +53,21 @@ export default function Sidebar({
   mobileOpen,
   onMobileClose,
 }) {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const isAdmin = user?.role === "admin";
   const location = useLocation();
+const handleLogout = async () => {
+  const result = await confirmLogout();
 
+  if (!result.isConfirmed) return;
+
+  logout(); // clear token + user
+
+  successAlert("Logged out successfully");
+
+  // optional redirect
+  window.location.href = "/login";
+};
   // track which dropdowns are open
   const [openGroups, setOpenGroups] = useState({ Analytics: true });
   const toggleGroup = (label) =>
@@ -83,10 +96,9 @@ export default function Sidebar({
           <button
             onClick={() => toggleGroup(label)}
             className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 group outline-none focus:outline-none
-              ${
-                isGroupActive
-                  ? "bg-primary-50 dark:bg-primary-900/60 text-primary-600 dark:text-primary-400"
-                  : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white"
+              ${isGroupActive
+                ? "bg-primary-50 dark:bg-primary-900/60 text-primary-600 dark:text-primary-400"
+                : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white"
               } ${collapsed ? "justify-center" : ""}`}
             title={collapsed ? label : undefined}
           >
@@ -131,10 +143,9 @@ export default function Sidebar({
                     onClick={onMobileClose}
                     className={({ isActive }) =>
                       `flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 outline-none focus:outline-none
-                      ${
-                        isActive
-                          ? "bg-primary-50 dark:bg-primary-900/60 text-primary-600 dark:text-primary-400"
-                          : "text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white"
+                      ${isActive
+                        ? "bg-primary-50 dark:bg-primary-900/60 text-primary-600 dark:text-primary-400"
+                        : "text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white"
                       }`
                     }
                   >
@@ -157,10 +168,9 @@ export default function Sidebar({
         onClick={onMobileClose}
         className={({ isActive }) =>
           `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 group outline-none focus:outline-none
-          ${
-            isActive
-              ? "bg-primary-50 dark:bg-primary-900/60 text-primary-600 dark:text-primary-400"
-              : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white"
+          ${isActive
+            ? "bg-primary-50 dark:bg-primary-900/60 text-primary-600 dark:text-primary-400"
+            : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white"
           } ${collapsed ? "justify-center" : ""}`
         }
         title={collapsed ? label : undefined}
@@ -192,9 +202,8 @@ export default function Sidebar({
     <div className="flex flex-col h-full">
       {/* Logo */}
       <div
-        className={`flex flex-col items-center px-4 py-5 border-b border-slate-200 dark:border-slate-800 ${
-          collapsed ? "justify-center" : ""
-        }`}
+        className={`flex flex-col items-center px-4 py-5 border-b border-slate-200 dark:border-slate-800 ${collapsed ? "justify-center" : ""
+          }`}
       >
         <div className="flex items-center justify-center">
           <img
@@ -209,9 +218,8 @@ export default function Sidebar({
           >
             <ChevronLeft
               size={16}
-              className={`transition-transform duration-200 ${
-                collapsed ? "rotate-180" : ""
-              }`}
+              className={`transition-transform duration-200 ${collapsed ? "rotate-180" : ""
+                }`}
             />
           </button>
         </div>
@@ -256,6 +264,20 @@ export default function Sidebar({
               </span>
             </div>
           )}
+
+        </div>
+        <div className="mt-3">
+          <button
+            onClick={handleLogout}
+            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl 
+    text-sm font-medium transition-all duration-200
+    bg-red-50 text-red-600 hover:bg-red-100
+    dark:bg-red-900/30 dark:text-red-400 dark:hover:bg-red-900/50"
+          >
+            <LogOut size={18} className="shrink-0" />
+
+            {!collapsed && <span>Terminate</span>}
+          </button>
         </div>
       </div>
     </div>

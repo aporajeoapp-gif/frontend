@@ -22,15 +22,14 @@ import {
   Globe2,
   HeartHandshake,
 } from "lucide-react";
-import doctors from "../constant/data/doctors.json";
-import emergencyContacts from "../constant/data/emergencyContacts.json";
-import busServices from "../constant/data/busServices.json";
-import ferryServices from "../constant/data/ferryServices.json";
-import testimonials from "../constant/data/testimonials.json";
-import advertisements from "../constant/data/advertisements.json";
+
+
 import AdBanner from "../components/AdBanner";
 import Testimonials from "../components/Testimonials";
-import AddBanner from "../components/AddBanner";
+import useDoctors from "../hooks/doctorhook";
+import useEmergencyServices from "../hooks/emergencyHook";
+import useBuses from "../hooks/bushook";
+import useFerries from "../hooks/ferryhook";
 
 const SLIDES = [
   {
@@ -87,58 +86,7 @@ const SLIDES = [
   },
 ];
 
-const SERVICES = [
-  {
-    path: "/doctor",
-    label: "Find Doctors",
-    Icon: Stethoscope,
-    from: "from-primary-500",
-    to: "to-violet-600",
-    shadow: "shadow-primary-200 dark:shadow-primary-900/40",
-    desc: "Verified specialists across all fields",
-    count: `${doctors.length}+ Doctors`,
-  },
-  {
-    path: "/emergency",
-    label: "Emergency",
-    Icon: AlertTriangle,
-    from: "from-rose-500",
-    to: "to-red-600",
-    shadow: "shadow-rose-200 dark:shadow-rose-900/40",
-    desc: "24/7 emergency contacts & services",
-    count: `${emergencyContacts.length}+ Services`,
-  },
-  {
-    path: "/bus",
-    label: "Bus Services",
-    Icon: Bus,
-    from: "from-emerald-500",
-    to: "to-teal-600",
-    shadow: "shadow-emerald-200 dark:shadow-emerald-900/40",
-    desc: "Live bus routes and schedules",
-    count: `${busServices.length}+ Routes`,
-  },
-  {
-    path: "/ferry",
-    label: "Ferry Services",
-    Icon: Ship,
-    from: "from-cyan-500",
-    to: "to-blue-600",
-    shadow: "shadow-cyan-200 dark:shadow-cyan-900/40",
-    desc: "Ferry timetables and fares",
-    count: `${ferryServices.length}+ Routes`,
-  },
-  {
-    path: "/events",
-    label: "Events",
-    Icon: CalendarDays,
-    from: "from-violet-500",
-    to: "to-purple-600",
-    shadow: "shadow-violet-200 dark:shadow-violet-900/40",
-    desc: "Community events near you",
-    count: "Upcoming Events",
-  },
-];
+
 
 const WHY_US = [
   {
@@ -175,7 +123,63 @@ export default function Home() {
   const [current, setCurrent] = useState(0);
   const [paused, setPaused] = useState(false);
   const slide = SLIDES[current];
+  const { doctors } = useDoctors();
+  const { emergencies } = useEmergencyServices();
+  const { buses } = useBuses();
+  const { ferries } = useFerries();
 
+  const SERVICES = [
+    {
+      path: "/doctor",
+      label: "Find Doctors",
+      Icon: Stethoscope,
+      from: "from-primary-500",
+      to: "to-violet-600",
+      shadow: "shadow-primary-200 dark:shadow-primary-900/40",
+      desc: "Verified specialists across all fields",
+      count: `${doctors.length}+ Doctors`,
+    },
+    {
+      path: "/emergency",
+      label: "Emergency",
+      Icon: AlertTriangle,
+      from: "from-rose-500",
+      to: "to-red-600",
+      shadow: "shadow-rose-200 dark:shadow-rose-900/40",
+      desc: "24/7 emergency contacts & services",
+      count: `${emergencies.length}+ Services`,
+    },
+    {
+      path: "/bus",
+      label: "Bus Services",
+      Icon: Bus,
+      from: "from-emerald-500",
+      to: "to-teal-600",
+      shadow: "shadow-emerald-200 dark:shadow-emerald-900/40",
+      desc: "Live bus routes and schedules",
+      count: `${buses.length}+ Routes`,
+    },
+    {
+      path: "/ferry",
+      label: "Ferry Services",
+      Icon: Ship,
+      from: "from-cyan-500",
+      to: "to-blue-600",
+      shadow: "shadow-cyan-200 dark:shadow-cyan-900/40",
+      desc: "Ferry timetables and fares",
+      count: `${ferries.length}+ Routes`,
+    },
+    {
+      path: "/events",
+      label: "Events",
+      Icon: CalendarDays,
+      from: "from-violet-500",
+      to: "to-purple-600",
+      shadow: "shadow-violet-200 dark:shadow-violet-900/40",
+      desc: "Community events near you",
+      count: "Upcoming Events",
+    },
+  ];
   useEffect(() => {
     if (paused) return;
     const id = setInterval(
@@ -351,14 +355,14 @@ export default function Home() {
               to: "to-violet-600",
             },
             {
-              count: emergencyContacts.length,
+              count: emergencies.length,
               label: "Emergency Services",
               Icon: AlertTriangle,
               from: "from-rose-500",
               to: "to-red-600",
             },
             {
-              count: busServices.length + ferryServices.length,
+              count: buses.length + ferries.length,
               label: "Transport Routes",
               Icon: Bus,
               from: "from-emerald-500",

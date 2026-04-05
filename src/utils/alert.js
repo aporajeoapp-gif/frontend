@@ -11,6 +11,17 @@ export const confirmDelete = async () => {
     cancelButtonColor: "#ef4444",
   });
 };
+export const confirmLogout = async () => {
+  return await Swal.fire({
+    title: "Are you sure?",
+    text: "You will be logged out from your account",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonText: "Yes, Logout",
+    confirmButtonColor: "#ef4444", // red
+    cancelButtonColor: "#6b7280", // gray
+  });
+};
 
 export const successAlert = (msg) =>
   Swal.fire("Success", msg, "success");
