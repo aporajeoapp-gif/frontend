@@ -27,9 +27,14 @@ import AdsPage from "./admin/pages/AdsPage";
 import AnalyticsPage from "./admin/pages/AnalyticsPage";
 import SettingsPage from "./admin/pages/SettingsPage";
 import BloodDonationPage from "./admin/pages/BloodDonationPage";
-import ProtectedRoute, { AdminRoute } from "./protectedroute/ProtectedRoute";
+import ProtectedRoute, {
+  AdminRoute,
+  NonMemberRoute,
+} from "./protectedroute/ProtectedRoute";
 import { Toaster } from "sonner";
 import PublicLayout from "./pages/layout/HomeLayout";
+import AuditLogs from "./admin/pages/AuditLogs";
+import AuditLogDetail from "./admin/pages/AuditLogDetail";
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -56,20 +61,31 @@ function App() {
               <Route element={<ProtectedRoute />}>
                 <Route path="/admin" element={<AdminLayout />}>
                   <Route index element={<AdminDashboard />} />
-                  <Route path="users" element={<UsersPage />} />
+                  <Route
+                    path="users"
+                    element={
+                      <AdminRoute>
+                        <UsersPage />
+                      </AdminRoute>
+                    }
+                  />
                   <Route path="bus" element={<BusPage />} />
                   <Route path="ferry" element={<FerryPage />} />
                   <Route path="doctors" element={<DoctorsPage />} />
                   <Route path="emergency" element={<EmergencyPage />} />
                   <Route path="events" element={<EventsPage />} />
                   <Route path="advertisements" element={<AdsPage />} />
-                  <Route path="analytics" element={<AnalyticsPage />} />
+                  <Route path="analytics" element={<AnalyticsPage />}>
+                    <Route path="auditlogs" element={<AuditLogs />} />
+                    <Route path="auditlogs/:id" element={<AuditLogDetail />} />
+                  </Route>
+
                   <Route
                     path="settings"
                     element={
-                      <AdminRoute>
+                      <NonMemberRoute>
                         <SettingsPage />
-                      </AdminRoute>
+                      </NonMemberRoute>
                     }
                   />
                   <Route

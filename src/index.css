@@ -29,7 +29,11 @@
   body {
     background-color: #f1f5f9;
     color: #0f172a;
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-family:
+      "Inter",
+      system-ui,
+      -apple-system,
+      sans-serif;
     -webkit-font-smoothing: antialiased;
   }
 
@@ -41,7 +45,8 @@
 }
 
 /* ── Smooth theme transitions (background/color only, not transforms) ── */
-body, body * {
+body,
+body * {
   transition-property: background-color, border-color, color;
   transition-duration: 150ms;
   transition-timing-function: ease;
@@ -57,10 +62,21 @@ body, body * {
 }
 
 /* ── Custom scrollbar ── */
-::-webkit-scrollbar { width: 5px; height: 5px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--brand, #6366f1); border-radius: 99px; }
-::-webkit-scrollbar-thumb:hover { background: var(--brand, #6366f1); opacity: 0.8; }
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--brand, #6366f1);
+  border-radius: 99px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--brand, #6366f1);
+  opacity: 0.8;
+}
 
 /* ── Focus ring ── */
 :focus-visible {
@@ -80,10 +96,10 @@ body, body * {
 .card-light {
   background: #ffffff;
   border: 1px solid #e2e8f0;
-  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.06), 0 1px 2px -1px rgb(0 0 0 / 0.06);
+  box-shadow:
+    0 1px 3px 0 rgb(0 0 0 / 0.06),
+    0 1px 2px -1px rgb(0 0 0 / 0.06);
 }
-
-
 
 /* ── Hide Google Translate toolbar injected into DOM ── */
 .goog-te-banner-frame,
@@ -106,8 +122,12 @@ iframe.goog-te-banner-frame {
   display: none !important;
   pointer-events: none !important;
 }
-.goog-te-gadget { display: none !important; }
-.goog-te-combo { display: none !important; }
+.goog-te-gadget {
+  display: none !important;
+}
+.goog-te-combo {
+  display: none !important;
+}
 
 /* Prevent Google Translate iframes from blocking clicks */
 iframe[id^="goog"] {
@@ -117,8 +137,12 @@ iframe[id^="goog"] {
 
 /* Ticker tape animation */
 @keyframes ticker {
-  0%   { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
 }
 
 /* Hide scrollbar utility */
@@ -131,8 +155,31 @@ iframe[id^="goog"] {
 }
 
 /* ── Brand color utilities (driven by --brand CSS variable) ── */
-.brand-bg       { background-color: var(--brand, #6366f1); }
-.brand-text     { color: var(--brand, #6366f1); }
-.brand-border   { border-color: var(--brand, #6366f1); }
-.brand-ring     { --tw-ring-color: var(--brand, #6366f1); }
-.brand-bg-light { background-color: color-mix(in srgb, var(--brand, #6366f1) 12%, transparent); }
+.brand-bg {
+  background-color: var(--brand, #6366f1);
+}
+.brand-text {
+  color: var(--brand, #6366f1);
+}
+.brand-border {
+  border-color: var(--brand, #6366f1);
+}
+.brand-ring {
+  --tw-ring-color: var(--brand, #6366f1);
+}
+.brand-bg-light {
+  background-color: color-mix(in srgb, var(--brand, #6366f1) 12%, transparent);
+}
+
+/* ── Remove click outline on sidebar nav items ── */
+aside a:focus,
+aside button:focus {
+  outline: none;
+}
+
+/* ── Remove Recharts click outline on graphs ── */
+.recharts-wrapper:focus,
+.recharts-surface:focus,
+.recharts-wrapper *:focus {
+  outline: none !important;
+}

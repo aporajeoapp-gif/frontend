@@ -48,6 +48,7 @@ import {
   Radar as RadarIcon,
 } from "lucide-react";
 import useAnalytics from "../../hooks/analyticsHook";
+import { Outlet, useLocation } from "react-router-dom";
 
 // ── Palette ───────────────────────────────────────────────────
 const C = {
@@ -228,6 +229,10 @@ const GRID = { stroke: "#e2e8f0", strokeDasharray: "3 3" };
 // ════════════════════════════════════════════════════════════════
 export default function AnalyticsPage() {
   const { stats, loading } = useAnalytics();
+  const location = useLocation();
+  const isChildRoute = location.pathname !== "/admin/analytics";
+
+  if (isChildRoute) return <Outlet />;
 
   if (loading || !stats) {
     return (
@@ -1149,6 +1154,7 @@ export default function AnalyticsPage() {
           color="sky"
         />
       </div>
+      <Outlet />
     </div>
   );
 }
