@@ -14,8 +14,10 @@ import {
   CheckCircle,
   XCircle,
   AlertCircle,
+  Image as ImageIcon,
 } from "lucide-react";
 import PageBanner from "../components/PageBanner";
+import { useBloodCamp } from "../hooks/bloodCampHook";
 
 const STATUS_META = {
   upcoming: {
@@ -92,10 +94,25 @@ function CampCard({ camp, onExpand, expanded }) {
       layout
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm hover:shadow-lg transition-all"
+      className="group relative bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm hover:shadow-lg transition-all"
     >
-      {/* Top accent */}
-      <div className="h-1.5 bg-linear-to-r from-rose-500 to-pink-500" />
+      {/* Banner */}
+      <div className="relative h-40 w-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
+        {camp.banner_image ? (
+          <img src={camp.banner_image} alt={camp.campName} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center text-slate-300 dark:text-slate-700">
+             <ImageIcon size={48} />
+          </div>
+        )}
+        <div className="absolute top-3 right-3">
+          <span
+            className={`text-[10px] font-bold px-2.5 py-1 rounded-full capitalize shadow-sm ${meta.cls}`}
+          >
+            {meta.label}
+          </span>
+        </div>
+      </div>
 
       <div className="p-5">
         {/* Header */}
@@ -116,31 +133,26 @@ function CampCard({ camp, onExpand, expanded }) {
               </p>
             </div>
           </div>
-          <span
-            className={`shrink-0 text-xs font-semibold px-2.5 py-1 rounded-full capitalize ${meta.cls}`}
-          >
-            {meta.label}
-          </span>
         </div>
 
         {/* Info */}
-        <div className="space-y-1.5 text-xs text-slate-500 dark:text-slate-400 mb-3">
-          <div className="flex items-center gap-2">
-            <CalendarDays size={11} className="text-rose-400" />
-            {camp.date}
+        <div className="grid grid-cols-2 gap-x-2 gap-y-1.5 text-[11px] text-slate-500 dark:text-slate-400 mb-4">
+          <div className="flex items-center gap-1.5">
+            <CalendarDays size={12} className="text-rose-400 shrink-0" />
+            <span className="truncate">{camp.date}</span>
           </div>
-          <div className="flex items-center gap-2">
-            <Clock size={11} className="text-rose-400" />
-            {camp.time}
+          <div className="flex items-center gap-1.5">
+            <Clock size={12} className="text-rose-400 shrink-0" />
+            <span className="truncate">{camp.time}</span>
           </div>
-          <div className="flex items-center gap-2">
-            <MapPin size={11} className="text-rose-400" />
-            {camp.location}
+          <div className="flex items-center gap-1.5 col-span-2">
+            <MapPin size={12} className="text-rose-400 shrink-0" />
+            <span className="truncate">{camp.location}, {camp.city}</span>
           </div>
         </div>
 
         {/* Blood groups */}
-        <div className="flex flex-wrap gap-1 mb-3">
+        <div className="flex flex-wrap gap-1 mb-4">
           {(camp.bloodGroupsNeeded ?? []).map((g) => (
             <span
               key={g}
@@ -152,45 +164,39 @@ function CampCard({ camp, onExpand, expanded }) {
         </div>
 
         {/* Progress */}
-        {camp.status === "completed" && (
-          <div className="mb-3">
-            <div className="flex justify-between text-xs text-slate-500 dark:text-slate-400 mb-1">
-              <span>Units collected</span>
-              <span className="font-semibold">
-                {camp.collectedUnits} / {camp.targetUnits}
-              </span>
-            </div>
-            <div className="h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-              <div
-                className="h-full bg-linear-to-r from-rose-500 to-pink-500 rounded-full transition-all"
-                style={{ width: `${progress}%` }}
-              />
-            </div>
+        <div className="mb-4">
+          <div className="flex justify-between text-[10px] text-slate-500 dark:text-slate-400 mb-1">
+            <span>Collected Units</span>
+            <span className="font-semibold">
+              {camp.collectedUnits} / {camp.targetUnits}
+            </span>
           </div>
-        )}
-
-        {/* Contact */}
-        <div className="flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400 mb-3">
-          <a
-            href={`tel:${camp.contactPhone}`}
-            className="flex items-center gap-1 hover:text-rose-600 transition-colors"
-          >
-            <Phone size={11} />
-            {camp.contactPhone}
-          </a>
+          <div className="h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+            <div
+              className="h-full bg-linear-to-r from-rose-500 to-pink-500 rounded-full transition-all"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
         </div>
 
-        {/* Expand donors */}
-        <button
-          onClick={() => onExpand(camp.id)}
-          className="w-full flex items-center justify-between px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-rose-50 dark:hover:bg-rose-900/20 hover:text-rose-600 dark:hover:text-rose-400 transition-colors"
-        >
-          <span className="flex items-center gap-1.5">
+        {/* Contact */}
+        <div className="flex items-center justify-between pt-3 border-t border-slate-100 dark:border-slate-800">
+          <a
+            href={`tel:${camp.contactPhone}`}
+            className="flex items-center gap-1.5 text-xs font-semibold text-rose-600 dark:text-rose-400 hover:opacity-80 transition-opacity"
+          >
+            <Phone size={12} />
+            Contact
+          </a>
+          <button
+            onClick={() => onExpand(camp._id)}
+            className="flex items-center gap-1.5 text-xs font-medium text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-colors"
+          >
             <Users size={12} />
-            {camp.donors?.length ?? 0} Registered Donors
-          </span>
-          {expanded ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
-        </button>
+            {camp.donors?.length ?? 0}
+            {expanded ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
+          </button>
+        </div>
       </div>
 
       {/* Donors table */}
@@ -201,42 +207,44 @@ function CampCard({ camp, onExpand, expanded }) {
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.25 }}
-            className="overflow-hidden border-t border-slate-100 dark:border-slate-800"
+            className="overflow-hidden border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30"
           >
             <div className="px-5 py-4">
-              <h4 className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-3">
-                Donor Details
+              <h4 className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-3">
+                Registered Donors
               </h4>
               {camp.donors?.length > 0 ? (
-                <div className="overflow-x-auto rounded-xl border border-slate-100 dark:border-slate-800">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="bg-slate-50 dark:bg-slate-800/60">
-                        {[
-                          "Name",
-                          "Blood Group",
-                          "Age",
-                          "Phone",
-                          "Donated On",
-                        ].map((h) => (
-                          <th
-                            key={h}
-                            className="px-4 py-2.5 text-left text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider whitespace-nowrap"
-                          >
-                            {h}
-                          </th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {camp.donors.map((d, i) => (
-                        <DonorRow key={d.id} donor={d} i={i} />
-                      ))}
-                    </tbody>
-                  </table>
+                <div className="overflow-x-auto">
+                   <table className="w-full text-xs">
+                     <thead>
+                       <tr className="text-left text-slate-500 dark:text-slate-400">
+                         <th className="pb-2 pr-4 font-semibold uppercase tracking-wider">Donor</th>
+                         <th className="pb-2 pr-4 font-semibold uppercase tracking-wider text-center">Group</th>
+                         <th className="pb-2 font-semibold uppercase tracking-wider">Status</th>
+                       </tr>
+                     </thead>
+                     <tbody>
+                       {camp.donors.map((d, i) => (
+                         <tr key={d.id} className="border-t border-slate-100 dark:border-slate-800/50">
+                            <td className="py-2 pr-4">
+                              <div className="text-xs font-medium text-slate-700 dark:text-slate-300">{d.name}</div>
+                              <div className="text-[9px] text-slate-400">{d.age} yrs · {d.phone}</div>
+                            </td>
+                            <td className="py-2 pr-4 text-center">
+                               <span className="inline-block px-1.5 py-0.5 rounded-md bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400 font-bold border border-rose-100 dark:border-rose-900/50">
+                                  {d.bloodGroup}
+                               </span>
+                            </td>
+                            <td className="py-2 text-[10px] text-slate-500">
+                               {d.donatedAt ? "Donated" : "Waiting"}
+                            </td>
+                         </tr>
+                       ))}
+                     </tbody>
+                   </table>
                 </div>
               ) : (
-                <p className="text-xs text-slate-400 italic text-center py-4">
+                <p className="text-[11px] text-slate-400 italic text-center py-2">
                   No donors registered yet.
                 </p>
               )}
@@ -249,14 +257,13 @@ function CampCard({ camp, onExpand, expanded }) {
 }
 
 export default function BloodDonation() {
-  const [camps, setCamps] = useState([]);
+  const { camps, loading, fetchCamps } = useBloodCamp();
   const [filter, setFilter] = useState("all");
   const [expanded, setExpanded] = useState(null);
 
   useEffect(() => {
-    // TODO: replace with real API when available
-    setCamps([]);
-  }, []);
+    fetchCamps();
+  }, [fetchCamps]);
 
   const filtered =
     filter === "all" ? camps : camps.filter((c) => c.status === filter);
@@ -269,91 +276,120 @@ export default function BloodDonation() {
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
       <PageBanner
         title="Blood Donation Camps"
-        subtitle="Find a camp near you and save lives"
+        subtitle="Find a camp near you and save lives. Every drop counts."
         image="https://images.unsplash.com/photo-1615461066841-6116e61058f4?w=1400&auto=format&fit=crop&q=80"
-        gradient="from-rose-900/85 via-pink-900/75 to-slate-900/80"
+        gradient="from-rose-950/90 via-rose-900/80 to-slate-950/90"
         Icon={Droplets}
-        badge="Save Lives · Donate Blood"
+        badge="Live to Give · Donate Blood"
       />
 
-      <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="max-w-7xl mx-auto px-4 py-8 -mt-12 relative z-10">
         {/* Summary stats */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-10">
           {[
             {
               label: "Total Camps",
               value: camps.length,
               color: "text-rose-500",
-              bg: "bg-rose-50 dark:bg-rose-900/20",
+              bg: "bg-white dark:bg-slate-900",
             },
             {
               label: "Upcoming",
               value: camps.filter((c) => c.status === "upcoming").length,
               color: "text-blue-500",
-              bg: "bg-blue-50 dark:bg-blue-900/20",
+              bg: "bg-white dark:bg-slate-900",
             },
             {
-              label: "Completed",
-              value: camps.filter((c) => c.status === "completed").length,
+              label: "Ongoing",
+              value: camps.filter((c) => c.status === "ongoing").length,
               color: "text-emerald-500",
-              bg: "bg-emerald-50 dark:bg-emerald-900/20",
+              bg: "bg-white dark:bg-slate-900",
             },
             {
-              label: "Donors",
+              label: "Total Donors",
               value: totalDonors,
               color: "text-violet-500",
-              bg: "bg-violet-50 dark:bg-violet-900/20",
+              bg: "bg-white dark:bg-slate-900",
             },
           ].map(({ label, value, color, bg }) => (
-            <div key={label} className={`${bg} rounded-2xl p-4 text-center`}>
-              <div className={`text-2xl font-extrabold ${color}`}>{value}</div>
-              <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+            <div key={label} className={`${bg} rounded-2xl p-5 shadow-sm border border-slate-200/60 dark:border-slate-800/50 text-center transform transition-transform hover:-translate-y-1`}>
+              <div className={`text-3xl font-black ${color}`}>{value}</div>
+              <div className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mt-1">
                 {label}
               </div>
             </div>
           ))}
         </div>
 
-        {/* Filter tabs */}
-        <div className="flex gap-2 mb-6 flex-wrap">
-          {FILTERS.map((f) => (
-            <button
-              key={f}
-              onClick={() => setFilter(f)}
-              className={`px-4 py-1.5 rounded-full text-xs font-semibold capitalize transition-colors ${
-                filter === f
-                  ? "bg-rose-600 text-white shadow-sm"
-                  : "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:border-rose-300"
-              }`}
-            >
-              {f === "all" ? "All Camps" : f}
-            </button>
-          ))}
+        {/* Header & Filter */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+           <div>
+              <h2 className="text-xl font-bold text-slate-800 dark:text-white">Active Blood Drives</h2>
+              <p className="text-sm text-slate-500 dark:text-slate-400">Current and upcoming donation events in our community.</p>
+           </div>
+           
+           <div className="flex gap-2.5 overflow-x-auto pb-1 scrollbar-hide">
+             {FILTERS.map((f) => (
+               <button
+                 key={f}
+                 onClick={() => setFilter(f)}
+                 className={`px-5 py-2 rounded-xl text-xs font-bold capitalize whitespace-nowrap transition-all ${
+                   filter === f
+                     ? "bg-rose-600 text-white shadow-lg shadow-rose-900/20"
+                     : "bg-white dark:bg-slate-900 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-800 hover:border-rose-400"
+                 }`}
+               >
+                 {f === "all" ? "View All" : f}
+               </button>
+             ))}
+           </div>
         </div>
 
         {/* Camp cards */}
-        {filtered.length === 0 ? (
-          <div className="text-center py-20">
-            <Droplets
-              size={48}
-              className="mx-auto text-slate-300 dark:text-slate-700 mb-3"
-            />
-            <p className="text-slate-500 dark:text-slate-400">
-              No camps found.
+        {loading ? (
+           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-pulse">
+              {[1, 2, 3].map(i => (
+                <div key={i} className="h-80 bg-slate-200 dark:bg-slate-800 rounded-2xl" />
+              ))}
+           </div>
+        ) : filtered.length === 0 ? (
+          <div className="text-center py-24 bg-white dark:bg-slate-900 rounded-3xl border border-dashed border-slate-200 dark:border-slate-800">
+            <div className="w-16 h-16 bg-slate-50 dark:bg-slate-800/50 rounded-full flex items-center justify-center mx-auto mb-4">
+               <Droplets size={32} className="text-slate-300 dark:text-slate-700" />
+            </div>
+            <h3 className="text-lg font-bold text-slate-800 dark:text-white">No Camps Found</h3>
+            <p className="text-sm text-slate-400 dark:text-slate-500 max-w-xs mx-auto mt-1">
+              There are currently no blood donation camps matching your selection.
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filtered.map((camp) => (
               <CampCard
-                key={camp.id}
+                key={camp._id}
                 camp={camp}
-                expanded={expanded === camp.id}
+                expanded={expanded === camp._id}
                 onExpand={toggleExpand}
               />
             ))}
           </div>
         )}
+        
+        {/* Footer info */}
+        <div className="mt-16 p-8 rounded-3xl bg-linear-to-br from-slate-900 to-slate-950 border border-slate-800 flex flex-col items-center text-center">
+            <h3 className="text-xl font-bold text-white mb-2">Want to register your own camp?</h3>
+            <p className="text-slate-400 text-sm max-w-lg mb-6">
+              If you are an organization or a volunteer group planning a blood drive, please contact the Oporajeo admin for verification and listing.
+            </p>
+            <div className="flex gap-4">
+               <a href="mailto:contact@oporajeo.org" className="px-6 py-2.5 rounded-xl bg-white text-slate-950 text-sm font-bold hover:bg-slate-100 transition-colors flex items-center gap-2">
+                  <Mail size={16} /> Email Us
+               </a>
+               <a href="tel:+910000000000" className="px-6 py-2.5 rounded-xl bg-slate-800 text-white text-sm font-bold hover:bg-slate-700 transition-colors flex items-center gap-2">
+                  <Phone size={16} /> Call Support
+               </a>
+            </div>
+        </div>
       </div>
     </div>
   );
