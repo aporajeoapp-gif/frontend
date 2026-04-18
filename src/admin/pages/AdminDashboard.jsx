@@ -184,7 +184,7 @@ export default function AdminDashboard() {
 
         {/* Last active */}
         <motion.div {...fade(6)} className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 p-5">
-          <SectionTitle>Last active</SectionTitle>
+          <SectionTitle>Last Update</SectionTitle>
           <div className="space-y-3">
             {users.lastActive.map((u) => {
               const updated = u.updatedAt !== u.createdAt;

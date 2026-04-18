@@ -66,7 +66,7 @@ const handleLogout = async () => {
   successAlert("Logged out successfully");
 
   // optional redirect
-  window.location.href = "/login";
+  window.location.href = "/";
 };
   // track which dropdowns are open
   const [openGroups, setOpenGroups] = useState({ Analytics: true });

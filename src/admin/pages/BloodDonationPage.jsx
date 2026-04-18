@@ -26,6 +26,7 @@ const btn = (v = "primary") =>
     ghost:
       "inline-flex items-center gap-1.5 px-2 py-1.5 rounded-lg text-sm font-medium hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 transition-colors",
   })[v];
+
 const Field = ({ label, children }) => (
   <div className="space-y-1.5">
     <label className="block text-xs font-medium text-slate-600 dark:text-slate-400">
@@ -34,6 +35,7 @@ const Field = ({ label, children }) => (
     {children}
   </div>
 );
+
 const Modal = ({ open, onClose, title, children }) => {
   if (!open) return null;
   return (
