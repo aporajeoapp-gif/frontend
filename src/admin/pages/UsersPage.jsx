@@ -1,4 +1,4 @@
-﻿import { useState } from "react";
+import { useState } from "react";
 import {
   Plus,
   Pencil,
@@ -17,6 +17,8 @@ import {
   Key,
   CalendarDays,
   Infinity,
+  Camera,
+  User as UserIcon,
 } from "lucide-react";
 import { toast } from "sonner";
 import Table from "../components/ui/Table";
@@ -285,15 +287,28 @@ export default function UsersPage() {
       return;
     }
     try {
+      const formData = new FormData();
+      Object.keys(form).forEach(key => {
+        if (key === "permissions" && Array.isArray(form[key])) {
+          form[key].forEach(p => formData.append("permissions[]", p));
+        } else if (key === "avatar") {
+           if (form[key] instanceof File) {
+             formData.append("avatar", form[key]);
+           }
+        } else if (form[key] !== undefined && form[key] !== null) {
+          formData.append(key, form[key]);
+        }
+      });
+
       if (modal.mode === "add") {
-        const res = await createUser(form);
+        const res = await createUser(formData);
         if (res.user) {
           addUser(res.user);
           toast.success(res.message);
           setModal(null);
         }
       } else {
-        const res = await updateUser(modal.id, form);
+        const res = await updateUser(modal.id, formData);
         if (res.user) {
           updateUserInList(modal.id, res.user);
           toast.success(res.message);
@@ -324,8 +339,12 @@ export default function UsersPage() {
       label: "User",
       render: (v, row) => (
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-primary-600 flex items-center justify-center text-white text-xs font-bold shrink-0">
-            {v.charAt(0).toUpperCase()}
+          <div className="w-8 h-8 rounded-full bg-primary-600 flex items-center justify-center text-white text-xs font-bold shrink-0 overflow-hidden">
+            {row.avatar ? (
+              <img src={row.avatar} alt={v} className="w-full h-full object-cover" />
+            ) : (
+              v.charAt(0).toUpperCase()
+            )}
           </div>
           <div>
             <p className="font-medium text-slate-800 dark:text-slate-200">
@@ -475,6 +494,38 @@ export default function UsersPage() {
               </button>
             </div>
             <div className="px-6 py-5 max-h-[75vh] overflow-y-auto space-y-4">
+              {/* Avatar Upload */}
+              <div className="flex flex-col items-center gap-3 pb-4 mb-4 border-b border-slate-100 dark:border-slate-800">
+                <div className="relative group">
+                  <div className="w-24 h-24 rounded-2xl bg-slate-100 dark:bg-slate-800 border-2 border-dashed border-slate-200 dark:border-slate-700 flex items-center justify-center overflow-hidden transition-all group-hover:border-primary-500">
+                    {form.avatar ? (
+                      <img 
+                        src={form.avatar instanceof File ? URL.createObjectURL(form.avatar) : form.avatar} 
+                        className="w-full h-full object-cover" 
+                        alt="Preview"
+                      />
+                    ) : (
+                      <UserIcon size={32} className="text-slate-300 dark:text-slate-600" />
+                    )}
+                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                       <Camera size={20} className="text-white" />
+                    </div>
+                  </div>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files[0];
+                      if (file) setForm({ ...form, avatar: file });
+                    }}
+                    className="absolute inset-0 opacity-0 cursor-pointer"
+                  />
+                </div>
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                  {form.avatar ? "Click to change picture" : "Upload profile picture"}
+                </p>
+              </div>
+
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <label className="block text-xs font-medium text-slate-600 dark:text-slate-400">

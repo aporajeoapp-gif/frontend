@@ -19,6 +19,20 @@ export const useBloodCamp = () => {
     }
   }, []);
 
+  const fetchCampById = useCallback(async (id) => {
+    setLoading(true);
+    try {
+      const response = await bloodCampApi.getCampById(id);
+      setError(null);
+      return { success: true, data: response.data };
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to fetch camp details");
+      return { success: false, message: err.response?.data?.message || "Failed to fetch camp details" };
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   const createCamp = async (data) => {
     setLoading(true);
     try {
@@ -58,13 +72,56 @@ export const useBloodCamp = () => {
     }
   };
 
+  const addDonor = async (data) => {
+    setLoading(true);
+    console.log("Hook: Adding donor...", data);
+    try {
+      const response = await bloodCampApi.addDonor(data);
+      console.log("Hook: addDonor Success", response.data);
+      return { success: true };
+    } catch (err) {
+      console.error("Hook: addDonor Failed", err);
+      return { success: false, message: err.response?.data?.message || "Failed to add donor" };
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchDonors = async (campId) => {
+    setLoading(true);
+    try {
+      const response = await bloodCampApi.getCampDonors(campId);
+      return { success: true, data: response.data };
+    } catch (err) {
+      return { success: false, message: err.response?.data?.message || "Failed to fetch donors" };
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const removeDonor = async (id) => {
+    setLoading(true);
+    try {
+      await bloodCampApi.deleteDonor(id);
+      return { success: true };
+    } catch (err) {
+      return { success: false, message: err.response?.data?.message || "Failed to delete donor" };
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return {
     camps,
     loading,
     error,
     fetchCamps,
+    fetchCampById,
     createCamp,
     updateCamp,
     deleteCamp,
+    addDonor,
+    fetchDonors,
+    removeDonor,
   };
 };

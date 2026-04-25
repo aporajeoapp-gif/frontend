@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import {
   Droplets,
   MapPin,
@@ -7,82 +7,33 @@ import {
   CalendarDays,
   Phone,
   Mail,
-  Users,
-  Target,
-  ChevronDown,
-  ChevronUp,
-  CheckCircle,
-  XCircle,
-  AlertCircle,
-  Image as ImageIcon,
+  Heart,
+  ChevronRight,
+  ImageIcon,
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import PageBanner from "../components/PageBanner";
 import { useBloodCamp } from "../hooks/bloodCampHook";
 
 const STATUS_META = {
   upcoming: {
     label: "Upcoming",
-    Icon: AlertCircle,
     cls: "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300",
   },
   ongoing: {
     label: "Ongoing",
-    Icon: AlertCircle,
     cls: "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300",
   },
   completed: {
     label: "Completed",
-    Icon: CheckCircle,
     cls: "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400",
-  },
-  cancelled: {
-    label: "Cancelled",
-    Icon: XCircle,
-    cls: "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300",
   },
 };
 
 const FILTERS = ["all", "upcoming", "ongoing", "completed"];
 
-function DonorRow({ donor, i }) {
-  return (
-    <motion.tr
-      initial={{ opacity: 0, x: -8 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ delay: i * 0.04 }}
-      className="border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors"
-    >
-      <td className="px-4 py-3">
-        <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-full bg-rose-100 dark:bg-rose-900/30 flex items-center justify-center text-rose-600 dark:text-rose-400 font-bold text-xs">
-            {donor.name.charAt(0)}
-          </div>
-          <span className="text-sm font-medium text-slate-800 dark:text-slate-200">
-            {donor.name}
-          </span>
-        </div>
-      </td>
-      <td className="px-4 py-3">
-        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-800">
-          {donor.bloodGroup}
-        </span>
-      </td>
-      <td className="px-4 py-3 text-sm text-slate-500 dark:text-slate-400">
-        {donor.age} yrs
-      </td>
-      <td className="px-4 py-3 text-sm text-slate-500 dark:text-slate-400">
-        {donor.phone}
-      </td>
-      <td className="px-4 py-3 text-sm text-slate-500 dark:text-slate-400">
-        {donor.donatedAt || (
-          <span className="text-slate-400 italic">Pending</span>
-        )}
-      </td>
-    </motion.tr>
-  );
-}
-
-function CampCard({ camp, onExpand, expanded }) {
+function CampCard({ camp }) {
+  const navigate = useNavigate();
   const meta = STATUS_META[camp.status] ?? STATUS_META.upcoming;
   const progress =
     camp.targetUnits > 0
@@ -94,7 +45,8 @@ function CampCard({ camp, onExpand, expanded }) {
       layout
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="group relative bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm hover:shadow-lg transition-all"
+      className="group relative bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm hover:shadow-lg transition-all cursor-pointer"
+      onClick={() => navigate(`/blood-donation/${camp._id}`)}
     >
       {/* Banner */}
       <div className="relative h-40 w-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
@@ -115,7 +67,6 @@ function CampCard({ camp, onExpand, expanded }) {
       </div>
 
       <div className="p-5">
-        {/* Header */}
         <div className="flex items-start justify-between gap-3 mb-3">
           <div className="flex items-center gap-3">
             <div className="w-11 h-11 rounded-xl bg-rose-100 dark:bg-rose-900/30 flex items-center justify-center shrink-0">
@@ -135,7 +86,6 @@ function CampCard({ camp, onExpand, expanded }) {
           </div>
         </div>
 
-        {/* Info */}
         <div className="grid grid-cols-2 gap-x-2 gap-y-1.5 text-[11px] text-slate-500 dark:text-slate-400 mb-4">
           <div className="flex items-center gap-1.5">
             <CalendarDays size={12} className="text-rose-400 shrink-0" />
@@ -151,7 +101,6 @@ function CampCard({ camp, onExpand, expanded }) {
           </div>
         </div>
 
-        {/* Blood groups */}
         <div className="flex flex-wrap gap-1 mb-4">
           {(camp.bloodGroupsNeeded ?? []).map((g) => (
             <span
@@ -163,7 +112,6 @@ function CampCard({ camp, onExpand, expanded }) {
           ))}
         </div>
 
-        {/* Progress */}
         <div className="mb-4">
           <div className="flex justify-between text-[10px] text-slate-500 dark:text-slate-400 mb-1">
             <span>Collected Units</span>
@@ -179,79 +127,17 @@ function CampCard({ camp, onExpand, expanded }) {
           </div>
         </div>
 
-        {/* Contact */}
         <div className="flex items-center justify-between pt-3 border-t border-slate-100 dark:border-slate-800">
-          <a
-            href={`tel:${camp.contactPhone}`}
-            className="flex items-center gap-1.5 text-xs font-semibold text-rose-600 dark:text-rose-400 hover:opacity-80 transition-opacity"
-          >
-            <Phone size={12} />
-            Contact
-          </a>
-          <button
-            onClick={() => onExpand(camp._id)}
-            className="flex items-center gap-1.5 text-xs font-medium text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-colors"
-          >
-            <Users size={12} />
-            {camp.donors?.length ?? 0}
-            {expanded ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
-          </button>
+          <div className="flex items-center gap-1.5 text-xs font-semibold text-rose-600 dark:text-rose-400">
+             <Heart size={12} className="fill-rose-600" />
+             Join Herd
+          </div>
+          <div className="flex items-center gap-1.5 text-xs font-bold text-slate-800 dark:text-white group-hover:text-rose-600 transition-colors">
+            View Details
+            <ChevronRight size={14} />
+          </div>
         </div>
       </div>
-
-      {/* Donors table */}
-      <AnimatePresence>
-        {expanded && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.25 }}
-            className="overflow-hidden border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30"
-          >
-            <div className="px-5 py-4">
-              <h4 className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-3">
-                Registered Donors
-              </h4>
-              {camp.donors?.length > 0 ? (
-                <div className="overflow-x-auto">
-                   <table className="w-full text-xs">
-                     <thead>
-                       <tr className="text-left text-slate-500 dark:text-slate-400">
-                         <th className="pb-2 pr-4 font-semibold uppercase tracking-wider">Donor</th>
-                         <th className="pb-2 pr-4 font-semibold uppercase tracking-wider text-center">Group</th>
-                         <th className="pb-2 font-semibold uppercase tracking-wider">Status</th>
-                       </tr>
-                     </thead>
-                     <tbody>
-                       {camp.donors.map((d, i) => (
-                         <tr key={d.id} className="border-t border-slate-100 dark:border-slate-800/50">
-                            <td className="py-2 pr-4">
-                              <div className="text-xs font-medium text-slate-700 dark:text-slate-300">{d.name}</div>
-                              <div className="text-[9px] text-slate-400">{d.age} yrs · {d.phone}</div>
-                            </td>
-                            <td className="py-2 pr-4 text-center">
-                               <span className="inline-block px-1.5 py-0.5 rounded-md bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400 font-bold border border-rose-100 dark:border-rose-900/50">
-                                  {d.bloodGroup}
-                               </span>
-                            </td>
-                            <td className="py-2 text-[10px] text-slate-500">
-                               {d.donatedAt ? "Donated" : "Waiting"}
-                            </td>
-                         </tr>
-                       ))}
-                     </tbody>
-                   </table>
-                </div>
-              ) : (
-                <p className="text-[11px] text-slate-400 italic text-center py-2">
-                  No donors registered yet.
-                </p>
-              )}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </motion.div>
   );
 }
@@ -259,7 +145,6 @@ function CampCard({ camp, onExpand, expanded }) {
 export default function BloodDonation() {
   const { camps, loading, fetchCamps } = useBloodCamp();
   const [filter, setFilter] = useState("all");
-  const [expanded, setExpanded] = useState(null);
 
   useEffect(() => {
     fetchCamps();
@@ -267,8 +152,6 @@ export default function BloodDonation() {
 
   const filtered =
     filter === "all" ? camps : camps.filter((c) => c.status === filter);
-
-  const toggleExpand = (id) => setExpanded((prev) => (prev === id ? null : id));
 
   const totalDonors = camps.reduce((s, c) => s + (c.donors?.length ?? 0), 0);
 
@@ -284,7 +167,6 @@ export default function BloodDonation() {
       />
 
       <div className="max-w-7xl mx-auto px-4 py-8 -mt-12 relative z-10">
-        {/* Summary stats */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-10">
           {[
             {
@@ -321,7 +203,6 @@ export default function BloodDonation() {
           ))}
         </div>
 
-        {/* Header & Filter */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
            <div>
               <h2 className="text-xl font-bold text-slate-800 dark:text-white">Active Blood Drives</h2>
@@ -345,7 +226,6 @@ export default function BloodDonation() {
            </div>
         </div>
 
-        {/* Camp cards */}
         {loading ? (
            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-pulse">
               {[1, 2, 3].map(i => (
@@ -365,17 +245,11 @@ export default function BloodDonation() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filtered.map((camp) => (
-              <CampCard
-                key={camp._id}
-                camp={camp}
-                expanded={expanded === camp._id}
-                onExpand={toggleExpand}
-              />
+              <CampCard key={camp._id} camp={camp} />
             ))}
           </div>
         )}
         
-        {/* Footer info */}
         <div className="mt-16 p-8 rounded-3xl bg-linear-to-br from-slate-900 to-slate-950 border border-slate-800 flex flex-col items-center text-center">
             <h3 className="text-xl font-bold text-white mb-2">Want to register your own camp?</h3>
             <p className="text-slate-400 text-sm max-w-lg mb-6">

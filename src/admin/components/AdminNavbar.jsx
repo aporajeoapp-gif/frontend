@@ -3,12 +3,14 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   Menu, Search, Bell, Sun, Moon, ChevronDown, LogOut,
   User, Settings, ExternalLink, Globe, X, Shield,
-  Mail, Calendar, CheckCircle, Clock, Key,
+  Mail, Calendar, CheckCircle, Clock, Key, Camera, Save, Pencil
 } from "lucide-react";
 import { ThemeContext } from "../../context/ThemeContext";
 import { LanguageContext } from "../../context/LanguageContext";
 import { useAuth } from "../../context/AuthContext";
 import { Link, useNavigate } from "react-router-dom";
+import { updateProfile } from "../../api/authApi";
+import { toast } from "sonner";
 
 const NOTIFICATIONS = [
   { id: 1, text: "New user registered: Rahul Das",       time: "2m ago",  unread: true  },
@@ -33,6 +35,39 @@ function fmt(dateStr) {
 
 /* ── Profile Detail Modal ── */
 function ProfileModal({ user, onClose }) {
+  const { setUser } = useAuth();
+  const [editing, setEditing] = useState(false);
+  const [name, setName] = useState(user?.name || "");
+  const [file, setFile] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (user) {
+      setName(user.name);
+      setEditing(false);
+      setFile(null);
+    }
+  }, [user]);
+
+  const handleUpdate = async () => {
+    try {
+      setLoading(true);
+      const formData = new FormData();
+      if (name) formData.append("name", name);
+      if (file) formData.append("avatar", file);
+
+      const res = await updateProfile(formData);
+      setUser(res.user);
+      toast.success(res.message);
+      setEditing(false);
+      setFile(null);
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to update profile");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <AnimatePresence>
       {user && (
@@ -58,7 +93,8 @@ function ProfileModal({ user, onClose }) {
             {/* Close */}
             <button
               onClick={onClose}
-              className="absolute top-4 right-4 w-8 h-8 rounded-xl flex items-center justify-center text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+              disabled={loading}
+              className="absolute top-4 right-4 w-8 h-8 rounded-xl flex items-center justify-center text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors disabled:opacity-50"
             >
               <X size={16} />
             </button>
@@ -67,16 +103,72 @@ function ProfileModal({ user, onClose }) {
             <div className="px-8 pt-8 pb-6 flex flex-col items-center text-center">
               <div className="relative mb-4">
                 <div className="absolute inset-0 rounded-full bg-primary-500/20 blur-xl" />
-                <div className="relative w-20 h-20 rounded-full bg-linear-to-br from-primary-500 to-violet-600 flex items-center justify-center text-white text-2xl font-extrabold shadow-lg">
-                  {initials(user.name)}
+                <div className="relative w-20 h-20 rounded-full bg-linear-to-br from-primary-500 to-violet-600 flex items-center justify-center text-white text-2xl font-extrabold shadow-lg overflow-hidden group">
+                  {file ? (
+                    <img src={URL.createObjectURL(file)} alt="Preview" className="w-full h-full object-cover" />
+                  ) : user.avatar ? (
+                    <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
+                  ) : (
+                    initials(user.name)
+                  )}
+                  {/* Hover Overlay for change */}
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity cursor-pointer">
+                    <Camera size={20} className="text-white" />
+                  </div>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => setFile(e.target.files[0])}
+                    className="absolute inset-0 opacity-0 cursor-pointer"
+                  />
                 </div>
                 {/* online dot */}
                 <span className="absolute bottom-1 right-1 w-4 h-4 bg-emerald-500 rounded-full border-2 border-white dark:border-slate-900" />
               </div>
-              <h2 className="text-xl font-extrabold text-slate-800 dark:text-white">{user.name}</h2>
-              <span className="mt-1.5 inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 capitalize">
-                <Shield size={10} /> {user.role}
-              </span>
+
+              {editing ? (
+                <div className="flex flex-col items-center gap-2">
+                  <input
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className="w-full max-w-[200px] text-center px-3 py-1 bg-slate-50 dark:bg-slate-800 border-2 border-primary-400 rounded-lg text-lg font-bold outline-none"
+                    autoFocus
+                  />
+                  <div className="flex gap-2">
+                    <button
+                      onClick={handleUpdate}
+                      disabled={loading}
+                      className="inline-flex items-center gap-1.5 px-3 py-1 bg-primary-600 text-white rounded-lg text-xs font-bold hover:bg-primary-700 transition-colors disabled:opacity-50"
+                    >
+                      {loading ? "Saving..." : "Save Changes"}
+                    </button>
+                    <button
+                      onClick={() => setEditing(false)}
+                      disabled={loading}
+                      className="px-3 py-1 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded-lg text-xs font-bold disabled:opacity-50"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex flex-col items-center">
+                  <div className="flex items-center gap-2">
+                    <h2 className="text-xl font-extrabold text-slate-800 dark:text-white uppercase">
+                      {user.name}
+                    </h2>
+                    <button
+                      onClick={() => setEditing(true)}
+                      className="p-1 text-slate-400 hover:text-primary-500 transition-colors"
+                    >
+                      <Pencil size={12} />
+                    </button>
+                  </div>
+                  <span className="mt-1.5 inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 capitalize">
+                    <Shield size={10} /> {user.role}
+                  </span>
+                </div>
+              )}
             </div>
 
             {/* Details grid */}
@@ -123,6 +215,18 @@ function ProfileModal({ user, onClose }) {
                 </div>
               ))}
             </div>
+            {/* Quick action button for image if not editing name but file selected */}
+            {!editing && file && (
+              <div className="px-8 pb-4">
+                 <button
+                   onClick={handleUpdate}
+                   disabled={loading}
+                   className="w-full flex items-center justify-center gap-2 py-2.5 bg-primary-600 text-white rounded-xl text-sm font-bold shadow-lg shadow-primary-500/30 hover:bg-primary-700 transition-all active:scale-95 disabled:opacity-50"
+                 >
+                   {loading ? "Uploading..." : <><Save size={16}/> Update Profile Picture</>}
+                 </button>
+              </div>
+            )}
           </motion.div>
         </motion.div>
       )}
@@ -246,8 +350,12 @@ export default function AdminNavbar({ onMenuClick }) {
               onClick={() => setDropOpen((v) => !v)}
               className="flex items-center gap-2 pl-2 pr-3 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
             >
-              <div className="w-7 h-7 rounded-full bg-linear-to-br from-primary-500 to-violet-600 flex items-center justify-center text-white text-xs font-bold">
-                {initials(user?.name)}
+              <div className="w-7 h-7 rounded-full bg-linear-to-br from-primary-500 to-violet-600 flex items-center justify-center text-white text-[10px] font-bold overflow-hidden">
+                {user?.avatar ? (
+                  <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
+                ) : (
+                  initials(user?.name)
+                )}
               </div>
               <span className="text-sm font-medium text-slate-700 dark:text-slate-300 hidden sm:block">
                 {user?.name?.split(" ")[0]}
@@ -266,8 +374,12 @@ export default function AdminNavbar({ onMenuClick }) {
                 >
                   {/* Mini profile header */}
                   <div className="px-4 py-3 border-b border-slate-100 dark:border-slate-800 flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-full bg-linear-to-br from-primary-500 to-violet-600 flex items-center justify-center text-white text-sm font-bold shrink-0">
-                      {initials(user?.name)}
+                    <div className="w-9 h-9 rounded-full bg-linear-to-br from-primary-500 to-violet-600 flex items-center justify-center text-white text-sm font-bold shrink-0 overflow-hidden">
+                      {user?.avatar ? (
+                        <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
+                      ) : (
+                        initials(user?.name)
+                      )}
                     </div>
                     <div className="min-w-0">
                       <p className="text-sm font-semibold text-slate-900 dark:text-white truncate">{user?.name}</p>

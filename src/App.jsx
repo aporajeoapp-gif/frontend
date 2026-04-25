@@ -13,6 +13,7 @@ import Bus from "./pages/Bus";
 import Ferry from "./pages/Ferry";
 import Events from "./pages/Events";
 import BloodDonation from "./pages/BloodDonation";
+import PublicBloodCampDetail from "./pages/PublicBloodCampDetail";
 
 // Admin Pages
 import AdminLayout from "./admin/AdminLayout";
@@ -27,6 +28,7 @@ import AdsPage from "./admin/pages/AdsPage";
 import AnalyticsPage from "./admin/pages/AnalyticsPage";
 import SettingsPage from "./admin/pages/SettingsPage";
 import BloodDonationPage from "./admin/pages/BloodDonationPage";
+import AdminBloodCampDetail from "./admin/pages/AdminBloodCampDetail";
 import ProtectedRoute, {
   AdminRoute,
   NonMemberRoute,
@@ -92,6 +94,10 @@ function App() {
                     path="blood-donation"
                     element={<BloodDonationPage />}
                   />
+                  <Route
+                    path="blood-donation/:id"
+                    element={<AdminBloodCampDetail />}
+                  />
                 </Route>
               </Route>
 
@@ -103,6 +109,7 @@ function App() {
                 <Route path="ferry" element={<Ferry />} />
                 <Route path="events" element={<Events />} />
                 <Route path="blood-donation" element={<BloodDonation />} />
+                <Route path="blood-donation/:id" element={<PublicBloodCampDetail />} />
               </Route>
             </Routes>
           </AuthProvider>

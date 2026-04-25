@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Plus,
   Pencil,
@@ -14,6 +15,7 @@ import {
 import { motion } from "framer-motion";
 import { useBloodCamp } from "../../hooks/bloodCampHook";
 import { confirmDelete, successAlert, errorAlert } from "../../utils/alert";
+import fetchUser from "../../hooks/userhook";
 
 const inp =
   "w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg outline-none focus:border-primary-400 dark:focus:border-primary-500 text-slate-800 dark:text-slate-200 placeholder-slate-400 transition-colors";
@@ -107,8 +109,8 @@ function BloodGroupToggle({ selected, onChange }) {
             )
           }
           className={`px-2.5 py-1 rounded-lg text-xs font-bold border transition-colors ${selected.includes(g)
-              ? "bg-rose-600 border-rose-600 text-white"
-              : "border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-400 hover:border-rose-400"
+                ? "bg-rose-600 border-rose-600 text-white"
+                : "border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-400 hover:border-rose-400"
             }`}
         >
           {g}
@@ -291,10 +293,12 @@ function CampForm({ value, onChange }) {
 }
 
 export default function BloodDonationPage() {
+  const navigate = useNavigate();
   const { camps, loading, fetchCamps, createCamp, updateCamp, deleteCamp } = useBloodCamp();
   const [modal, setModal] = useState(null);
   const [form, setForm] = useState(empty);
   const [search, setSearch] = useState("");
+  const { profile } = fetchUser();
 
   useEffect(() => {
     fetchCamps();
@@ -329,7 +333,7 @@ export default function BloodDonationPage() {
     if (res.success) {
       setModal(null);
     } else {
-      alert(res.message);
+      errorAlert(res.message);
     }
   };
 
@@ -339,14 +343,26 @@ export default function BloodDonationPage() {
     try {
       await deleteCamp(id);
       successAlert("Camp deleted successfully");
-
     } catch (error) {
-      errorAlert("Failed to delete camp");
-
+      errorAlert("Failed to delete camp", error);
     }
-
-
   };
+
+  const isAdmin = profile?.role === "admin";
+  const perms = Array.isArray(profile?.permissions) ? profile.permissions : [];
+  const hasPerm = (key) => isAdmin || perms.includes(key);
+  const canCreate = hasPerm("blood.create");
+  const canRead   = hasPerm("blood.read");
+  const canUpdate = hasPerm("blood.update");
+  const canDelete = hasPerm("blood.delete");
+
+  if (!canRead) {
+    return (
+      <div className="flex items-center justify-center py-20 text-slate-400 text-sm">
+        You don't have permission to view blood donation camps.
+      </div>
+    );
+  }
 
   const stats = [
     {
@@ -390,12 +406,13 @@ export default function BloodDonationPage() {
             {camps.length} camps registered
           </p>
         </div>
-        <button className={btn()} onClick={openAdd} disabled={loading}>
-          <Plus size={15} /> Add Camp
-        </button>
+        {canCreate && (
+          <button className={btn()} onClick={openAdd} disabled={loading}>
+            <Plus size={15} /> Add Camp
+          </button>
+        )}
       </div>
 
-      {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {stats.map(({ label, value, Icon, color, bg }) => (
           <div
@@ -429,81 +446,117 @@ export default function BloodDonationPage() {
         {loading && <div className="text-xs text-slate-500 animate-pulse">Processing...</div>}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-        {filtered.map((camp, i) => (
-          <motion.div
-            key={camp._id}
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.04 }}
-            className="group relative bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden hover:shadow-md transition-shadow"
-          >
-            <div className="h-28 w-full bg-slate-200 dark:bg-slate-800 relative">
-              {camp.banner_image ? (
-                <img src={camp.banner_image} alt={camp.campName} className="w-full h-full object-cover" />
+      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden shadow-sm">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="bg-slate-50/50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800">
+                <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-wider">Camp Details</th>
+                <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-wider text-center">Schedule</th>
+                <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-wider text-center">Status</th>
+                <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-wider text-center">Collection</th>
+                {(canUpdate || canDelete) && (
+                  <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-wider text-right">Actions</th>
+                )}
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-50 dark:divide-slate-800/50">
+              {filtered.length === 0 ? (
+                <tr>
+                  <td colSpan="5" className="px-6 py-12 text-center text-sm text-slate-500 italic">No camps found matching your search.</td>
+                </tr>
               ) : (
-                <div className="w-full h-full flex items-center justify-center text-slate-400">
-                  <ImageIcon size={32} />
-                </div>
-              )}
-              <div className="absolute top-2 right-2">
-                <span
-                  className={`text-[10px] font-bold px-2 py-1 rounded-full capitalize shadow-sm ${STATUS_STYLE[camp.status] ?? STATUS_STYLE.upcoming}`}
-                >
-                  {camp.status}
-                </span>
-              </div>
-            </div>
-
-            <div className="p-5">
-              <h3 className="font-semibold text-slate-800 dark:text-slate-200 text-sm truncate">
-                {camp.campName}
-              </h3>
-              <p className="text-xs text-primary-600 dark:text-primary-400 font-medium mt-0.5">
-                {camp.organizer}
-              </p>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                {camp.date} · {camp.time}
-              </p>
-              <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
-                {camp.location}, {camp.city}
-              </p>
-
-              <div className="flex flex-wrap gap-1 mt-2">
-                {(camp.bloodGroupsNeeded ?? []).map((g) => (
-                  <span
-                    key={g}
-                    className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-800"
+                filtered.map((camp, i) => (
+                  <motion.tr
+                    key={camp._id}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.02 }}
+                    className="group hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors cursor-pointer"
+                    onClick={() => navigate(`/admin/blood-donation/${camp._id}`)}
                   >
-                    {g}
-                  </span>
-                ))}
-              </div>
-
-              <div className="mt-3 flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
-                <Target size={11} />
-                <span>
-                  {camp.collectedUnits}/{camp.targetUnits} units
-                </span>
-              </div>
-
-              <div className="flex gap-2 mt-4 pt-3 border-t border-slate-100 dark:border-slate-800">
-                <button
-                  className={btn("secondary") + " flex-1 justify-center"}
-                  onClick={() => openEdit(camp)}
-                >
-                  <Pencil size={13} /> Edit
-                </button>
-                <button
-                  className={btn("ghost")}
-                  onClick={() => handleDelete(camp._id)}
-                >
-                  <Trash2 size={13} className="text-red-500" />
-                </button>
-              </div>
-            </div>
-          </motion.div>
-        ))}
+                    <td className="px-6 py-4 max-w-sm">
+                      <div className="flex items-center gap-4">
+                        <div className="w-10 h-10 rounded-lg bg-slate-100 dark:bg-slate-800 overflow-hidden shrink-0 border border-slate-200 dark:border-slate-700 group-hover:border-primary-400 transition-colors">
+                          {camp.banner_image ? (
+                            <img src={camp.banner_image} alt="" className="w-full h-full object-cover" />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center text-slate-400">
+                              <ImageIcon size={18} />
+                            </div>
+                          )}
+                        </div>
+                        <div className="min-w-0">
+                          <div className="text-sm font-bold text-slate-900 dark:text-white truncate">{camp.campName}</div>
+                          <div className="text-[10px] text-primary-600 dark:text-primary-400 font-bold uppercase tracking-wider mt-0.5">{camp.organizer}</div>
+                          <div className="text-[10px] text-slate-500 truncate mt-0.5">{camp.location}</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="text-center">
+                        <div className="text-xs font-bold text-slate-700 dark:text-slate-300">{camp.date}</div>
+                        <div className="text-[10px] text-slate-500 mt-1">{camp.time}</div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="text-center">
+                        <span className={`text-[10px] font-black px-2 py-1 rounded-lg capitalize shadow-sm ${STATUS_STYLE[camp.status] ?? STATUS_STYLE.upcoming}`}>
+                          {camp.status}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex flex-col items-center">
+                        <div className="flex items-center gap-1.5 mb-1.5">
+                           <span className="text-[10px] font-black text-slate-900 dark:text-white">{camp.collectedUnits}</span>
+                           <span className="text-[10px] text-slate-400">/ {camp.targetUnits} units</span>
+                        </div>
+                        <div className="w-20 h-1 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                          <div 
+                            className="h-full bg-rose-500 rounded-full transition-all duration-500" 
+                            style={{ width: `${Math.min((camp.collectedUnits / (camp.targetUnits || 1)) * 100, 100)}%` }}
+                          />
+                        </div>
+                      </div>
+                    </td>
+                    {(canUpdate || canDelete) && (
+                      <td className="px-6 py-4 text-right" onClick={(e) => e.stopPropagation()}>
+                         <div className="flex justify-end gap-1 opacity-100  transition-opacity">
+                           <button
+                             className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-emerald-500 transition-colors"
+                             onClick={() => navigate(`/admin/blood-donation/${camp._id}`)}
+                             title="Add Donor"
+                           >
+                             <Plus size={14} />
+                           </button>
+                           {canUpdate && (
+                             <button
+                               className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-primary-500 transition-colors"
+                               onClick={() => openEdit(camp)}
+                               title="Edit"
+                             >
+                               <Pencil size={14} />
+                             </button>
+                           )}
+                           {canDelete && (
+                             <button
+                               className="p-2 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-900/20 text-slate-400 hover:text-rose-500 transition-colors"
+                               onClick={() => handleDelete(camp._id)}
+                               title="Delete"
+                             >
+                               <Trash2 size={14} />
+                             </button>
+                           )}
+                         </div>
+                      </td>
+                    )}
+                  </motion.tr>
+                )))
+              }
+            </tbody>
+          </table>
+        </div>
       </div>
 
       <Modal

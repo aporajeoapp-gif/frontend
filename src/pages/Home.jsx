@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -30,6 +30,7 @@ import useDoctors from "../hooks/doctorhook";
 import useEmergencyServices from "../hooks/emergencyHook";
 import useBuses from "../hooks/bushook";
 import useFerries from "../hooks/ferryhook";
+import { useEvents } from "../hooks/eventHook";
 
 const SLIDES = [
   {
@@ -127,6 +128,11 @@ export default function Home() {
   const { emergencies } = useEmergencyServices();
   const { buses } = useBuses();
   const { ferries } = useFerries();
+  const { events, fetchEvents } = useEvents();
+
+  useEffect(() => {
+    fetchEvents();
+  }, [fetchEvents]);
 
   const SERVICES = [
     {
@@ -177,7 +183,7 @@ export default function Home() {
       to: "to-purple-600",
       shadow: "shadow-violet-200 dark:shadow-violet-900/40",
       desc: "Community events near you",
-      count: "Upcoming Events",
+      count: `${events.length}+ Events`,
     },
   ];
   useEffect(() => {

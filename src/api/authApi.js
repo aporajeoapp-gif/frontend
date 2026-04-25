@@ -25,6 +25,11 @@ export const updateUser = async (id, data) => {
   return res.data;
 };
 
+export const updateProfile = async (data) => {
+  const res = await axiosClient.put("/user/update-profile", data);
+  return res.data;
+};
+
 export const deleteUser = async (id) => {
   const res = await axiosClient.delete(`/user/delete-user/${id}`);
   return res.data;

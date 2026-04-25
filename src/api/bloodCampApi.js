@@ -2,6 +2,7 @@ import axiosClient from "./axiosClient";
 
 const bloodCampApi = {
   getAllCamps: () => axiosClient.get("/blood-camp/get-all-camps"),
+  getCampById: (id) => axiosClient.get(`/blood-camp/get-camp/${id}`),
   createCamp: (data) => {
     const formData = new FormData();
     Object.keys(data).forEach((key) => {
@@ -33,6 +34,9 @@ const bloodCampApi = {
     });
   },
   deleteCamp: (id) => axiosClient.delete(`/blood-camp/delete-camp/${id}`),
+  addDonor: (data) => axiosClient.post("/blood-camp/add-donor", data),
+  getCampDonors: (campId) => axiosClient.get(`/blood-camp/get-camp-donors/${campId}`),
+  deleteDonor: (id) => axiosClient.delete(`/blood-camp/delete-donor/${id}`),
 };
 
 export default bloodCampApi;

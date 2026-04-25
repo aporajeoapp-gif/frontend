@@ -1,75 +1,7 @@
 import { useRef, useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Sparkles } from "lucide-react";
-
-const ads = [
-  {
-    id: 1,
-    title: "Hospital Promotion",
-    description: "Best cardiology services in the city. Book your appointment today.",
-    tag: "Healthcare",
-    imageUrl: "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=800&auto=format&fit=crop&q=80",
-    redirectUrl: "https://hospital.com",
-    cta: "Book Now",
-    color: "#ef4444",
-    colorDark: "#fca5a5",
-  },
-  {
-    id: 2,
-    title: "Pharmacy Discount",
-    description: "Up to 40% off on all medicines. Free home delivery on orders above ₹500.",
-    tag: "Pharmacy",
-    imageUrl: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=800&auto=format&fit=crop&q=80",
-    redirectUrl: "https://pharmacy.com",
-    cta: "Shop Now",
-    color: "#10b981",
-    colorDark: "#6ee7b7",
-  },
-  {
-    id: 3,
-    title: "City Bus Pass",
-    description: "Monthly unlimited travel pass at just ₹299. Valid on all city routes.",
-    tag: "Transport",
-    imageUrl: "https://images.unsplash.com/photo-1570125909232-eb263c188f7e?w=800&auto=format&fit=crop&q=80",
-    redirectUrl: "https://buspass.com",
-    cta: "Get Pass",
-    color: "#6366f1",
-    colorDark: "#a5b4fc",
-  },
-  {
-    id: 4,
-    title: "Community Festival",
-    description: "Join the biggest cultural festival of the year. Free entry for all.",
-    tag: "Events",
-    imageUrl: "https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?w=800&auto=format&fit=crop&q=80",
-    redirectUrl: "https://festival.com",
-    cta: "Learn More",
-    color: "#f59e0b",
-    colorDark: "#fcd34d",
-  },
-  {
-    id: 5,
-    title: "Dental Care Clinic",
-    description: "Complete dental checkup at ₹199. Smile brighter with expert care.",
-    tag: "Healthcare",
-    imageUrl: "https://images.unsplash.com/photo-1606811841689-23dfddce3e95?w=800&auto=format&fit=crop&q=80",
-    redirectUrl: "https://dentalcare.com",
-    cta: "Book Now",
-    color: "#06b6d4",
-    colorDark: "#67e8f9",
-  },
-  {
-    id: 6,
-    title: "Ferry Season Pass",
-    description: "Unlimited ferry rides for 30 days. Explore the waterways freely.",
-    tag: "Transport",
-    imageUrl: "https://images.unsplash.com/photo-1605281317010-fe5ffe798166?w=800&auto=format&fit=crop&q=80",
-    redirectUrl: "https://ferrypass.com",
-    cta: "Get Pass",
-    color: "#8b5cf6",
-    colorDark: "#c4b5fd",
-  },
-];
+import { Sparkles, Image as ImageIcon } from "lucide-react";
+import { useAds } from "../hooks/adsHook";
 
 /* ── Dark mode observer ─────────────────────────────────────────────────── */
 function useDark() {
@@ -89,13 +21,25 @@ function useDark() {
   return dark;
 }
 
+const TAG_COLORS = {
+  Healthcare: { light: "#ef4444", dark: "#fca5a5" },
+  Pharmacy:   { light: "#10b981", dark: "#6ee7b7" },
+  Transport:  { light: "#6366f1", dark: "#a5b4fc" },
+  Events:     { light: "#f59e0b", dark: "#fcd34d" },
+  Education:  { light: "#3b82f6", dark: "#93c5fd" },
+  Default:    { light: "#8b5cf6", dark: "#c4b5fd" }
+};
+
 /* ── Single ad card ─────────────────────────────────────────────────────── */
 function AdCard({ ad, dark, didDragRef }) {
-  const accent = dark ? ad.colorDark : ad.color;
+  const tagMeta = TAG_COLORS[ad.tag] || TAG_COLORS.Default;
+  const accent = dark 
+    ? (ad.colorDark || tagMeta.dark) 
+    : (ad.color || tagMeta.light);
 
   return (
     <a
-      href={ad.redirectUrl}
+      href={ad.link || ad.redirectUrl}
       target="_blank"
       rel="noopener noreferrer"
       draggable={false}
@@ -113,14 +57,20 @@ function AdCard({ ad, dark, didDragRef }) {
       }}
     >
       {/* Image */}
-      <div className="relative h-36 overflow-hidden rounded-t-2xl pointer-events-none">
-        <img
-          src={ad.imageUrl}
-          alt={ad.title}
-          draggable={false}
-          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-          loading="lazy"
-        />
+      <div className="relative h-36 overflow-hidden rounded-t-2xl pointer-events-none bg-slate-100 dark:bg-slate-800">
+        {ad.image || ad.imageUrl ? (
+          <img
+            src={ad.image || ad.imageUrl}
+            alt={ad.title}
+            draggable={false}
+            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+            loading="lazy"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center text-slate-400">
+             <ImageIcon size={32} />
+          </div>
+        )}
         <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
         <span
           className="absolute bottom-2.5 left-3 text-[9px] font-black uppercase tracking-[0.15em] px-2.5 py-1 rounded-md text-white"
@@ -189,7 +139,7 @@ const FRICTION   = 0.88; // momentum decay per frame
 const MAX_DT     = 50;   // ms — cap to avoid jumps after tab-hide
 
 /* ── Marquee track ──────────────────────────────────────────────────────── */
-function MarqueeTrack({ dark }) {
+function MarqueeTrack({ dark, ads }) {
   const trackRef    = useRef(null);
   const posRef      = useRef(0);
   const halfWRef    = useRef(0);
@@ -347,6 +297,13 @@ function MarqueeTrack({ dark }) {
 /* ── Main export ────────────────────────────────────────────────────────── */
 export default function AdSection() {
   const dark = useDark();
+  const { ads, fetchAds, loading } = useAds();
+
+  useEffect(() => {
+    fetchAds();
+  }, [fetchAds]);
+
+  if (!loading && ads.length === 0) return null;
 
   const sectionBg = dark
     ? "linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%)"
@@ -416,7 +373,7 @@ export default function AdSection() {
           className="pointer-events-none absolute inset-y-0 right-0 w-20 z-10"
           style={{ background: `linear-gradient(to left, ${fadeBg}, transparent)` }}
         />
-        <MarqueeTrack dark={dark} />
+        <MarqueeTrack dark={dark} ads={ads} />
       </div>
 
       <p

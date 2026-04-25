@@ -1,4 +1,4 @@
-﻿import { useState } from "react";
+import { useState } from "react";
 import {
   Plus,
   Pencil,
@@ -7,8 +7,14 @@ import {
   ToggleLeft,
   ToggleRight,
   X,
+  Upload,
+  Image as ImageIcon,
 } from "lucide-react";
 import { motion } from "framer-motion";
+import { useEffect } from "react";
+import { useAds } from "../../hooks/adsHook";
+import { confirmDelete, successAlert, errorAlert } from "../../utils/alert";
+import fetchUser from "../../hooks/userhook";
 
 const inp =
   "w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg outline-none focus:border-primary-400 dark:focus:border-primary-500 text-slate-800 dark:text-slate-200 placeholder-slate-400 transition-colors";
@@ -68,41 +74,95 @@ const empty = {
   title: "",
   description: "",
   tag: "Other",
-  imageUrl: "",
-  redirectUrl: "",
+  image: null,
+  link: "",
   cta: "Learn More",
-  active: true,
+  status: "active",
   startDate: "",
   endDate: "",
 };
 
 export default function AdsPage() {
-  const [advertisements, setAdvertisements] = useState([]);
+  const { ads, loading, fetchAds, createAd, updateAd, deleteAd } = useAds();
   const [modal, setModal] = useState(null);
   const [form, setForm] = useState(empty);
+  const [preview, setPreview] = useState(null);
+  const { profile } = fetchUser();
+
+  useEffect(() => {
+    fetchAds();
+  }, [fetchAds]);
 
   const openAdd = () => {
     setForm(empty);
+    setPreview(null);
     setModal("add");
   };
   const openEdit = (a) => {
-    setForm({ ...a });
+    setForm({ ...a, image: null });
+    setPreview(a.image);
     setModal("edit");
   };
-  const handleSave = () => {
-    if (!form.title) return;
-    if (modal === "add")
-      setAdvertisements((prev) => [{ ...form, id: Date.now() }, ...prev]);
-    else
-      setAdvertisements((prev) =>
-        prev.map((a) => (a.id === form.id ? form : a)),
-      );
-    setModal(null);
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setForm({ ...form, image: file });
+      setPreview(URL.createObjectURL(file));
+    }
   };
-  const toggleActive = (ad) =>
-    setAdvertisements((prev) =>
-      prev.map((a) => (a.id === ad.id ? { ...a, active: !a.active } : a)),
+
+  const handleSave = async () => {
+    if (!form.title || !form.startDate || !form.endDate) return;
+
+    let res;
+    if (modal === "add") {
+      res = await createAd(form);
+    } else {
+      res = await updateAd(form._id, form);
+    }
+
+    if (res.success) {
+      successAlert(`Ad ${modal === "add" ? "created" : "updated"} successfully`);
+      setModal(null);
+    } else {
+      errorAlert(res.message);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    const result = await confirmDelete();
+    if (!result.isConfirmed) return;
+
+    const res = await deleteAd(id);
+    if (res.success) {
+      successAlert("Ad deleted successfully");
+    } else {
+      errorAlert(res.message);
+    }
+  };
+
+  const toggleActive = async (ad) => {
+    const newStatus = ad.status === "active" ? "expired" : "active";
+    const res = await updateAd(ad._id, { status: newStatus });
+    if (!res.success) errorAlert(res.message);
+  };
+
+  const isAdmin = profile?.role === "admin";
+  const perms = Array.isArray(profile?.permissions) ? profile.permissions : [];
+  const hasPerm = (key) => isAdmin || perms.includes(key);
+  const canCreate = hasPerm("ads.create");
+  const canRead   = hasPerm("ads.read");
+  const canUpdate = hasPerm("ads.update");
+  const canDelete = hasPerm("ads.delete");
+
+  if (!canRead) {
+    return (
+      <div className="flex items-center justify-center py-20 text-slate-400 text-sm">
+        You don't have permission to view advertisements.
+      </div>
     );
+  }
 
   return (
     <div className="space-y-5">
@@ -112,34 +172,37 @@ export default function AdsPage() {
             Advertisements
           </h1>
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
-            {advertisements.length} total ·{" "}
-            {advertisements.filter((a) => a.active !== false).length} active
+            {ads.length} total ·{" "}
+            {ads.filter((a) => a.status === "active").length} active
           </p>
         </div>
-        <button className={btn()} onClick={openAdd}>
-          <Plus size={15} /> Add Ad
-        </button>
+        {canCreate && (
+          <button className={btn()} onClick={openAdd}>
+            <Plus size={15} /> Add Ad
+          </button>
+        )}
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {advertisements.map((ad, i) => (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {ads.map((ad, i) => (
           <motion.div
-            key={ad.id}
+            key={ad._id}
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.04 }}
             className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden hover:shadow-md transition-shadow"
           >
             <div className="relative h-36 bg-slate-200 dark:bg-slate-800 overflow-hidden">
-              {ad.imageUrl && (
+              {ad.image ? (
                 <img
-                  src={ad.imageUrl}
+                  src={ad.image}
                   alt={ad.title}
                   className="w-full h-full object-cover"
-                  onError={(e) => {
-                    e.target.style.display = "none";
-                  }}
                 />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-slate-400">
+                  <ImageIcon size={32} />
+                </div>
               )}
               <div className="absolute inset-0 bg-linear-to-t from-slate-900/60 to-transparent" />
               <div className="absolute top-2 left-2">
@@ -148,13 +211,15 @@ export default function AdsPage() {
                 </span>
               </div>
               <div className="absolute top-2 right-2">
-                <button onClick={() => toggleActive(ad)} className="text-white">
-                  {ad.active !== false ? (
-                    <ToggleRight size={20} className="text-emerald-400" />
-                  ) : (
-                    <ToggleLeft size={20} className="text-slate-400" />
-                  )}
-                </button>
+                {canUpdate && (
+                  <button onClick={() => toggleActive(ad)} className="text-white">
+                    {ad.status === "active" ? (
+                      <ToggleRight size={20} className="text-emerald-400" />
+                    ) : (
+                      <ToggleLeft size={20} className="text-slate-400" />
+                    )}
+                  </button>
+                )}
               </div>
             </div>
             <div className="p-4">
@@ -163,43 +228,45 @@ export default function AdsPage() {
                   {ad.title}
                 </h3>
                 <span
-                  className={`text-xs px-2 py-0.5 rounded-full font-medium shrink-0 ${ad.active !== false ? "bg-emerald-100 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300" : "bg-slate-100 dark:bg-slate-800 text-slate-500"}`}
+                  className={`text-xs px-2 py-0.5 rounded-full font-medium shrink-0 ${ad.status === "active" ? "bg-emerald-100 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300" : "bg-slate-100 dark:bg-slate-800 text-slate-500"}`}
                 >
-                  {ad.active !== false ? "Active" : "Inactive"}
+                  {ad.status}
                 </span>
               </div>
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-2">
                 {ad.description}
               </p>
-              {ad.redirectUrl && (
+              {ad.link && (
                 <a
-                  href={ad.redirectUrl}
+                  href={ad.link}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-1 text-xs text-primary-500 hover:text-primary-600 mt-2"
                 >
                   <ExternalLink size={11} />{" "}
-                  {ad.redirectUrl.replace(/^https?:\/\//, "")}
+                  {ad.link.replace(/^https?:\/\//, "")}
                 </a>
               )}
-              <div className="flex gap-2 mt-4 pt-3 border-t border-slate-100 dark:border-slate-800">
-                <button
-                  className={btn("secondary") + " flex-1 justify-center"}
-                  onClick={() => openEdit(ad)}
-                >
-                  <Pencil size={13} /> Edit
-                </button>
-                <button
-                  className={btn("ghost")}
-                  onClick={() =>
-                    setAdvertisements((prev) =>
-                      prev.filter((a) => a.id !== ad.id),
-                    )
-                  }
-                >
-                  <Trash2 size={13} className="text-red-500" />
-                </button>
-              </div>
+              {(canUpdate || canDelete) && (
+                <div className="flex gap-2 mt-4 pt-3 border-t border-slate-100 dark:border-slate-800">
+                  {canUpdate && (
+                    <button
+                      className={btn("secondary") + " flex-1 justify-center"}
+                      onClick={() => openEdit(ad)}
+                    >
+                      <Pencil size={13} /> Edit
+                    </button>
+                  )}
+                  {canDelete && (
+                    <button
+                      className={btn("ghost")}
+                      onClick={() => handleDelete(ad._id)}
+                    >
+                      <Trash2 size={13} className="text-red-500" />
+                    </button>
+                  )}
+                </div>
+              )}
             </div>
           </motion.div>
         ))}
@@ -251,21 +318,24 @@ export default function AdsPage() {
               />
             </Field>
           </div>
-          <Field label="Image URL">
-            <input
-              className={inp}
-              value={form.imageUrl}
-              onChange={(e) => setForm({ ...form, imageUrl: e.target.value })}
-              placeholder="https://..."
-            />
+          <Field label="Ad Image">
+            <label className="relative flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-xl cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors overflow-hidden">
+              {preview ? (
+                <img src={preview} alt="Preview" className="absolute inset-0 w-full h-full object-cover" />
+              ) : (
+                <div className="flex flex-col items-center">
+                  <Upload size={24} className="text-slate-400 mb-2" />
+                  <span className="text-xs text-slate-500">Upload Ad Image</span>
+                </div>
+              )}
+              <input type="file" className="hidden" onChange={handleFileChange} accept="image/*" />
+            </label>
           </Field>
-          <Field label="Redirect URL">
+          <Field label="Redirect Link (Optional)">
             <input
               className={inp}
-              value={form.redirectUrl}
-              onChange={(e) =>
-                setForm({ ...form, redirectUrl: e.target.value })
-              }
+              value={form.link}
+              onChange={(e) => setForm({ ...form, link: e.target.value })}
               placeholder="https://example.com"
             />
           </Field>
@@ -289,24 +359,24 @@ export default function AdsPage() {
               />
             </Field>
           </div>
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={form.active !== false}
-              onChange={(e) => setForm({ ...form, active: e.target.checked })}
-              className="w-4 h-4 rounded border-slate-300 accent-primary-600"
-            />
-            <span className="text-sm text-slate-600 dark:text-slate-400">
-              Active
-            </span>
-          </label>
+          <Field label="Status">
+            <select
+              className={inp}
+              value={form.status}
+              onChange={(e) => setForm({ ...form, status: e.target.value })}
+            >
+              <option value="active">Active</option>
+              <option value="expired">Expired</option>
+              <option value="pending">Pending</option>
+            </select>
+          </Field>
         </div>
         <div className="flex justify-end gap-2 mt-6 pt-4 border-t border-slate-100 dark:border-slate-800">
-          <button className={btn("secondary")} onClick={() => setModal(null)}>
+          <button className={btn("secondary")} onClick={() => setModal(null)} disabled={loading}>
             Cancel
           </button>
-          <button className={btn()} onClick={handleSave}>
-            Save
+          <button className={btn()} onClick={handleSave} disabled={loading}>
+            {loading ? "Saving..." : "Save"}
           </button>
         </div>
       </Modal>
