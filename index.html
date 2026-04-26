@@ -1,158 +1,501 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-    <!-- ── Primary Meta ── -->
-    <title>অপরাজেয় | Oporajeo — Community Services Platform</title>
-    <meta
-      name="title"
-      content="অপরাজেয় | Oporajeo — Community Services Platform"
-    />
-    <meta
-      name="description"
-      content="Oporajeo (অপরাজেয়) is a smart community platform offering verified doctors, emergency contacts, bus & ferry schedules, local events, and blood donation services."
-    />
-    <meta
-      name="keywords"
-      content="oporajeo, অপরাজেয়, community services, doctors, emergency, bus schedule, ferry schedule, blood donation, events, Bangladesh, smart city"
-    />
-    <meta name="author" content="Oporajeo Team" />
-    <meta name="robots" content="index, follow" />
-    <meta name="theme-color" content="#6366f1" />
-    <meta name="color-scheme" content="light dark" />
-    <meta name="generator" content="Vite + React" />
-    <meta name="application-name" content="Oporajeo" />
-    <meta name="rating" content="general" />
-    <meta name="language" content="English, Bengali" />
-    <meta name="revisit-after" content="7 days" />
-    <meta name="category" content="Community, Healthcare, Transport" />
-
-    <!-- ── Favicon & Icons ── -->
-    <link rel="icon" type="image/png" href="/logo.png" />
-    <link rel="apple-touch-icon" href="/logo.png" />
-    <link rel="shortcut icon" href="/logo.png" />
-
-    <!-- ── Open Graph / Facebook ── -->
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://aporajeo.vercel.app/" />
-    <meta
-      property="og:title"
-      content="অপরাজেয় | Oporajeo — Community Services Platform"
-    />
-    <meta
-      property="og:description"
-      content="Find verified doctors, emergency contacts, bus & ferry schedules, local events, and blood donation services — all in one place."
-    />
-    <meta
-      property="og:image"
-      content="https://res.cloudinary.com/dlsuycdfj/image/upload/v1774797481/aporajeo_banner_xmosjk.jpg"
-    />
-    <meta property="og:image:width" content="1200" />
-    <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content="Oporajeo Community Platform" />
-    <meta property="og:site_name" content="Oporajeo" />
-    <meta property="og:locale" content="en_US" />
-    <meta property="og:locale:alternate" content="bn_BD" />
-
-    <!-- ── Twitter Card ── -->
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:url" content="https://aporajeo.vercel.app/" />
-    <meta
-      name="twitter:title"
-      content="অপরাজেয় | Oporajeo — Community Services Platform"
-    />
-    <meta
-      name="twitter:description"
-      content="Find verified doctors, emergency contacts, bus & ferry schedules, local events, and blood donation services — all in one place."
-    />
-    <meta
-      name="twitter:image"
-      content="https://res.cloudinary.com/dlsuycdfj/image/upload/v1774797481/aporajeo_banner_xmosjk.jpg"
-    />
-    <meta name="twitter:image:alt" content="Oporajeo Community Platform" />
-    <meta name="twitter:site" content="@oporajeo" />
-    <meta name="twitter:creator" content="@oporajeo" />
-
-    <!-- ── Canonical ── -->
-    <link rel="canonical" href="https://aporajeo.vercel.app/" />
-
-    <!-- ── Geo / Regional ── -->
-    <meta name="geo.region" content="BD" />
-    <meta name="geo.placename" content="Bangladesh" />
-
-    <!-- ── PWA / Mobile ── -->
-    <meta name="mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-    <meta name="apple-mobile-web-app-title" content="Oporajeo" />
-    <meta name="msapplication-TileColor" content="#6366f1" />
-    <meta name="msapplication-TileImage" content="/logo.png" />
-    <meta name="format-detection" content="telephone=no" />
-
-    <!-- ── Theme flash prevention ── -->
-    <script>
-      (function () {
-        var t = localStorage.getItem("theme");
-        if (t === "dark") document.documentElement.classList.add("dark");
-        else document.documentElement.classList.remove("dark");
-        var c = localStorage.getItem("accentColor");
-        if (c) document.documentElement.style.setProperty("--brand", c);
-      })();
-    </script>
-
-    <!-- ── Google Translate banner suppression ── -->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>APORAJE | Under Maintenance</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
-      .goog-te-banner-frame,
-      iframe.goog-te-banner-frame,
-      .skiptranslate {
-        display: none !important;
-        height: 0 !important;
-        pointer-events: none !important;
-      }
-      body {
-        top: 0 !important;
-        position: static !important;
-      }
-    </style>
-    <script>
-      (function () {
-        var observer = new MutationObserver(function () {
-          if (document.body && document.body.style.top)
-            document.body.style.top = "0px";
-          if (document.body && document.body.style.position === "relative")
-            document.body.style.position = "static";
-        });
-        document.addEventListener("DOMContentLoaded", function () {
-          observer.observe(document.body, {
-            attributes: true,
-            attributeFilter: ["style"],
-          });
-        });
-      })();
-    </script>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
+        /* CSS Variables - Red, Yellow, and White */
+        :root {
+            --primary: #ff1e1e; /* Vibrant Red */
+            --secondary: #ffcc00; /* Vibrant Yellow */
+            --bg-color: #140303; /* Deep dark background */
+            --text-main: #ffffff; /* White */
+            --text-muted: #e0e0e0;
+        }
 
-    <!-- Google Translate (hidden widget) -->
-    <div
-      id="google_translate_element"
-      style="display: none; visibility: hidden; position: absolute"
-    ></div>
+        /* Reset & Base */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body, html {
+            height: 100%;
+            width: 100%;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Canvas Background */
+        #canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        /* Glassmorphism Container */
+        .glass-container {
+            position: relative;
+            z-index: 10;
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 40px;
+            max-width: 700px;
+            width: 90%;
+            max-height: 95vh;
+            overflow-y: auto; /* Prevent cut-off on small screens */
+            text-align: center;
+            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.5);
+            animation: slideUp 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            opacity: 0;
+            transform: translateY(50px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Scrollbar hiding for internal container if scroll is needed */
+        .glass-container::-webkit-scrollbar { display: none; }
+        .glass-container { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* Image Logo Styles */
+        .main-logo {
+            max-width: 250px; 
+            width: 100%;
+            height: auto;
+            margin-bottom: 15px;
+            display: block;
+            filter: drop-shadow(0 10px 15px rgba(255, 30, 30, 0.2));
+            animation: float 4s ease-in-out infinite;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--secondary);
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+        }
+
+        /* --- VECTOR ANIMATION STYLES --- */
+        .vector-anim-container {
+            width: 100%;
+            max-width: 380px;
+            margin: 10px auto 20px auto;
+        }
+
+        .gear-main {
+            transform-origin: 65px 40px;
+            animation: spin 6s linear infinite;
+        }
+
+        .gear-small {
+            transform-origin: 102px 65px;
+            animation: spinReverse 4s linear infinite;
+        }
+
+        .floating-plug {
+            animation: unplugFloat 3.5s ease-in-out infinite alternate;
+        }
+
+        .spark {
+            transform-origin: center;
+            animation: sparkFlicker 0.15s infinite alternate;
+        }
+
+        .light-blink-1 { animation: blink 1.2s infinite; }
+        .light-blink-2 { animation: blink 0.8s infinite; }
+        .light-blink-3 { animation: blink 2s infinite; }
+
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        @keyframes spinReverse { 100% { transform: rotate(-360deg); } }
+        @keyframes unplugFloat {
+            0% { transform: translate(5px, 0px) rotate(0deg); }
+            100% { transform: translate(35px, 12px) rotate(4deg); }
+        }
+        @keyframes sparkFlicker {
+            0% { opacity: 0; transform: scale(0.8); }
+            100% { opacity: 1; transform: scale(1.2); }
+        }
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.2; }
+        }
+
+        .message {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        /* Animated Progress Bar */
+        .progress-wrapper {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            margin-bottom: 30px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 75%; 
+            background: linear-gradient(90deg, var(--secondary), var(--primary)); 
+            border-radius: 10px;
+            position: relative;
+        }
+
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.8), transparent);
+            animation: loadingShine 2s infinite;
+        }
+
+        /* Notify Form */
+        .notify-form {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            width: 100%;
+        }
+
+        .notify-form input {
+            padding: 12px 20px;
+            border-radius: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(0, 0, 0, 0.3);
+            color: white;
+            outline: none;
+            width: 250px;
+            transition: 0.3s;
+        }
+
+        .notify-form input::placeholder { color: #a0aec0; }
+        .notify-form input:focus {
+            border-color: var(--secondary);
+            box-shadow: 0 0 15px rgba(255, 204, 0, 0.3);
+        }
+
+        .notify-form button {
+            padding: 12px 30px;
+            border-radius: 30px;
+            border: none;
+            background: linear-gradient(45deg, var(--secondary), var(--primary));
+            color: var(--bg-color);
+            font-weight: 800;
+            cursor: pointer;
+            transition: 0.3s;
+            box-shadow: 0 5px 15px rgba(255, 30, 30, 0.4);
+        }
+
+        .notify-form button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 204, 0, 0.5);
+            color: white;
+        }
+
+        /* Social Links */
+        .socials {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .socials a {
+            color: var(--text-main);
+            font-size: 1.1rem;
+            width: 38px;
+            height: 38px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            text-decoration: none;
+            transition: 0.3s all;
+        }
+
+        .socials a:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            transform: translateY(-4px);
+            box-shadow: 0 5px 15px rgba(255, 30, 30, 0.5);
+        }
+
+        /* General Animations */
+        @keyframes slideUp { to { opacity: 1; transform: translateY(0); } }
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+            100% { transform: translateY(0px); }
+        }
+        @keyframes loadingShine {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .main-logo { max-width: 200px; }
+            .glass-container { padding: 30px 20px; }
+            .notify-form input { width: 100%; }
+            .notify-form button { width: 100%; }
+            .vector-anim-container { max-width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Interactive Particle Background -->
+    <canvas id="canvas"></canvas>
+
+    <!-- Main Content -->
+    <div class="glass-container">
+        
+        <!-- MAIN LOGO -->
+        <img src="logo.png" alt="APORAJE Logo" class="main-logo">
+        
+        <h2 class="subtitle">Empowering Humanity</h2>
+
+        <!-- PLUGGED OUT & SERVER MAINTENANCE VECTOR ANIMATION -->
+        <div class="vector-anim-container">
+            <svg viewBox="0 0 400 180" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+                
+                <!-- Main Server Body -->
+                <rect x="25" y="65" width="85" height="100" rx="8" fill="#140303" stroke="#ff1e1e" stroke-width="4"/>
+                
+                <!-- Server Racks -->
+                <rect x="35" y="80" width="65" height="15" rx="3" fill="#ffcc00" opacity="0.9"/>
+                <rect x="35" y="105" width="65" height="15" rx="3" fill="#333333"/>
+                <rect x="35" y="130" width="65" height="15" rx="3" fill="#333333"/>
+
+                <!-- Server Blinking Lights -->
+                <circle cx="85" cy="87.5" r="3.5" fill="#ffffff" class="light-blink-1"/>
+                <circle cx="85" cy="112.5" r="3.5" fill="#ff1e1e" class="light-blink-2"/>
+                <circle cx="85" cy="137.5" r="3.5" fill="#ffcc00" class="light-blink-3"/>
+
+                <!-- Background/Small Gear -->
+                <g class="gear-small">
+                    <path d="M102,53 A12,12 0 1,0 102,77 A12,12 0 1,0 102,53 Z" fill="none" stroke="#ffffff" stroke-width="4"/>
+                    <line x1="102" y1="46" x2="102" y2="84" stroke="#ffffff" stroke-width="5"/>
+                    <line x1="83" y1="65" x2="121" y2="65" stroke="#ffffff" stroke-width="5"/>
+                    <line x1="88" y1="51" x2="116" y2="79" stroke="#ffffff" stroke-width="5"/>
+                    <line x1="88" y1="79" x2="116" y2="51" stroke="#ffffff" stroke-width="5"/>
+                    <circle cx="102" cy="65" r="6" fill="#140303"/>
+                </g>
+
+                <!-- Foreground/Large Gear -->
+                <g class="gear-main">
+                    <path d="M65,22 A18,18 0 1,0 65,58 A18,18 0 1,0 65,22 Z" fill="none" stroke="#ffcc00" stroke-width="5"/>
+                    <line x1="65" y1="12" x2="65" y2="68" stroke="#ffcc00" stroke-width="6"/>
+                    <line x1="37" y1="40" x2="93" y2="40" stroke="#ffcc00" stroke-width="6"/>
+                    <line x1="45" y1="20" x2="85" y2="60" stroke="#ffcc00" stroke-width="6"/>
+                    <line x1="45" y1="60" x2="85" y2="20" stroke="#ffcc00" stroke-width="6"/>
+                    <circle cx="65" cy="40" r="8" fill="#140303"/>
+                </g>
+
+                <!-- Wire from Server to Female Socket -->
+                <path d="M110,120 L150,120 L160,110 L180,110" fill="none" stroke="#ffffff" stroke-width="6" stroke-linecap="round"/>
+                
+                <!-- Female Socket Structure -->
+                <rect x="175" y="95" width="30" height="30" rx="4" fill="#ff1e1e"/>
+                <rect x="180" y="90" width="20" height="40" rx="2" fill="#ff1e1e"/>
+                <!-- Socket Holes -->
+                <rect x="195" y="100" width="10" height="6" rx="2" fill="#140303"/>
+                <rect x="195" y="114" width="10" height="6" rx="2" fill="#140303"/>
+
+                <!-- Disconnected Sparks -->
+                <path d="M 215 102 L 222 92 L 225 106 L 235 96" fill="none" stroke="#ffcc00" stroke-width="2.5" class="spark" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M 218 116 L 225 106 L 228 120 L 238 110" fill="none" stroke="#ff1e1e" stroke-width="2" class="spark" stroke-linecap="round" stroke-linejoin="round" style="animation-delay: 0.1s;"/>
+
+                <!-- FLOATING DISCONNECTED MALE PLUG -->
+                <g class="floating-plug">
+                    <!-- Prongs -->
+                    <rect x="220" y="101" width="15" height="4" rx="2" fill="#ffcc00"/>
+                    <rect x="220" y="115" width="15" height="4" rx="2" fill="#ffcc00"/>
+                    <!-- Male Plug Body -->
+                    <rect x="235" y="90" width="45" height="40" rx="6" fill="#ffffff"/>
+                    <rect x="275" y="95" width="15" height="30" rx="4" fill="#e0e0e0"/>
+                    <!-- Warning stripe on plug -->
+                    <rect x="250" y="90" width="10" height="40" fill="#ff1e1e"/>
+                    <!-- Dangling Wire exiting to the right -->
+                    <path d="M290,110 C 320,110 330,150 380,150" fill="none" stroke="#ffffff" stroke-width="6" stroke-linecap="round"/>
+                </g>
+            </svg>
+        </div>
+
+        <p class="message">
+            We are currently working behind the scenes. Our server infrastructure is undergoing scheduled upgrades to serve our mission better. Thank you for your patience!
+        </p>
+
+        <!-- Animated Progress -->
+        <div class="progress-wrapper">
+            <div class="progress-bar"></div>
+        </div>
+
+        <!-- Notification Form -->
+        <form class="notify-form" onsubmit="event.preventDefault(); alert('Thank you! We will notify you.');">
+            <input type="email" placeholder="Enter your email address" required>
+            <button type="submit">Notify Me</button>
+        </form>
+
+        <!-- Social Media Links -->
+        <div class="socials">
+            <a href="#"><i class="fab fa-facebook-f"></i></a>
+            <a href="#"><i class="fab fa-twitter"></i></a>
+            <a href="#"><i class="fab fa-instagram"></i></a>
+            <a href="#"><i class="fab fa-linkedin-in"></i></a>
+        </div>
+    </div>
+
+    <!-- Advanced Javascript for Particle Network Background -->
     <script>
-      window.googleTranslateElementInit = function () {
-        new window.google.translate.TranslateElement(
-          { pageLanguage: "en", autoDisplay: false },
-          "google_translate_element",
-        );
-      };
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        let particlesArray;
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        let mouse = {
+            x: null,
+            y: null,
+            radius: (canvas.height/80) * (canvas.width/80)
+        }
+
+        window.addEventListener('mousemove', function(event) {
+            mouse.x = event.x;
+            mouse.y = event.y;
+        });
+
+        class Particle {
+            constructor(x, y, directionX, directionY, size, color) {
+                this.x = x;
+                this.y = y;
+                this.directionX = directionX;
+                this.directionY = directionY;
+                this.size = size;
+                this.color = color;
+            }
+            
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2, false);
+                ctx.fillStyle = this.color; 
+                ctx.fill();
+            }
+            
+            update() {
+                if (this.x > canvas.width || this.x < 0 ) {
+                    this.directionX = -this.directionX;
+                }
+                if (this.y > canvas.height || this.y < 0) {
+                    this.directionY = -this.directionY;
+                }
+
+                let dx = mouse.x - this.x;
+                let dy = mouse.y - this.y;
+                let distance = Math.sqrt(dx*dx + dy*dy);
+                if (distance < mouse.radius + this.size){
+                    if (mouse.x < this.x && this.x < canvas.width - this.size * 10) { this.x += 3; }
+                    if (mouse.x > this.x && this.x > this.size * 10) { this.x -= 3; }
+                    if (mouse.y < this.y && this.y < canvas.height - this.size * 10) { this.y += 3; }
+                    if (mouse.y > this.y && this.y > this.size * 10) { this.y -= 3; }
+                }
+                
+                this.x += this.directionX;
+                this.y += this.directionY;
+                this.draw();
+            }
+        }
+
+        function init() {
+            particlesArray = [];
+            let numberOfParticles = (canvas.height * canvas.width) / 9000;
+            for (let i = 0; i < numberOfParticles; i++) {
+                let size = (Math.random() * 2) + 1;
+                let x = (Math.random() * ((innerWidth - size * 2) - (size * 2)) + size * 2);
+                let y = (Math.random() * ((innerHeight - size * 2) - (size * 2)) + size * 2);
+                let directionX = (Math.random() * 1) - 0.5;
+                let directionY = (Math.random() * 1) - 0.5;
+                let color = '#ff1e1e'; // Red particles
+
+                particlesArray.push(new Particle(x, y, directionX, directionY, size, color));
+            }
+        }
+
+        function connect() {
+            let opacityValue = 1;
+            for (let a = 0; a < particlesArray.length; a++) {
+                for (let b = a; b < particlesArray.length; b++) {
+                    let distance = ((particlesArray[a].x - particlesArray[b].x) * (particlesArray[a].x - particlesArray[b].x))
+                    + ((particlesArray[a].y - particlesArray[b].y) * (particlesArray[a].y - particlesArray[b].y));
+                    
+                    if (distance < (canvas.width/7) * (canvas.height/7)) {
+                        opacityValue = 1 - (distance/20000);
+                        ctx.strokeStyle = 'rgba(255, 204, 0,' + opacityValue + ')'; // Yellow lines
+                        ctx.lineWidth = 1;
+                        ctx.beginPath();
+                        ctx.moveTo(particlesArray[a].x, particlesArray[a].y);
+                        ctx.lineTo(particlesArray[b].x, particlesArray[b].y);
+                        ctx.stroke();
+                    }
+                }
+            }
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            ctx.clearRect(0, 0, innerWidth, innerHeight);
+            for (let i = 0; i < particlesArray.length; i++) {
+                particlesArray[i].update();
+            }
+            connect();
+        }
+
+        window.addEventListener('resize', function() {
+            canvas.width = innerWidth;
+            canvas.height = innerHeight;
+            mouse.radius = ((canvas.height/80) * (canvas.width/80));
+            init();
+        });
+
+        window.addEventListener('mouseout', function() {
+            mouse.x = undefined;
+            mouse.y = undefined;
+        });
+
+        init();
+        animate();
     </script>
-    <script
-      src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"
-      async
-    ></script>
-  </body>
+</body>
 </html>
